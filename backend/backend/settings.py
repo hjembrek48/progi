@@ -1,3 +1,4 @@
+# backend/setting.py
 """
 Django settings for backend project.
 
@@ -18,9 +19,17 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+DEBUG = True
+#DEBUG = os.getenv("DEBUG", "1") == "1"
+USE_SECURE_COOKIES = os.getenv("USE_SECURE_COOKIES", "0") == "1"
+#USE_SECURE_COOKIES = False
+# SAMESITE mora biti "None" ako frontend i backend nisu na istoj domeni
+SESSION_COOKIE_SAMESITE = "None" if USE_SECURE_COOKIES else "Lax"
+CSRF_COOKIE_SAMESITE    = "None" if USE_SECURE_COOKIES else "Lax"
 
+# SECURE ovisi o tome radiš li lokalno (HTTP) ili produkcijski (HTTPS)
+SESSION_COOKIE_SECURE = USE_SECURE_COOKIES
+CSRF_COOKIE_SECURE = USE_SECURE_COOKIES
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -29,7 +38,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("SECRET_KEY", "fallback-secret-key")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
 
 ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
 
@@ -64,12 +72,12 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "corsheaders.middleware.CorsMiddleware",
 ]
 
 ROOT_URLCONF = "backend.urls"
@@ -96,31 +104,34 @@ WSGI_APPLICATION = "backend.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+
 # --- DB config (Postgres ako su varijable postavljene, inače SQLite) ---
 USE_SQLITE = os.getenv("USE_SQLITE", "1") == "1"  # default: koristi SQLite
 
-if USE_SQLITE:
+
+if os.getenv("DB_NAME"):
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.getenv("DB_NAME"),
+            "USER": os.getenv("DB_USER"),
+            "PASSWORD": os.getenv("DB_PWD"),
+            "HOST": os.getenv("DB_HOST", "127.0.0.1"),
+            "PORT": os.getenv("DB_PORT", "5432"),
+        }
+    }
+else:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
             "NAME": BASE_DIR / "db.sqlite3",
         }
     }
-else:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.postgresql",
-            "NAME": os.getenv("DB_NAME"),
-            "USER": os.getenv("DB_USER"),
-            "PASSWORD": os.getenv("DB_PASSWORD"),
-            "HOST": os.getenv("DB_HOST"),
-            "PORT": os.getenv("DB_PORT"),
-        }
-    }
 
 
-
-
+# Ako koristiš JWT refresh token u cookie
+JWT_AUTH_COOKIE = "access_token"
+JWT_AUTH_REFRESH_COOKIE = "refresh_token"
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
@@ -163,7 +174,15 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 CORS_ALLOWED_ORIGINS = [
-    "https://tvoj-frontend-url.com",
-    "http://localhost:3000"
+    "http://localhost:3000",
+    "https://tvoj-frontend.net",
+    "https://<tvoj-codespaces>.githubpreview.dev",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:3000",
+    "https://tvoj-frontend.net",
+    "https://*.githubpreview.dev",
+    "https://*.app.github.dev",
 ]
 CORS_ALLOW_CREDENTIALS = True

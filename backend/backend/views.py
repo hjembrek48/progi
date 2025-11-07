@@ -1,14 +1,42 @@
+# backend/views.py
+from django.conf import settings
+from django.contrib.auth import get_user_model   # <-- DODANO
+from django.utils.crypto import get_random_string
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import generics, status
 from rest_framework_simplejwt.tokens import RefreshToken
-from django.contrib.auth.models import User
+import requests
+import traceback
 
 from api.models import Profile
 from api.serializers import ProfileSerializer
 
-import requests
+# --- helper koji kreira cookie i vraća access token u JSON-u ---
+def create_cookie_response(user):
+    refresh = RefreshToken.for_user(user)
+    res = Response(
+        {
+            "access": str(refresh.access_token),
+            "username": user.username,
+        },
+        status=status.HTTP_200_OK,
+    )
+
+    # samesite i secure ovisno o USE_SECURE_COOKIES
+    samesite = "None" if getattr(settings, "USE_SECURE_COOKIES", False) else "Lax"
+
+    res.set_cookie(
+        key="refresh_token",
+        value=str(refresh),
+        httponly=True,
+        secure=getattr(settings, "USE_SECURE_COOKIES", False),
+        samesite=samesite,
+        path="/",
+        max_age=14 * 24 * 3600,  # 14 dana
+    )
+    return res
 
 
 class LogInWithGoogle(APIView):
@@ -16,86 +44,55 @@ class LogInWithGoogle(APIView):
 
     def post(self, request):
         try:
-            token = request.data["google_access_token"]
+            print("USING COOKIE LOGIN >>>", getattr(settings, "USE_SECURE_COOKIES", False))
+
+            token = request.data.get("google_access_token")
+            if not token:
+                return Response({"detail": "Missing 'google_access_token'."}, status=400)
 
             r = requests.get(
                 "https://www.googleapis.com/oauth2/v3/userinfo",
-                params={"access_token": token},
-                timeout=5,
+                headers={"Authorization": f"Bearer {token}"},
+                timeout=10,
             )
-            # Ako Google vrati 4xx/5xx -> podigni exception
-            r.raise_for_status()
-            data = r.json()
+            print("GOOGLE STATUS =>", r.status_code)
+            if r.status_code != 200:
+                print("GOOGLE BODY   =>", r.text[:300])
+                return Response({"detail": "Google login failed."}, status=400)
 
-            email = data.get("email")
+            info = r.json()
+            email = info.get("email")
             if not email:
-                return Response(
-                    {"detail": "Google response does not contain email."},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
+                return Response({"detail": "Google response has no email."}, status=400)
 
-            first_name = data.get("given_name", "")
-            last_name = data.get("family_name", "")
-            avatar = data.get("picture", "")
-
-            user = User.objects.filter(email=email).first()
-            if user is None:
-                base_username = email.split("@")[0]
-                username = base_username
-                n = 1
-                while User.objects.filter(username=username).exists():
-                    n += 1
-                    username = f"{base_username}{n}"
-
-                user = User.objects.create_user(
-                    username=username,
-                    email=email,
-                    first_name=first_name,
-                    last_name=last_name,
-                )
-                # social login -> onemogući lokalnu lozinku
-                user.set_unusable_password()
+            User = get_user_model()  
+            user, created = User.objects.get_or_create(
+                username=email,
+                defaults={
+                    "first_name": info.get("given_name", "") or "",
+                    "last_name": info.get("family_name", "") or "",
+                    "email":      email,
+                    "is_active":  True,
+                },
+            )
+            if created:
+                user.set_password(get_random_string(32))  # npr. 32-znakovna lozinka
                 user.save()
 
-            # Osiguraj da postoji Profile zapis
-            profile, _ = Profile.objects.get_or_create(user=user)
-            if avatar and not profile.avatar:
-                profile.avatar = avatar
-                profile.save()
+            return create_cookie_response(user)  
 
-            refresh = RefreshToken.for_user(user)
+        except Exception as e:
+            print("Internal Server Error: /api/google-login/")
+            traceback.print_exc()
             return Response(
-                {
-                    "refresh": str(refresh),
-                    "access": str(refresh.access_token),
-                    "username": user.username,
-                },
-                status=status.HTTP_200_OK,
+                {"detail": f"server error: {e.__class__.__name__}: {e}"},
+                status=500,
             )
-
-        except requests.RequestException:
-            return Response(
-                {"detail": "Failed to contact Google."},
-                status=status.HTTP_502_BAD_GATEWAY,
-            )
-        except KeyError:
-            return Response(
-                {"detail": "Missing 'google_access_token'."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        except Exception:
-            # u produkciji: proper logging
-            return Response(
-                {"detail": "Google login failed."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
 
 class ProfileRetrieveUpdate(generics.RetrieveUpdateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = ProfileSerializer
 
     def get_object(self):
-        # profil trenutno prijavljenog korisnika
         profile, _ = Profile.objects.get_or_create(user=self.request.user)
         return profile
