@@ -6,8 +6,8 @@ from .models import Profile
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
-        fields = ["id", "phone", "address", "avatar"]
-
+        fields = ["id", "address", "latitude", "longitude", "updated_at"]
+        read_only_fields = ["updated_at"]
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
