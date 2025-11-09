@@ -1,6 +1,6 @@
 # backend/views.py
 from django.conf import settings
-from django.contrib.auth import get_user_model   # <-- DODANO
+from django.contrib.auth import get_user_model
 from django.utils.crypto import get_random_string
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -13,7 +13,6 @@ import traceback
 from api.models import Profile
 from api.serializers import ProfileSerializer
 
-# --- helper koji kreira cookie i vraća access token u JSON-u ---
 def create_cookie_response(user):
     refresh = RefreshToken.for_user(user)
     res = Response(
@@ -24,7 +23,6 @@ def create_cookie_response(user):
         status=status.HTTP_200_OK,
     )
 
-    # samesite i secure ovisno o USE_SECURE_COOKIES
     samesite = "None" if getattr(settings, "USE_SECURE_COOKIES", False) else "Lax"
 
     res.set_cookie(

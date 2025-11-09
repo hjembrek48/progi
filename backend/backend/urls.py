@@ -2,7 +2,7 @@
 from django.contrib import admin
 from django.urls import path, include
 from django.views.generic.base import RedirectView
-from backend.views import ProfileRetrieveUpdate   # ako ti treba
+from backend.views import ProfileRetrieveUpdate
 
 urlpatterns = [
     path('', RedirectView.as_view(url='/admin/', permanent=True)),

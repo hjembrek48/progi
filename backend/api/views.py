@@ -12,13 +12,16 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 from .models import Note
 from .serializers import NoteSerializer, UserSerializer, ProfileSerializer
+from decimal import Decimal, ROUND_HALF_UP, InvalidOperation
 
+def round6(value):
+    try:
+        return str(Decimal(str(value)).quantize(Decimal("0.000001"), rounding=ROUND_HALF_UP))
+    except InvalidOperation:
+        return None
 
 def create_cookie_response(user: User) -> Response:
-    """
-    Vraća Response s access tokenom i username-om,
-    te postavlja HttpOnly refresh cookie (JWT refresh).
-    """
+
     refresh = RefreshToken.for_user(user)
 
     res = Response(
@@ -39,6 +42,30 @@ def create_cookie_response(user: User) -> Response:
 
     return res
 
+def geocode_address(address: str):
+    """
+    Vrati (lat, lon) za zadanu adresu ili None ako nije nađeno.
+    Koristi OSM Nominatim. Poštuj rate-limit (<=1 req/s).
+    """
+    if not address or not address.strip():
+        return None
+
+    try:
+        r = requests.get(
+            "https://nominatim.openstreetmap.org/search",
+            params={"q": address, "format": "json", "limit": 1},
+            headers={"User-Agent": "progi-app/1.0 (contact: your-email@example.com)"},
+            timeout=5,
+        )
+        if r.status_code != 200:
+            return None
+        data = r.json()
+        if not data:
+            return None
+
+        return (data[0].get("lat"), data[0].get("lon"))
+    except requests.RequestException:
+        return None
 
 class LogInWithGoogle(APIView):
     permission_classes = [AllowAny]
@@ -97,8 +124,6 @@ class LogInWithGoogle(APIView):
                 first_name=first_name[:150],
                 last_name=last_name[:150],
             )
-            # Ako imaš profil model za avatar, tu bi ga spremio;
-            # u User ga standardno ne spremamo jer nema polje.
 
         # Vrati access + postavi refresh u cookie
         return create_cookie_response(user)
@@ -148,13 +173,24 @@ class ProfileLocationUpdate(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        profile = request.user.profile   # kreiran automatski signalom iz models.py
-        data = ProfileSerializer(profile).data
-        return Response(data, status=status.HTTP_200_OK)
+        profile = request.user.profile
+        return Response(ProfileSerializer(profile).data, status=status.HTTP_200_OK)
 
     def put(self, request):
         profile = request.user.profile
-        ser = ProfileSerializer(profile, data=request.data, partial=False)
+        payload = request.data.copy()
+
+        # Ako dobijemo adresu, a nema lat/lon -> popuni iz geocodinga
+        addr = payload.get("address")
+        if addr and (not payload.get("latitude") or not payload.get("longitude")):
+            coords = geocode_address(addr)
+            if coords:
+                lat, lon = coords
+                payload["latitude"]  = round6(lat)
+                payload["longitude"] = round6(lon)
+
+
+        ser = ProfileSerializer(profile, data=payload, partial=False)
         if ser.is_valid():
             ser.save()
             return Response(ser.data, status=status.HTTP_200_OK)
@@ -162,11 +198,23 @@ class ProfileLocationUpdate(APIView):
 
     def patch(self, request):
         profile = request.user.profile
-        ser = ProfileSerializer(profile, data=request.data, partial=True)
+        payload = request.data.copy()
+
+        addr = payload.get("address")
+        if addr and (not payload.get("latitude") or not payload.get("longitude")):
+            coords = geocode_address(addr)
+            if coords:
+                lat, lon = coords
+                payload["latitude"]  = round6(lat)
+                payload["longitude"] = round6(lon)
+
+
+        ser = ProfileSerializer(profile, data=payload, partial=True)
         if ser.is_valid():
             ser.save()
             return Response(ser.data, status=status.HTTP_200_OK)
         return Response(ser.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class CreateUserView(generics.CreateAPIView):
     queryset = User.objects.all()

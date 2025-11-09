@@ -105,7 +105,7 @@ WSGI_APPLICATION = "backend.wsgi.application"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 
-# --- DB config (Postgres ako su varijable postavljene, inače SQLite) ---
+
 USE_SQLITE = os.getenv("USE_SQLITE", "1") == "1"  # default: koristi SQLite
 
 
@@ -129,7 +129,7 @@ else:
     }
 
 
-# Ako koristiš JWT refresh token u cookie
+# Ako koristi JWT refresh token u cookie
 JWT_AUTH_COOKIE = "access_token"
 JWT_AUTH_REFRESH_COOKIE = "refresh_token"
 # Password validation
