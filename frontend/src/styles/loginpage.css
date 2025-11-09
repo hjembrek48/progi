@@ -1,0 +1,46 @@
+.body_container{
+    background-color: #84A98C;
+    height: 100%;
+}
+.login_header{
+    background-color: #52796F;
+    color: #CAD2C5;
+    border-bottom: dashed #CAD2C5 5px ;
+}
+.home_button {
+    background-color: #354F52 !important;
+    color: #CAD2C5 !important;
+    border-radius: 8px !important;
+    border: #CAD2C5 solid 3px !important;
+    transition: all 0.2s ease !important;
+}
+.home_button:hover{
+    background-color: #2F3E46 !important;
+    transform: scale(1.05) !important;
+}
+.map_container {
+    width: 100%;
+    max-width: 800px;
+    height: 600px;
+    background-color: #f0f0f0;
+    border: 3px solid #CAD2C5;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+}
+.my_alert{
+    max-width: 70%;
+    min-width: 50%;
+    margin: 20px auto 0 auto;
+    text-align: center;
+    border-radius: 10px;
+    padding: 15px 20px;
+}
+
+.custom_alert .alert-heading {
+    font-weight: 800;
+    font-size: 2rem;
+}

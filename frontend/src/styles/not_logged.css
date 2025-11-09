@@ -1,0 +1,40 @@
+.not_logged_container{
+    height: 100vh;
+}
+.card{
+    background-color: white;
+    border-radius: 12px;
+    padding: 30px 20px;
+    max-width: 400px;
+    border: solid 5px #ff6700;
+}
+.icon{
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 15px auto;
+    background-color: #ff6700;
+    color: #fff;
+    font-size: 2rem;
+    font-weight: bold;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.not_logged_mess{
+    font-weight: 500;
+    margin-bottom: 20px;
+    font-size: 1.1rem;
+}
+.home_button {
+    height: 70px !important;
+    background-color: #354F52 !important;
+    color: #CAD2C5 !important;
+    border-radius: 8px !important;
+    border: #CAD2C5 solid 3px !important;
+    transition: all 0.2s ease !important;
+}
+.home_button:hover{
+    background-color: #2F3E46 !important;
+    transform: scale(1.05) !important;
+}
