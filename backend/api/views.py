@@ -3,18 +3,15 @@
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db.models import Q
-
 import requests
 import secrets
 from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
-
 from .models import Note
-from .serializers import NoteSerializer, UserSerializer
+from .serializers import NoteSerializer, UserSerializer, ProfileSerializer
 
 
 def create_cookie_response(user: User) -> Response:
@@ -147,6 +144,29 @@ class NoteDelete(generics.DestroyAPIView):
     def get_queryset(self):
         return Note.objects.filter(author=self.request.user)
 
+class ProfileLocationUpdate(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        profile = request.user.profile   # kreiran automatski signalom iz models.py
+        data = ProfileSerializer(profile).data
+        return Response(data, status=status.HTTP_200_OK)
+
+    def put(self, request):
+        profile = request.user.profile
+        ser = ProfileSerializer(profile, data=request.data, partial=False)
+        if ser.is_valid():
+            ser.save()
+            return Response(ser.data, status=status.HTTP_200_OK)
+        return Response(ser.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def patch(self, request):
+        profile = request.user.profile
+        ser = ProfileSerializer(profile, data=request.data, partial=True)
+        if ser.is_valid():
+            ser.save()
+            return Response(ser.data, status=status.HTTP_200_OK)
+        return Response(ser.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class CreateUserView(generics.CreateAPIView):
     queryset = User.objects.all()
