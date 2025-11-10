@@ -1,46 +1,56 @@
-.body_container{
-    background-color: #84A98C;
-    height: 100%;
+.body_container {
+  background-color: #84a98c;
+  height: 100%;
 }
-.login_header{
-    background-color: #52796F;
-    color: #CAD2C5;
-    border-bottom: dashed #CAD2C5 5px ;
+.login_header {
+  background-color: #52796f;
+  color: #cad2c5;
+  border-bottom: dashed #cad2c5 5px;
 }
 .home_button {
-    background-color: #354F52 !important;
-    color: #CAD2C5 !important;
-    border-radius: 8px !important;
-    border: #CAD2C5 solid 3px !important;
-    transition: all 0.2s ease !important;
+  background-color: #354f52 !important;
+  color: #cad2c5 !important;
+  border-radius: 8px !important;
+  border: #cad2c5 solid 3px !important;
+  transition: all 0.2s ease !important;
 }
-.home_button:hover{
-    background-color: #2F3E46 !important;
-    transform: scale(1.05) !important;
+.home_button:hover {
+  background-color: #2f3e46 !important;
+  transform: scale(1.05) !important;
 }
 .map_container {
-    width: 100%;
-    max-width: 800px;
-    height: 600px;
-    background-color: #f0f0f0;
-    border: 3px solid #CAD2C5;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.2rem;
-    margin-bottom: 20px;
+  width: 100%;
+  max-width: 800px;
+  height: 600px;
+  background-color: #f0f0f0;
+  border: 3px solid #cad2c5;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+  padding-left: 0rem !important;
+  padding-right: 0rem !important;
 }
-.my_alert{
-    max-width: 70%;
-    min-width: 50%;
-    margin: 20px auto 0 auto;
-    text-align: center;
-    border-radius: 10px;
-    padding: 15px 20px;
+.my_alert {
+  max-width: 70%;
+  min-width: 50%;
+  margin: 20px auto 0 auto;
+  text-align: center;
+  border-radius: 10px;
+  padding: 15px 20px;
 }
 
 .custom_alert .alert-heading {
-    font-weight: 800;
-    font-size: 2rem;
+  font-weight: 800;
+  font-size: 2rem;
+}
+
+.add-location-container {
+  background-color: #52796f;
+  height: 100vh;
+  border-color: #cad2c5;
+  border-style: none dashed none dashed;
+  border-width: 5px;
 }
