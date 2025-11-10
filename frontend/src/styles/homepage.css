@@ -3,12 +3,29 @@
     padding: 10px 20px;
     border-bottom: 3px solid #ddd;
 }
+.homepage-button-bar-container {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    background-color: #f8f9fa;
+}
+.homepage-button-bar-container .btn-group {
+    display: flex;
+    width: 100%;
+}
 .home_button{
     background-color: #354F52 !important;
     color: #CAD2C5 !important;
     border-radius: 8px !important;
     border: #CAD2C5 solid 3px !important;
     transition: all 0.2s ease !important;
+}
+#nav_button{
+    display: flex;
+    flex: 1;
+    margin: 0 4px;
+    justify-content: space-around;
+
 }
 .home_button:hover{
     background-color: #2F3E46 !important;

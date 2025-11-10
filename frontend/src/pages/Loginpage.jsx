@@ -5,11 +5,12 @@ import { FaGoogle } from "react-icons/fa";
 import { IoArrowBackSharp } from "react-icons/io5";
 import axios from "axios";
 import { setAccessToken } from "../services/auth.js";
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom';
 import { Alert, Button, Container, Row, Col, Stack } from 'react-bootstrap'
 import { LoginHeader } from "../components/Login_Header.jsx";
 import { useAuth } from "../components/AuthProvider.jsx";
 import './../styles/loginpage.css'
+import apiAuth from "../services/apiAuth.js";
 
 export function Loginpage() {
     const navigate = useNavigate();
@@ -48,9 +49,17 @@ export function Loginpage() {
                     });
                     //ako smo ovdje - server je vratio status 200
                     setAccessToken(server_res.data.access);
-                    setRegistrationStep(2);
-                    //sljedeći korak - dodavanje lokacije
-                    navigate('add_location'); // '/login/add_location'
+                    //provjera ima li korisnik od prije zadanu lokaciju
+                    const location = await apiAuth.get("/profile/location/");
+                    //ako korisnik ima zadanu lokaciju
+                    if(location.data.latitude != null && location.data.longitude != null) {
+                        setRegistrationStep(3);
+                        navigate('/');
+                    //ako korisnik nema zadanu lokaciju - sljedeći korak - dodavanje lokacije
+                    } else {
+                        setRegistrationStep(2);
+                        navigate('add_location');
+                    }
                 } catch(error) {
                     //ako smo ovdje - server vratio status >= 400 ili server niti ne radi:
                     if(error.response) {

@@ -11,6 +11,15 @@ export function Homepage() {
     return(
         <Container>
             {registrationStep > 2 ? <Logged_homepage_header /> : <Homepage_header />}
+            {registrationStep > 2 &&
+                <div className='homepage-button-bar-container p-2'>
+                    <ButtonGroup>
+                        <Button className='home_button' id="nav_button">My Games</Button>
+                        <Button className='home_button' id="nav_button">My Trades</Button>
+                        <Button className='home_button' id="nav_button">Offers</Button>
+                        <Button className='home_button' id="nav_button">Wishlist</Button>
+                    </ButtonGroup>
+                </div>}
         </Container>
     )
 };

@@ -8,6 +8,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './styles/App.css'
 import { ProtectedRoute } from './components/ProtectedRoute.jsx';
 import { AuthProvider } from './components/AuthProvider.jsx';
+import { RestrictedRoute } from './components/RestrictedRoute.jsx';
 
 
 function App() {
@@ -19,7 +20,9 @@ function App() {
             <Route path='/login' element={<Loginpage />} />
             <Route path='/login/add_location' element={
               <ProtectedRoute minStep={2}>
-                <Login_add_location />
+                <RestrictedRoute maxStep={2}>
+                  <Login_add_location />
+                </RestrictedRoute>
               </ProtectedRoute>} />
             <Route path='/profile' element={
               <ProtectedRoute minStep={3}>
@@ -27,7 +30,7 @@ function App() {
               </ProtectedRoute>} />
             <Route path='/profile/add_game' element={
               <ProtectedRoute minStep={3}>
-                <Add_game />
+                  <Add_game />
               </ProtectedRoute>} />
         </Routes>
       </BrowserRouter>

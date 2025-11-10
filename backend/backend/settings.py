@@ -14,6 +14,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from pathlib import Path
 from datetime import timedelta
 from dotenv import load_dotenv
+import dj_database_url 
 import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -39,7 +40,7 @@ SECRET_KEY = os.getenv("SECRET_KEY", "fallback-secret-key")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
-ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
+ALLOWED_HOSTS = ["127.0.0.1", "localhost", os.getenv("RENDER_EXTERNAL_HOSTNAME", "")]
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
@@ -71,6 +72,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -101,11 +103,6 @@ TEMPLATES = [
 WSGI_APPLICATION = "backend.wsgi.application"
 
 
-# Database
-# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
-
-
 USE_SQLITE = os.getenv("USE_SQLITE", "1") == "1"  # default: koristi SQLite
 
 
@@ -113,10 +110,10 @@ if os.getenv("DB_NAME"):
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
-            "NAME": os.getenv("DB_NAME"),
-            "USER": os.getenv("DB_USER"),
-            "PASSWORD": os.getenv("DB_PWD"),
-            "HOST": os.getenv("DB_HOST", "127.0.0.1"),
+            "NAME": os.getenv("DB_NAME", "db_ebmr"),
+            "USER": os.getenv("DB_USER", "codecartel"),
+            "PASSWORD": os.getenv("DB_PWD", "XaJLCgQVRFfORW9WWgU23RwOEwvI1fvJ"),
+            "HOST": os.getenv("DB_HOST", "dpg-d44ef6ruibrs73a2ogkg-a"),
             "PORT": os.getenv("DB_PORT", "5432"),
         }
     }
@@ -129,7 +126,6 @@ else:
     }
 
 
-# Ako koristi JWT refresh token u cookie
 JWT_AUTH_COOKIE = "access_token"
 JWT_AUTH_REFRESH_COOKIE = "refresh_token"
 # Password validation
@@ -167,6 +163,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -184,5 +181,6 @@ CSRF_TRUSTED_ORIGINS = [
     "https://tvoj-frontend.net",
     "https://*.githubpreview.dev",
     "https://*.app.github.dev",
+    "https://*.onrender.com",
 ]
 CORS_ALLOW_CREDENTIALS = True

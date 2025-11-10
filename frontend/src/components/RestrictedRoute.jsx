@@ -28,6 +28,8 @@ export function RestrictedRoute({ children, maxStep }) {
     }
 
     if(maxStep < registrationStep) {
-        return children;
+        return <Navigate to="/" replace />;
     }
+
+    return children;
 }
