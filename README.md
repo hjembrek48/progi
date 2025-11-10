@@ -10,9 +10,23 @@ Ovaj projekt je reultat timskog rada u sklopu projeknog zadatka kolegija [Progra
 
 Ovim projektom želimo omogućiti zamjenu društvenih igara između korisnika te tako povećati isplativost igara koje već posjeduju. Željeli bismo korisnicima omogućiti pristup i upoznavanje s novim igrama, samo na par klikova i jednostavno navođenje kroz aplikaciju. Naravno, uz nekoliko ograničenja poput poštivanja dogovora oko zamjene igara ili pak samih uvjeta korištenja, koje sam vlasnik ima pravo postaviti kao dio objave vlastite igre. Motivacija za ovaj projekt proizlazi iz želje za radom u timu na nekom zajedničkom projektu uz pomno praćenje napretka u razvoju i izradi projekta. No ne bilo kojeg projekta, već onog koji će riješiti neki problem interesantne prirode. Konkretno, želimo riješiti problem igara koje na polici možda samo skupljaju prašinu, a netko drugi bi je možda rado htio igrati. Taj problem željeli bih smo riješiti na ekonomičan i pristupačan način, a jedno od rješenja jest ova web-aplikacija pod nazivom Play Trade.
 
+
 # Funkcijski zahtjevi
-> Navedite ključne zahtjeve Vašeg projekta.
-> treba na(do)pisati
+- uvid u listu svih objavljenih društvenih igara (i za neregistrirane korisnike)
+- registracija i prijava u sustav (važećom adresom e-pošte)
+- unos lokacije korisnika
+- mogućnost uređivanja vlastitog profila
+- prijedlog zamjena po interesima korisnika
+- objava društvenih igara
+- pregled i moguće uređivanje vlastitih objava na pregledu "Moje igre"
+- pretraga uz mogućnost filtriranja
+- "Ponuda zamjena"
+- pregled ponuda u "Ponuda" (pristiglih i upućenih)
+- mogućnost stvaranja liste želja
+- primanje obavijesti za ponude i liste želja putem e-pošte
+- arhiviranje izvršenih zamjena u "Moje zamjene"
+- održavanje platforme od strane sistemskih administratora
+
 
 # Tehnologije
 
