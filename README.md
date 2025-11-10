@@ -1,35 +1,36 @@
-# Programsko inženjerstvo
+# Programsko inženjerstvo - Play Trade
 
-> Ime projekta u naslovu ima cilj opisati namjenu projekta te pomoći u podizanju početnog interesa za projekt prezentirajući osnovnu svrhu projekta.
-> Isključivo ovisi o Vama!
-> 
-> Naravno, nijedan predložak nije idealan za sve projekte jer su potrebe i ciljevi različiti. Ne bojte se naglasiti Vaš cilj u ovoj početnoj stranici projekta, podržat ćemo ga bez obzira usredotočili se Vi više na tenologiju ili marketing.
-> 
-> Zašto ovaj dokument? Samo manji dio timova je do sada propoznao potrebu (a i meni je lakše pratiti Vaš rad).  
+
+> Potencijalna sekcija za deploy link
+
 
 # Opis projekta
-Ovaj projekt je reultat timskog rada u sklopu projeknog zadatka kolegija [Programsko inženjerstvo](https://www.fer.unizg.hr/predmet/proinz) na Fakultetu elektrotehnike i računarstva Sveučilišta u Zagrebu. 
+Ovaj projekt je reultat timskog rada u sklopu projeknog zadatka kolegija [Programsko inženjerstvo](https://www.fer.unizg.hr/predmet/proinz) na Fakultetu elektrotehnike i računarstva Sveučilišta u Zagrebu.
 
-Kratko opisati cilj Vašeg projekta. Vaša motivacija?  (Napomena: odgovor nije »Zato što je to bio zadatak i nismo imali ideje za drugo.«). Koji problem rješavate?
-> Obzirom da je ovo zadani projekt navedite i što želite/jeste novo  naučili.
 
-> Dobro izrađen opis omogućuje vam da pokažete svoj rad drugim programerima, kao i potencijalnim poslodavcima. Ne samo da prvi dojam na stranici opisa često razlikuje dobar projekt od lošeg projekta već i predstavlja dobru praksu koju morate savladati.
+Ovim projektom želimo omogućiti zamjenu društvenih igara između korisnika te tako povećati isplativost igara koje već posjeduju. Željeli bismo korisnicima omogućiti pristup i upoznavanje s novim igrama, samo na par klikova i jednostavno navođenje kroz aplikaciju. Naravno, uz nekoliko ograničenja poput poštivanja dogovora oko zamjene igara ili pak samih uvjeta korištenja, koje sam vlasnik ima pravo postaviti kao dio objave vlastite igre. Motivacija za ovaj projekt proizlazi iz želje za radom u timu na nekom zajedničkom projektu uz pomno praćenje napretka u razvoju i izradi projekta. No ne bilo kojeg projekta, već onog koji će riješiti neki problem interesantne prirode. Konkretno, želimo riješiti problem igara koje na polici možda samo skupljaju prašinu, a netko drugi bi je možda rado htio igrati. Taj problem željeli bih smo riješiti na ekonomičan i pristupačan način, a jedno od rješenja jest ova web-aplikacija pod nazivom Play Trade.
 
 # Funkcijski zahtjevi
 > Navedite ključne zahtjeve Vašeg projekta.
-
+> treba na(do)pisati
 
 # Tehnologije
 
 #Instalcija
-# Članovi tima 
-> Popis članova tima/linkovi/ glavni doprinos
->
+# Članovi tima
+Članovi tima:
+- Hrvoje Jembrek (voditelj)
+- Fran Račić
+- Andrej Pavić
+- Matko Balala
+- Lovro Priselec
+- Marko Fuček
+- Nikola Lip-Nojković
 
-# Kontribucije
->Pravila ovise o organizaciji tima i su često izdvojena u CONTRIBUTING.md
+> Popis članova tima/linkovi/ glavni doprinos na(do)pisati
 
 
+> Dodati neki opis rada ili način rada (nečin komunikacije, način raspodjele zadataka i sl.)
 
 # 📝 Kodeks ponašanja [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](CODE_OF_CONDUCT.md)
 Kao studenti sigurno ste upoznati s minimumom prihvatljivog ponašanja definiran u [KODEKS PONAŠANJA STUDENATA FAKULTETA ELEKTROTEHNIKE I RAČUNARSTVA SVEUČILIŠTA U ZAGREBU](https://www.fer.hr/_download/repository/Kodeks_ponasanja_studenata_FER-a_procisceni_tekst_2016%5B1%5D.pdf), te dodatnim naputcima za timski rad na predmetu [Programsko inženjerstvo](https://wwww.fer.hr).
@@ -48,6 +49,7 @@ Kodeks ponašanja skup je provedivih pravila koja služe za jasnu komunikaciju o
 >* Razgovarajte s vašim asistentom jer ima najbolji uvid u dinamiku tima. Zajedno ćete saznati kako riješiti sukob i kako izbjeći daljnje utjecanje u vašem radu.
 >* Ako se osjećate ugodno neposredno razgovarajte o problemu. Manje incidente trebalo bi rješavati izravno. Odvojite vrijeme i privatno razgovarajte s pogođenim članom tima te vjerujte u iskrenost.
 
+> Prilagoditi ovaj dio da odgovara našoj odabranoj licenciji
 # 📝 Licenca
 Važeča (1)
 [![CC BY-NC-SA 4.0][cc-by-nc-sa-shield]][cc-by-nc-sa]
