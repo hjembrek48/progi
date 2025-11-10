@@ -29,8 +29,19 @@ Ovim projektom želimo omogućiti zamjenu društvenih igara između korisnika te
 
 
 # Tehnologije
+Za otvaranje ovog projekta koristili smo ove tehnologije/alate:
+- frontend:
+   - React
+   - Bootstrap
+- backend:
+   - django
+- deployment:
+   - ???
+- autentifikacija:
+   - OAuth 2.0
+- geolokacija: 
+   - OpenStreetMap
 
-#Instalcija
 # Članovi tima
 Članovi tima:
 - Hrvoje Jembrek (voditelj)
@@ -44,7 +55,13 @@ Ovim projektom želimo omogućiti zamjenu društvenih igara između korisnika te
 > Popis članova tima/linkovi/ glavni doprinos na(do)pisati
 
 
-> Dodati neki opis rada ili način rada (nečin komunikacije, način raspodjele zadataka i sl.)
+# Način rada
+Za rad u timu definirani su kanali komunikacije između članova tima međusobno, a to su primarno WhatsApp te sastavci uživo. Također, unaprijed su definirani i načini komunikacije s demonstratorom te asistentom, uživo u terminima laboratorijskih vježbi ili online preko platforme Teams ili putem e-pošte.
+
+Sama podjela rada inicijalno je podijeljena na frontend i backend dio, prema preferencijama i iskustvima pojedinih članova grupe. Ostatak projekta, poput pisanja dokumentacije, deployanje i testiranja, dogovarani su u hodu između svih članova tima, sukladno željama i mogućnostima članova.
+
+Na samom početku projekta dogovoren je naziv i tima te vođa tima.
+
 
 # 📝 Kodeks ponašanja [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](CODE_OF_CONDUCT.md)
 Kao studenti sigurno ste upoznati s minimumom prihvatljivog ponašanja definiran u [KODEKS PONAŠANJA STUDENATA FAKULTETA ELEKTROTEHNIKE I RAČUNARSTVA SVEUČILIŠTA U ZAGREBU](https://www.fer.hr/_download/repository/Kodeks_ponasanja_studenata_FER-a_procisceni_tekst_2016%5B1%5D.pdf), te dodatnim naputcima za timski rad na predmetu [Programsko inženjerstvo](https://wwww.fer.hr).
