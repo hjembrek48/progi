@@ -4,7 +4,7 @@ services:
     name: progi-backend
     runtime: python
     buildCommand: "./build.sh"
-    startCommand: "python -m gunicorn backend.asgi:application -k uvicorn.workers.UvicornWorker"
+    startCommand: "cd backend && python -m gunicorn backend.asgi:application -k uvicorn.workers.UvicornWorker"
     envVars:
       - key: DB_NAME
         value: db_ebmr
