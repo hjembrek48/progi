@@ -36,7 +36,7 @@ Za otvaranje ovog projekta koristili smo ove tehnologije/alate:
 - backend:
    - django
 - deployment:
-   - ???
+   - Render
 - autentifikacija:
    - OAuth 2.0
 - geolokacija: 
