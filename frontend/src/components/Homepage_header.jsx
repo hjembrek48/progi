@@ -10,12 +10,12 @@ export function Homepage_header() {
             <Col xs={2}>
                 Icon
             </Col>
-            <Col xs={7}>
+            <Col xs={5}>
                 <Container>
                     <h1>PlayTrade</h1>
                 </Container>
             </Col>
-            <Col xs={3} className='d-flex justify-content-end'>
+            <Col xs={5} className='d-flex justify-content-end'>
                 <Button className='home_button' onClick={() => {navigate('login')}}>
                     Log In
                 </Button>

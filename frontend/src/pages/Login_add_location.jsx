@@ -3,17 +3,20 @@ import { useNavigate } from "react-router";
 import { useState } from "react";
 import apiAuth from './../services/apiAuth.js';
 import { deleteTokenFromVariable } from "../services/auth.js";
+import { useAuth } from "../components/AuthProvider.jsx";
 import './../styles/loginpage.css'
 
 export function Login_add_location() {
     const navigate = useNavigate();
     const [warningMess, setWarningMess] = useState('');
+    const { registrationStep, setRegistrationStep } = useAuth();
 
     const logoutUser = async () => {
         try {
             await apiAuth.post('logout/');
             //ako je uspješno -> 200:
             deleteTokenFromVariable();
+            setRegistrationStep(1);
             navigate('/login');
         } catch(error) {
             if(error.response) {

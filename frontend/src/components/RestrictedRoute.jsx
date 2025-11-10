@@ -1,11 +1,10 @@
+import { Navigate, useNavigate } from "react-router";
+import { useAuth } from "./AuthProvider";
 import { Container, Spinner, Button } from "react-bootstrap";
-import { Not_logged } from "./Not_logged.jsx";
-import { useAuth } from "./AuthProvider.jsx";
-import { useNavigate } from "react-router";
 
-export function ProtectedRoute({ children, minStep }) {
+export function RestrictedRoute({ children, maxStep }) {
     const {registrationStep, setRegistrationStep} = useAuth();
-    const navigate = useNavigate();
+    const navigate = useNavigate()
 
     if(registrationStep === null || registrationStep === undefined) {
         return (
@@ -28,11 +27,7 @@ export function ProtectedRoute({ children, minStep }) {
         );
     }
 
-    //Ako je registrationStep manji od onog zadanog (kojim je ruta štićena) onda nemoj pustiti na tu rutu
-    if(minStep > registrationStep) {
-        return (<Not_logged />
-        );
-    } else { //Inače pusti korisnika na rutu
+    if(maxStep < registrationStep) {
         return children;
     }
 }

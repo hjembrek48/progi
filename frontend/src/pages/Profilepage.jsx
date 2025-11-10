@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import { useRef } from "react";
 import { ProfilePageHeader } from "../components/ProfilePageHeader";
 import { Footer } from "../components/Footer";
 import { FaPlus, FaUserCircle } from "react-icons/fa";

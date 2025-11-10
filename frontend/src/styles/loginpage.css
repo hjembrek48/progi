@@ -39,8 +39,10 @@
     border-radius: 10px;
     padding: 15px 20px;
 }
-
 .custom_alert .alert-heading {
     font-weight: 800;
     font-size: 2rem;
+}
+.boot_icon{
+    margin-right: 8px;
 }
