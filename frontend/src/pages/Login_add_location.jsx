@@ -18,6 +18,20 @@ export function Login_add_location() {
     address: null,
     loading: false,
   });
+
+  useEffect(() => {
+    async function fetchData() {
+      const data = await apiAuth.get(
+        "http://localhost:8000/api/profile/location/"
+      );
+
+      if (data.data.latitude != null || data.data.longitude != null) {
+        navigate("/");
+      }
+    }
+    fetchData();
+  });
+
   useEffect(() => {
     if (location.latlng == null) {
       return;
@@ -45,9 +59,8 @@ export function Login_add_location() {
         json.address.town ??
         json.address.village ??
         json.name;
-      console.log(json);
-      const address = `${placeName}, ${json.address.country}`;
-      setAddress({ address: address, loading: false });
+      const newAddress = `${placeName}, ${json.address.country}`;
+      setAddress({ address: newAddress, loading: false });
     }, 2000);
     return () => clearTimeout(timeoutId);
   }, [location]);

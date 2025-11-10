@@ -1,4 +1,10 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import {
+  BrowserRouter,
+  redirect,
+  Route,
+  Routes,
+  useNavigate,
+} from "react-router-dom";
 import { Add_game } from "./pages/Add_game.jsx";
 import { Homepage } from "./pages/Homepage.jsx";
 import { Profilepage } from "./pages/Profilepage.jsx";
@@ -7,6 +13,7 @@ import { Login_add_location } from "./pages/Login_add_location.jsx";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./styles/App.css";
 import { ProtectedRoute } from "./components/ProtectedRoute.jsx";
+import apiAuth from "./services/apiAuth.js";
 
 function App() {
   return (
