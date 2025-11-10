@@ -82,4 +82,5 @@ Orginal [![cc0-1.0][cc0-1.0-shield]][cc0-1.0]
 <br>
 <br>
 <br>
+
 > Predložak temeljen na wiki materijalima projekta [Programsko inženjerstvo](https://github.com/VladoSruk/Programsko-inzenjerstvo/wiki) autora Vlado Sruk, pod licencom CC BY-NC-SA 4.0.
