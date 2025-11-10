@@ -1,0 +1,20 @@
+services:
+  - type: web
+    plan: free
+    name: progi-backend
+    runtime: python
+    buildCommand: "./build.sh"
+    startCommand: "python -m gunicorn backend.asgi:application -k uvicorn.workers.UvicornWorker"
+    envVars:
+      - key: DB_NAME
+        value: db_ebmr
+      - key: DB_USER
+        value: codecartel
+      - key: DB_PWD
+        value: XaJLCgQVRFfORW9WWgU23RwOEwvI1fvJ
+      - key: DB_HOST
+        value: dpg-d44ef6ruibrs73a2ogkg-a
+      - key: DB_PORT
+        value: 5432
+      - key: SECRET_KEY
+        generateValue: true
