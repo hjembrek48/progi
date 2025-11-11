@@ -24,7 +24,7 @@ export function Login_add_location() {
   useEffect(() => {
     async function fetchData() {
       const data = await apiAuth.get(
-        "http://localhost:8000/api/profile/location/"
+        `${process.env.REACT_APP_API_URL}/api/profile/location/`
       );
 
       if (data.data.latitude != null || data.data.longitude != null) {
@@ -74,7 +74,7 @@ export function Login_add_location() {
     }
     try {
       const data = await apiAuth.put(
-        "http://localhost:8000/api/profile/location/",
+        `${process.env.REACT_APP_API_URL}/api/profile/location/`,
         {
           latitude: location.latlng.lat.toFixed(6),
           longitude: location.latlng.lng.toFixed(6),

@@ -6,7 +6,7 @@ import {
 } from "./auth.js";
 
 const apiAuth = axios.create({
-  baseURL: "http://localhost:8000/api/",
+  baseURL: `${process.env.REACT_APP_API_URL}/api/`,
   withCredentials: true,
 });
 
@@ -34,7 +34,7 @@ apiAuth.interceptors.response.use(
       console.log("401 detected, trying to refresh token...");
       try {
         const new_token = await axios.post(
-          "http://localhost:8000/api/token/refresh-cookie/",
+          `${process.env.REACT_APP_API_URL}/api/token/refresh-cookie/`,
           {},
           { withCredentials: true }
         );

@@ -39,7 +39,7 @@ export function Loginpage() {
             scope: "https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile",
             callback: async (response) => {
                 try {
-                    const server_res = await axios.post('http://localhost:8000/api/google-login/',
+                    const server_res = await axios.post(`${process.env.REACT_APP_API_URL}/api/google-login/`,
                     {
                         google_access_token: response.access_token
                     }, 
