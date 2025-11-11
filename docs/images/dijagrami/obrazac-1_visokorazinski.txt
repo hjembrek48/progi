@@ -1,0 +1,31 @@
+@startuml
+left to right direction
+
+:Neregistrirani\nkorisnik: as Guest
+:Registrirani\nkorisnik: as RegisteredUser
+:Sistemski\nmoderator: as Moderator
+:Google OAuth: as Google
+:OpenStreetMap\nAPI: as OSM
+
+rectangle "PlayTrade aplikacija" {
+    usecase "Pregled igara" as UC1
+    usecase "Prijava/registracija" as UC2
+    usecase "Odabir lokacije korisnika" as UC3
+    usecase "Stvaranje objava i zahtjeva\nza zamjenu igara" as UC8
+    usecase "Moderiranje objava" as UC9
+
+}
+
+Guest --> (UC1)
+Guest --> (UC2)
+
+RegisteredUser --> (UC1)
+RegisteredUser --> (UC2)
+RegisteredUser --> (UC8)
+RegisteredUser --> (UC3)
+
+Moderator --> (UC9)
+
+(UC2) --> Google
+(UC3) --> OSM
+@enduml
