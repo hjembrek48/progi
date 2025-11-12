@@ -1,7 +1,7 @@
 # Programsko inženjerstvo - Play Trade
 
 
-> Potencijalna sekcija za deploy link
+Link aplikacije: https://progi-frontend.onrender.com
 
 
 # Opis projekta
