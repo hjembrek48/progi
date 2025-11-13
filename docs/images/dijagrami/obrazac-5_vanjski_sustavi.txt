@@ -1,0 +1,35 @@
+@startuml
+left to right direction
+skinparam linetype ortho
+
+:Neregistrirani\nkorisnik: as Guest
+:Registrirani\nkorisnik: as RegisteredUser
+:Google OAuth: as Google
+:OpenStreetMap\nAPI: as OSM
+:Baza podataka: as Database
+
+rectangle "PlayTrade aplikacija" {    
+    usecase "Prijava korisnika" as UC02_1
+    usecase "Registracija korisnika" as UC02
+    usecase "Odabir lokacije korisnika" as UC03
+    usecase "Pregled i uređivanje korisničkog računa" as UC04
+}
+
+
+
+UC03 <. UC02 : include
+UC03 .l-> UC04 : extend
+
+Guest -d-> UC02
+
+RegisteredUser --> UC02_1
+UC02_1 ---> Google
+UC02 --> Google
+
+RegisteredUser --> UC04
+UC04 --> Database
+
+
+UC03 --> OSM
+
+@enduml

@@ -1,0 +1,31 @@
+@startuml
+left to right direction
+
+:Korisnik: as User
+:Neregistrirani\nkorisnik: as Guest
+:Baza podataka: as Database
+:Google OAuth: as Google
+:OpenStreetMap\nAPI: as OSM
+
+Guest -|> User
+
+rectangle "PlayTrade aplikacija" {
+    usecase "UC-01: Pregled početne stranice\nu Guest mode" as UC01
+    usecase "UC-02: Registracija korisnika" as UC02
+    usecase "UC-03: Odabir lokacije korisnika" as UC03
+    usecase "UC-06: Filtracija igara" as UC06
+    usecase "UC-11: Pregled uputa za korištenje sustava" as UC11
+}
+
+Guest --> (UC01)
+Guest --> (UC02)
+(UC02) --> Google
+(UC02) -|> (UC03) : include
+(UC03) --> OSM
+Guest --> (UC06)
+Guest --> (UC11)
+
+(UC01) --> Database
+(UC06) --> Database
+
+@enduml

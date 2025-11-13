@@ -1,0 +1,33 @@
+@startuml
+left to right direction
+
+:Registrirani\nkorisnik: as RegisteredUser
+:Notifikacijski\nservis: as Notifications
+:Baza podataka: as Database
+
+rectangle "PlayTrade aplikacija" {
+    usecase "UC-08: Stvaranje objave" as UC08
+    usecase "UC-12: Upravljanje listom želja" as UC12
+    usecase "UC-13: Uređivanje ponude za zamjenu" as UC13
+    usecase "UC-14: Obavijesti o ponudama i\npromjenama" as UC14
+    usecase "UC-15: Pregled arhive zamjena" as UC15
+    usecase "UC-10: Prijava objave koja je neprimjerena" as UC10
+}
+
+RegisteredUser --> (UC08)
+RegisteredUser --> (UC10)
+RegisteredUser --> (UC12)
+RegisteredUser --> (UC13)
+RegisteredUser --> (UC15)
+
+(UC15) --> Database
+(UC08) --> Database
+(UC12) --> Database
+(UC13) ---> Database
+(UC10) ---> Database
+
+(UC13) .> (UC14) : include
+(UC14) .> (UC08) : extend
+(UC14) --> Notifications
+
+@enduml

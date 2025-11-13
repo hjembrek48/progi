@@ -1,0 +1,18 @@
+@startuml
+left to right direction
+
+:Registrirani\nkorisnik: as User
+:Sistemski\nmoderator: as Moderator
+:Baza podataka: as Database
+
+Moderator -|> User
+
+rectangle "PlayTrade aplikacija" {
+    usecase "UC-09: Moderiranje objava" as UC09
+}
+
+Moderator --> (UC09)
+(UC09) --> Database
+
+
+@enduml

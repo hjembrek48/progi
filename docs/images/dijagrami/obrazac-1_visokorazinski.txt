@@ -8,11 +8,11 @@ left to right direction
 :OpenStreetMap\nAPI: as OSM
 
 rectangle "PlayTrade aplikacija" {
-    usecase "Pregled igara" as UC1
-    usecase "Prijava/registracija" as UC2
-    usecase "Odabir lokacije korisnika" as UC3
-    usecase "Stvaranje objava i zahtjeva\nza zamjenu igara" as UC8
-    usecase "Moderiranje objava" as UC9
+    usecase "UC-01: Pregled igara" as UC1
+    usecase "UC-02: Prijava/registracija" as UC2
+    usecase "UC-03: Odabir lokacije korisnika" as UC3
+    usecase "UC-08, UC-13: Stvaranje objava i\nzahtjeva za zamjenu igara" as UC8
+    usecase "UC-09: Moderiranje objava" as UC9
 
 }
 

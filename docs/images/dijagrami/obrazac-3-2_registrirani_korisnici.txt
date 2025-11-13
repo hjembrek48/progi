@@ -1,0 +1,43 @@
+@startuml
+left to right direction
+
+:Korisnik: as User
+:Registrirani\nkorisnik: as RegisteredUser
+:Baza podataka: as Database
+:OpenStreetMap\nAPI: as OSM
+
+RegisteredUser -|> User
+
+rectangle "PlayTrade aplikacija" {
+    usecase "UC-04 Pregled i uređivanje\nkorisničkog računa" as UC04
+    usecase "UC-03: Odabir lokacije korisnika" as UC03
+    usecase "UC-07: Pregled igara koje bi se korisniku mogle svidjeti" as UC07
+    usecase "UC-08: Stvaranje objave" as UC08
+    usecase "UC-10: Prijava objave koja je neprimjerena" as UC10
+    usecase "UC-12: Upravljanje listom želja" as UC12
+    usecase "UC-13: Uređivanje ponude za zamjenu" as UC13
+    usecase "UC-15: Pregled arhive izvršenih zamjena" as UC15
+    usecase "UC-06: Filtracija igara" as UC06
+    usecase "UC-11: Pregled uputa za korištenje sustava" as UC11
+}
+
+RegisteredUser --> (UC04)
+RegisteredUser ---> (UC07)
+RegisteredUser --> (UC08)
+RegisteredUser --> (UC10)
+RegisteredUser --> (UC12)
+RegisteredUser --> (UC13)
+RegisteredUser --> (UC15)
+RegisteredUser --> (UC06)
+RegisteredUser --> (UC11)
+
+
+(UC04) <. (UC03) : extend
+(UC03) --> OSM
+
+
+note "Informacije se dohvaćaju i spremaju\nu bazu podataka (pasivan aktor)" as N1
+(UC10) --[hidden]> N1
+N1 -d[hidden]> Database
+
+@enduml
