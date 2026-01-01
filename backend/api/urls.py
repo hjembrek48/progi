@@ -1,8 +1,20 @@
-#api-urls.py
+# api-urls.py
 from django.urls import path
 from .views import (
-    NoteListCreate, NoteDelete, CreateUserView,
-    LogInWithGoogle, RefreshFromCookie, Logout, ProfileLocationUpdate,
+    NoteListCreate,
+    NoteDelete,
+    CreateUserView,
+    LogInWithGoogle,
+    RefreshFromCookie,
+    Logout,
+    ProfileLocationUpdate,
+    GenreList,
+    GameListCreate,
+    GameDetail,
+    ListingList,
+    ListingDetail,
+    WishlistListCreate,
+    WishlistDetail,
 )
 
 urlpatterns = [
@@ -13,4 +25,11 @@ urlpatterns = [
     path("notes/", NoteListCreate.as_view(), name="notes"),
     path("notes/<int:pk>/", NoteDelete.as_view(), name="note-delete"),
     path("users/", CreateUserView.as_view(), name="users-create"),
+    path("genres/", GenreList.as_view(), name="genre-list"),
+    path("games/", GameListCreate.as_view(), name="game-list-create"),
+    path("games/<int:pk>/", GameDetail.as_view(), name="game-detail"),
+    path("listings/", ListingList.as_view(), name="listing-list-create"),
+    path("listings/<int:pk>/", ListingDetail.as_view(), name="listing-detail"),
+    path("wishlist/", WishlistListCreate.as_view(), name="wishlist-list-create"),
+    path("wishlist/<int:pk>/", WishlistDetail.as_view(), name="wishlist-detail"),
 ]

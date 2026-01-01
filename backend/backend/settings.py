@@ -14,19 +14,19 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from pathlib import Path
 from datetime import timedelta
 from dotenv import load_dotenv
-import dj_database_url 
+import dj_database_url
 import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
 
 DEBUG = True
-#DEBUG = os.getenv("DEBUG", "1") == "1"
+# DEBUG = os.getenv("DEBUG", "1") == "1"
 USE_SECURE_COOKIES = os.getenv("USE_SECURE_COOKIES", "0") == "1"
-#USE_SECURE_COOKIES = False
+# USE_SECURE_COOKIES = False
 # SAMESITE mora biti "None" ako frontend i backend nisu na istoj domeni
 SESSION_COOKIE_SAMESITE = "None" if USE_SECURE_COOKIES else "Lax"
-CSRF_COOKIE_SAMESITE    = "None" if USE_SECURE_COOKIES else "Lax"
+CSRF_COOKIE_SAMESITE = "None" if USE_SECURE_COOKIES else "Lax"
 
 # SECURE ovisi o tome radiš li lokalno (HTTP) ili produkcijski (HTTPS)
 SESSION_COOKIE_SECURE = USE_SECURE_COOKIES
@@ -49,6 +49,13 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Play Trade API",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
 }
 
 SIMPLE_JWT = {
@@ -68,6 +75,7 @@ INSTALLED_APPS = [
     "api",
     "rest_framework",
     "corsheaders",
+    "drf_spectacular",
 ]
 
 MIDDLEWARE = [

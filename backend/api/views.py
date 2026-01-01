@@ -6,19 +6,36 @@ from django.db.models import Q
 import requests
 import secrets
 from rest_framework import generics, status
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import (
+    IsAuthenticated,
+    AllowAny,
+    IsAuthenticatedOrReadOnly,
+)
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
-from .models import Note
-from .serializers import NoteSerializer, UserSerializer, ProfileSerializer
+from .models import Note, Genre, Game, Listing, WishlistEntry
+from .serializers import (
+    NoteSerializer,
+    UserSerializer,
+    ProfileSerializer,
+    GenreSerializer,
+    GameSerializer,
+    ListingSerializer,
+    WishlistSerializer,
+)
 from decimal import Decimal, ROUND_HALF_UP, InvalidOperation
+from drf_spectacular.utils import extend_schema, OpenApiParameter
+
 
 def round6(value):
     try:
-        return str(Decimal(str(value)).quantize(Decimal("0.000001"), rounding=ROUND_HALF_UP))
+        return str(
+            Decimal(str(value)).quantize(Decimal("0.000001"), rounding=ROUND_HALF_UP)
+        )
     except InvalidOperation:
         return None
+
 
 def create_cookie_response(user: User) -> Response:
 
@@ -41,6 +58,7 @@ def create_cookie_response(user: User) -> Response:
     )
 
     return res
+
 
 def geocode_address(address: str):
     """
@@ -66,6 +84,7 @@ def geocode_address(address: str):
         return (data[0].get("lat"), data[0].get("lon"))
     except requests.RequestException:
         return None
+
 
 class LogInWithGoogle(APIView):
     permission_classes = [AllowAny]
@@ -120,7 +139,7 @@ class LogInWithGoogle(APIView):
             user = User.objects.create_user(
                 username=username,
                 email=email,
-                password = secrets.token_urlsafe(32),
+                password=secrets.token_urlsafe(32),
                 first_name=first_name[:150],
                 last_name=last_name[:150],
             )
@@ -169,6 +188,7 @@ class NoteDelete(generics.DestroyAPIView):
     def get_queryset(self):
         return Note.objects.filter(author=self.request.user)
 
+
 class ProfileLocationUpdate(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -186,9 +206,8 @@ class ProfileLocationUpdate(APIView):
             coords = geocode_address(addr)
             if coords:
                 lat, lon = coords
-                payload["latitude"]  = round6(lat)
+                payload["latitude"] = round6(lat)
                 payload["longitude"] = round6(lon)
-
 
         ser = ProfileSerializer(profile, data=payload, partial=False)
         if ser.is_valid():
@@ -205,9 +224,8 @@ class ProfileLocationUpdate(APIView):
             coords = geocode_address(addr)
             if coords:
                 lat, lon = coords
-                payload["latitude"]  = round6(lat)
+                payload["latitude"] = round6(lat)
                 payload["longitude"] = round6(lon)
-
 
         ser = ProfileSerializer(profile, data=payload, partial=True)
         if ser.is_valid():
@@ -220,3 +238,95 @@ class CreateUserView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [AllowAny]
+
+
+class GenreList(generics.ListAPIView):
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
+    permission_classes = [AllowAny]
+
+
+class GameListCreate(generics.ListCreateAPIView):
+    serializer_class = GameSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Game.objects.filter(profile=self.request.user.profile)
+
+    def perform_create(self, serializer):
+        serializer.save(profile=self.request.user.profile)
+
+
+class GameDetail(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = GameSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Game.objects.filter(profile=self.request.user.profile)
+
+
+class ListingList(generics.ListCreateAPIView):
+    serializer_class = ListingSerializer
+
+    def get_permissions(self):
+        if self.request.method == "GET":
+            return [AllowAny()]
+        return [IsAuthenticated()]
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="genre_id",
+                description="Filter by genre ID",
+                required=False,
+                type=int,
+            ),
+        ]
+    )
+    def get(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
+    def get_queryset(self):
+        queryset = Listing.objects.all().order_by("-created_at")
+        genre_id = self.request.query_params.get("genre_id")
+        if genre_id:
+            queryset = queryset.filter(game__genre_id=genre_id)
+        return queryset
+
+    def perform_create(self, serializer):
+        serializer.save(profile=self.request.user.profile)
+
+
+class ListingDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Listing.objects.all()
+    serializer_class = ListingSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def perform_update(self, serializer):
+        if self.get_object().profile != self.request.user.profile:
+            raise PermissionError("You can only edit your own listings.")
+        serializer.save()
+
+    def perform_destroy(self, instance):
+        if instance.profile != self.request.user.profile:
+            raise PermissionError("You can only delete your own listings.")
+        instance.delete()
+
+
+class WishlistListCreate(generics.ListCreateAPIView):
+    serializer_class = WishlistSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return WishlistEntry.objects.filter(profile=self.request.user.profile)
+
+    def perform_create(self, serializer):
+        serializer.save(profile=self.request.user.profile)
+
+
+class WishlistDetail(generics.DestroyAPIView):
+    serializer_class = WishlistSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return WishlistEntry.objects.filter(profile=self.request.user.profile)
