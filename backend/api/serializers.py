@@ -152,7 +152,7 @@ class SwapOfferSerializer(serializers.ModelSerializer):
         many=True,
     )
     target_id = serializers.PrimaryKeyRelatedField(
-        queryset=Profile.objects.all(), source="target", write_only=True
+        queryset=Profile.objects.all(), source="target", write_only=True, required=False
     )
 
     class Meta:
@@ -172,42 +172,41 @@ class SwapOfferSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ["proposer", "status", "created_at", "updated_at"]
 
-    def validate_offered_game_ids(self, values):
-        request = self.context.get("request")
-        if not request:
-            return values
-        for game in values:
-            if game.profile != request.user.profile:
-                raise serializers.ValidationError(
-                    f"You do not own the game '{game.name}'."
-                )
-            if not game.active:
-                raise serializers.ValidationError(f"Game '{game.name}' is not active.")
-        return values
-
-    def validate_requested_game_ids(self, values):
-        request = self.context.get("request")
-        if not request:
-            return values
-        for game in values:
-            if game.profile == request.user.profile:
-                raise serializers.ValidationError(
-                    f"You cannot request your own game '{game.name}'."
-                )
-            if not game.active:
-                raise serializers.ValidationError(f"Game '{game.name}' is not active.")
-        return values
-
     def validate(self, data):
-        target = data.get("target")
-        requested_games = data.get("requested_games", [])
+        request = self.context.get("request")
+        if not request:
+            return data
 
-        if target:
-            for game in requested_games:
-                if game.profile != target:
-                    raise serializers.ValidationError(
-                        f"Game '{game.name}' does not belong to the target user."
-                    )
+        if self.instance:
+            proposer = self.instance.proposer
+            target = self.instance.target
+        else:
+            proposer = request.user.profile
+            target = data.get("target")
+            if not target:
+                raise serializers.ValidationError(
+                    "Target user is required for new swap offers."
+                )
+            if proposer == target:
+                raise serializers.ValidationError("You cannot swap with yourself.")
+
+        offered_games = data.get("offered_games", [])
+        for game in offered_games:
+            if game.profile != proposer:
+                raise serializers.ValidationError(
+                    f"Game '{game.name}' does not belong to the proposer ({proposer.user.username})."
+                )
+            if not game.active:
+                raise serializers.ValidationError(f"Game '{game.name}' is not active.")
+
+        requested_games = data.get("requested_games", [])
+        for game in requested_games:
+            if game.profile != target:
+                raise serializers.ValidationError(
+                    f"Game '{game.name}' does not belong to the target ({target.user.username})."
+                )
+            if not game.active:
+                raise serializers.ValidationError(f"Game '{game.name}' is not active.")
 
         return data
 
