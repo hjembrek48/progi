@@ -280,9 +280,69 @@ class ListingList(generics.ListCreateAPIView):
         parameters=[
             OpenApiParameter(
                 name="genre_id",
-                description="Filter by genre ID",
+                description="Filtriraj po ID-u žanra",
                 required=False,
                 type=int,
+            ),
+            OpenApiParameter(
+                name="search",
+                description="Pretraži po imenu igre",
+                required=False,
+                type=str,
+            ),
+            OpenApiParameter(
+                name="min_grade",
+                description="Filtriraj po minimalnoj ocjeni",
+                required=False,
+                type=int,
+            ),
+            OpenApiParameter(
+                name="max_grade",
+                description="Filtriraj po maksimalnoj ocjeni",
+                required=False,
+                type=int,
+            ),
+            OpenApiParameter(
+                name="min_players",
+                description="Filtriraj po minimalnom broju igrača",
+                required=False,
+                type=int,
+            ),
+            OpenApiParameter(
+                name="max_players",
+                description="Filtriraj po maksimalnom broju igrača",
+                required=False,
+                type=int,
+            ),
+            OpenApiParameter(
+                name="min_playing_time",
+                description="Filtriraj po minimalnom vremenu igranja",
+                required=False,
+                type=int,
+            ),
+            OpenApiParameter(
+                name="max_playing_time",
+                description="Filtriraj po maksimalnom vremenu igranja",
+                required=False,
+                type=int,
+            ),
+            OpenApiParameter(
+                name="min_complexity",
+                description="Filtriraj po minimalnoj kompleksnosti",
+                required=False,
+                type=int,
+            ),
+            OpenApiParameter(
+                name="max_complexity",
+                description="Filtriraj po maksimalnoj kompleksnosti",
+                required=False,
+                type=int,
+            ),
+            OpenApiParameter(
+                name="publisher",
+                description="Filtriraj po izdavaču",
+                required=False,
+                type=str,
             ),
         ]
     )
@@ -291,9 +351,51 @@ class ListingList(generics.ListCreateAPIView):
 
     def get_queryset(self):
         queryset = Listing.objects.all().order_by("-created_at")
+
         genre_id = self.request.query_params.get("genre_id")
         if genre_id:
             queryset = queryset.filter(game__genre_id=genre_id)
+
+        search = self.request.query_params.get("search")
+        if search:
+            queryset = queryset.filter(game__name__icontains=search)
+
+        min_grade = self.request.query_params.get("min_grade")
+        if min_grade:
+            queryset = queryset.filter(game__grade__gte=min_grade)
+
+        max_grade = self.request.query_params.get("max_grade")
+        if max_grade:
+            queryset = queryset.filter(game__grade__lte=max_grade)
+
+        min_players = self.request.query_params.get("min_players")
+        if min_players:
+            queryset = queryset.filter(game__number_of_players__gte=min_players)
+
+        max_players = self.request.query_params.get("max_players")
+        if max_players:
+            queryset = queryset.filter(game__number_of_players__lte=max_players)
+
+        min_playing_time = self.request.query_params.get("min_playing_time")
+        if min_playing_time:
+            queryset = queryset.filter(game__playing_time__gte=min_playing_time)
+
+        max_playing_time = self.request.query_params.get("max_playing_time")
+        if max_playing_time:
+            queryset = queryset.filter(game__playing_time__lte=max_playing_time)
+
+        min_complexity = self.request.query_params.get("min_complexity")
+        if min_complexity:
+            queryset = queryset.filter(game__complexity__gte=min_complexity)
+
+        max_complexity = self.request.query_params.get("max_complexity")
+        if max_complexity:
+            queryset = queryset.filter(game__complexity__lte=max_complexity)
+
+        publisher = self.request.query_params.get("publisher")
+        if publisher:
+            queryset = queryset.filter(game__publisher__icontains=publisher)
+
         return queryset
 
     def perform_create(self, serializer):
@@ -339,13 +441,52 @@ class SwapOfferListCreate(generics.ListCreateAPIView):
     serializer_class = SwapOfferSerializer
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="status",
+                description="Filtriraj po statusu zamjene",
+                required=False,
+                type=str,
+            ),
+            OpenApiParameter(
+                name="start_date",
+                description="Filtriraj po početnom datumu",
+                required=False,
+                type=str,
+            ),
+            OpenApiParameter(
+                name="end_date",
+                description="Filtriraj po završnom datumu",
+                required=False,
+                type=str,
+            ),
+        ]
+    )
+    def get(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
     def get_queryset(self):
         user_profile = self.request.user.profile
-        return (
+        queryset = (
             SwapOffer.objects.filter(Q(proposer=user_profile) | Q(target=user_profile))
             .distinct()
             .order_by("-updated_at")
         )
+
+        status_param = self.request.query_params.get("status")
+        if status_param:
+            queryset = queryset.filter(status=status_param)
+
+        start_date = self.request.query_params.get("start_date")
+        if start_date:
+            queryset = queryset.filter(updated_at__date__gte=start_date)
+
+        end_date = self.request.query_params.get("end_date")
+        if end_date:
+            queryset = queryset.filter(updated_at__date__lte=end_date)
+
+        return queryset
 
     def perform_create(self, serializer):
         offer = serializer.save(proposer=self.request.user.profile)
