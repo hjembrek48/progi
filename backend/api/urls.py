@@ -15,6 +15,12 @@ from .views import (
     ListingDetail,
     WishlistListCreate,
     WishlistDetail,
+    SwapOfferListCreate,
+    SwapOfferDetail,
+    SwapOfferAccept,
+    SwapOfferReject,
+    NotificationList,
+    NotificationMarkRead,
 )
 
 urlpatterns = [
@@ -32,4 +38,14 @@ urlpatterns = [
     path("listings/<int:pk>/", ListingDetail.as_view(), name="listing-detail"),
     path("wishlist/", WishlistListCreate.as_view(), name="wishlist-list-create"),
     path("wishlist/<int:pk>/", WishlistDetail.as_view(), name="wishlist-detail"),
+    path("swaps/", SwapOfferListCreate.as_view(), name="swap-list-create"),
+    path("swaps/<int:pk>/", SwapOfferDetail.as_view(), name="swap-detail"),
+    path("swaps/<int:pk>/accept/", SwapOfferAccept.as_view(), name="swap-accept"),
+    path("swaps/<int:pk>/reject/", SwapOfferReject.as_view(), name="swap-reject"),
+    path("notifications/", NotificationList.as_view(), name="notification-list"),
+    path(
+        "notifications/<int:pk>/read/",
+        NotificationMarkRead.as_view(),
+        name="notification-read",
+    ),
 ]

@@ -2,6 +2,7 @@
 
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.db import transaction
 from django.db.models import Q
 import requests
 import secrets
@@ -14,7 +15,7 @@ from rest_framework.permissions import (
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
-from .models import Note, Genre, Game, Listing, WishlistEntry
+from .models import Note, Genre, Game, Listing, WishlistEntry, SwapOffer, Notification
 from .serializers import (
     NoteSerializer,
     UserSerializer,
@@ -23,6 +24,8 @@ from .serializers import (
     GameSerializer,
     ListingSerializer,
     WishlistSerializer,
+    SwapOfferSerializer,
+    NotificationSerializer,
 )
 from decimal import Decimal, ROUND_HALF_UP, InvalidOperation
 from drf_spectacular.utils import extend_schema, OpenApiParameter
@@ -330,3 +333,163 @@ class WishlistDetail(generics.DestroyAPIView):
 
     def get_queryset(self):
         return WishlistEntry.objects.filter(profile=self.request.user.profile)
+
+
+class SwapOfferListCreate(generics.ListCreateAPIView):
+    serializer_class = SwapOfferSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user_profile = self.request.user.profile
+        return (
+            SwapOffer.objects.filter(Q(proposer=user_profile) | Q(target=user_profile))
+            .distinct()
+            .order_by("-updated_at")
+        )
+
+    def perform_create(self, serializer):
+        offer = serializer.save(proposer=self.request.user.profile)
+
+        Notification.objects.create(
+            recieved_profile=offer.target,
+            profile=offer.proposer,
+            description=f"New swap offer from {offer.proposer.user.username}",
+            swap_offer=offer,
+        )
+
+
+class SwapOfferDetail(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = SwapOfferSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user_profile = self.request.user.profile
+        return SwapOffer.objects.filter(
+            Q(proposer=user_profile) | Q(target=user_profile)
+        ).distinct()
+
+    def perform_update(self, serializer):
+        instance = self.get_object()
+        user_profile = self.request.user.profile
+
+        updated_offer = serializer.save()
+
+        recieved_profile = (
+            instance.target if user_profile == instance.proposer else instance.proposer
+        )
+        Notification.objects.create(
+            recieved_profile=recieved_profile,
+            profile=user_profile,
+            description=f"Swap offer updated by {user_profile.user.username}",
+            swap_offer=updated_offer,
+        )
+
+    def perform_destroy(self, instance):
+        instance.delete()
+
+
+class SwapOfferAccept(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, pk):
+        try:
+            offer = SwapOffer.objects.get(pk=pk)
+        except SwapOffer.DoesNotExist:
+            return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        if request.user.profile != offer.target:
+            return Response(
+                {"detail": "Only the target can accept the offer."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        if offer.status != "PENDING":
+            return Response(
+                {"detail": "Offer is not pending."}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        with transaction.atomic():
+            offer.status = "ACCEPTED"
+            offer.save()
+
+            # Transfer igara
+            for game in offer.offered_games.all():
+                game.borrower_profile = offer.target
+                game.active = False
+                game.save()
+
+            for game in offer.requested_games.all():
+                game.borrower_profile = offer.proposer
+                game.active = False
+                game.save()
+
+            Notification.objects.create(
+                recieved_profile=offer.proposer,
+                profile=offer.target,
+                description=f"{offer.target.user.username} accepted your swap offer!",
+                swap_offer=offer,
+            )
+
+        return Response(SwapOfferSerializer(offer).data)
+
+
+class SwapOfferReject(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, pk):
+        try:
+            offer = SwapOffer.objects.get(pk=pk)
+        except SwapOffer.DoesNotExist:
+            return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        if request.user.profile != offer.target:
+            return Response(
+                {"detail": "Only the target can reject the offer."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        if offer.status != "PENDING":
+            return Response(
+                {"detail": "Offer is not pending."}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        offer.status = "REJECTED"
+        offer.save()
+
+        Notification.objects.create(
+            recieved_profile=offer.proposer,
+            profile=offer.target,
+            description=f"{offer.target.user.username} rejected your swap offer.",
+            swap_offer=offer,
+        )
+
+        return Response(SwapOfferSerializer(offer).data)
+
+
+class NotificationList(generics.ListAPIView):
+    serializer_class = NotificationSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Notification.objects.filter(
+            recieved_profile=self.request.user.profile
+        ).order_by("-time")
+
+
+class NotificationMarkRead(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request, pk):
+        try:
+            notif = Notification.objects.get(pk=pk)
+        except Notification.DoesNotExist:
+            return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        if notif.recieved_profile != request.user.profile:
+            return Response(
+                {"detail": "Not your notification."}, status=status.HTTP_403_FORBIDDEN
+            )
+
+        notif.read = True
+        notif.save()
+        return Response(NotificationSerializer(notif).data)
