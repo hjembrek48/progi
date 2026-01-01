@@ -14,6 +14,9 @@ class Profile(models.Model):
         max_digits=9, decimal_places=6, null=True, blank=True
     )
     address = models.CharField(max_length=255, blank=True, default="")
+    interests = models.ManyToManyField(
+        "Genre", through="HasInterest", related_name="interested_profiles", blank=True
+    )
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -31,6 +34,15 @@ class Genre(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class HasInterest(models.Model):
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    genre = models.ForeignKey(Genre, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ("profile", "genre")
+        db_table = "hasInterest"
 
 
 class Game(models.Model):

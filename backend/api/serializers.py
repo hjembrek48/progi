@@ -12,10 +12,33 @@ from .models import (
 )
 
 
+class GenreSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Genre
+        fields = ["id", "name"]
+
+
 class ProfileSerializer(serializers.ModelSerializer):
+    interests = GenreSerializer(many=True, read_only=True)
+    interest_ids = serializers.PrimaryKeyRelatedField(
+        queryset=Genre.objects.all(),
+        source="interests",
+        write_only=True,
+        many=True,
+        required=False,
+    )
+
     class Meta:
         model = Profile
-        fields = ["id", "address", "latitude", "longitude", "updated_at"]
+        fields = [
+            "id",
+            "address",
+            "latitude",
+            "longitude",
+            "updated_at",
+            "interests",
+            "interest_ids",
+        ]
         read_only_fields = ["updated_at"]
 
 
@@ -36,12 +59,6 @@ class NoteSerializer(serializers.ModelSerializer):
         model = Note
         fields = ["id", "title", "content", "created_at", "author"]
         extra_kwargs = {"author": {"read_only": True}}
-
-
-class GenreSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Genre
-        fields = ["id", "name"]
 
 
 class GameSerializer(serializers.ModelSerializer):
