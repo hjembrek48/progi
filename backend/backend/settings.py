@@ -110,10 +110,10 @@ if os.getenv("DB_NAME"):
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
-            "NAME": os.getenv("DB_NAME", "db_ebmr"),
+            "NAME": os.getenv("DB_NAME", "db_wmlx"),
             "USER": os.getenv("DB_USER", "codecartel"),
-            "PASSWORD": os.getenv("DB_PWD", "XaJLCgQVRFfORW9WWgU23RwOEwvI1fvJ"),
-            "HOST": os.getenv("DB_HOST", "dpg-d44ef6ruibrs73a2ogkg-a"),
+            "PASSWORD": os.getenv("DB_PWD", "Z57qUXh4eLOuYaCRrArl1oJKQzvi2vsD"),
+            "HOST": os.getenv("DB_HOST", "dpg-d5f1c4umcj7s73at9tcg-a"),
             "PORT": os.getenv("DB_PORT", "5432"),
         }
     }
