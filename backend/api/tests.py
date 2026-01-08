@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from rest_framework.test import APIClient
 from rest_framework import status
-from .models import Game, SwapOffer, Notification
+from .models import Game, SwapOffer, Notification, BoardGame
 
 
 class TradingFlowTest(TestCase):
@@ -14,6 +14,23 @@ class TradingFlowTest(TestCase):
 
         self.profile_a = self.user_a.profile
         self.profile_b = self.user_b.profile
+
+        self.bgg_catan = BoardGame.objects.create(
+            bgg_id=13,
+            name="Catan",
+            min_players=3,
+            max_players=4,
+            playing_time=60,
+            complexity=2.3
+        )
+        self.bgg_monopoly = BoardGame.objects.create(
+            bgg_id=140,
+            name="Monopoly",
+            min_players=2,
+            max_players=8,
+            playing_time=120,
+            complexity=1.6
+        )
 
     def test_full_trading_scenario(self):
         """
@@ -29,13 +46,10 @@ class TradingFlowTest(TestCase):
         # --- KORAK 1: User A dodaje Catan ---
         self.client.force_authenticate(user=self.user_a)
         game_data_a = {
-            "name": "Catan",
+            "board_game_id": self.bgg_catan.id,
             "description": "Trading game",
             "publisher": "Kosmos",
             "grade": 5,
-            "number_of_players": 4,
-            "playing_time": 60,
-            "complexity": 3,
             "active": True,
         }
         response = self.client.post("/api/games/", game_data_a)
@@ -45,13 +59,10 @@ class TradingFlowTest(TestCase):
         # --- KORAK 2: User B dodaje Monopoly ---
         self.client.force_authenticate(user=self.user_b)
         game_data_b = {
-            "name": "Monopoly",
+            "board_game_id": self.bgg_monopoly.id,
             "description": "Property trading",
             "publisher": "Hasbro",
             "grade": 4,
-            "number_of_players": 6,
-            "playing_time": 120,
-            "complexity": 2,
             "active": True,
         }
         response = self.client.post("/api/games/", game_data_b)

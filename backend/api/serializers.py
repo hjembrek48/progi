@@ -9,6 +9,7 @@ from .models import (
     WishlistEntry,
     SwapOffer,
     Notification,
+    BoardGame,
 )
 
 
@@ -16,6 +17,12 @@ class GenreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Genre
         fields = ["id", "name"]
+
+
+class BoardGameSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BoardGame
+        fields = ["id", "bgg_id", "name", "image_url", "year_published"]
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -72,6 +79,20 @@ class GameSerializer(serializers.ModelSerializer):
         allow_null=True,
     )
     genre = GenreSerializer(read_only=True)
+    board_game_id = serializers.PrimaryKeyRelatedField(
+        queryset=BoardGame.objects.all(),
+        source="board_game",
+        write_only=True,
+        required=False,
+        allow_null=True,
+    )
+    board_game = BoardGameSerializer(read_only=True)
+
+    name = serializers.CharField(source="board_game.name", read_only=True)
+    min_players = serializers.IntegerField(source="board_game.min_players", read_only=True)
+    max_players = serializers.IntegerField(source="board_game.max_players", read_only=True)
+    playing_time = serializers.IntegerField(source="board_game.playing_time", read_only=True)
+    complexity = serializers.FloatField(source="board_game.complexity", read_only=True)
 
     class Meta:
         model = Game
@@ -82,7 +103,8 @@ class GameSerializer(serializers.ModelSerializer):
             "photo",
             "publisher",
             "grade",
-            "number_of_players",
+            "min_players",
+            "max_players",
             "playing_time",
             "complexity",
             "active",
@@ -90,6 +112,8 @@ class GameSerializer(serializers.ModelSerializer):
             "borrower_profile",
             "genre",
             "genre_id",
+            "board_game",
+            "board_game_id",
             "created_at",
         ]
         read_only_fields = ["profile", "borrower_profile", "created_at"]
@@ -192,21 +216,23 @@ class SwapOfferSerializer(serializers.ModelSerializer):
 
         offered_games = data.get("offered_games", [])
         for game in offered_games:
+            game_name = game.board_game.name if game.board_game else f"Game #{game.id}"
             if game.profile != proposer:
                 raise serializers.ValidationError(
-                    f"Game '{game.name}' does not belong to the proposer ({proposer.user.username})."
+                    f"Game '{game_name}' does not belong to the proposer ({proposer.user.username})."
                 )
             if not game.active:
-                raise serializers.ValidationError(f"Game '{game.name}' is not active.")
+                raise serializers.ValidationError(f"Game '{game_name}' is not active.")
 
         requested_games = data.get("requested_games", [])
         for game in requested_games:
+            game_name = game.board_game.name if game.board_game else f"Game #{game.id}"
             if game.profile != target:
                 raise serializers.ValidationError(
-                    f"Game '{game.name}' does not belong to the target ({target.user.username})."
+                    f"Game '{game_name}' does not belong to the target ({target.user.username})."
                 )
             if not game.active:
-                raise serializers.ValidationError(f"Game '{game.name}' is not active.")
+                raise serializers.ValidationError(f"Game '{game_name}' is not active.")
 
         return data
 

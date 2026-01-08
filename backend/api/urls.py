@@ -21,9 +21,11 @@ from .views import (
     SwapOfferReject,
     NotificationList,
     NotificationMarkRead,
+    BoardGameAutocompleteView,
 )
 
 urlpatterns = [
+    path("boardgames/autocomplete/", BoardGameAutocompleteView.as_view(), name="boardgame-autocomplete"),
     path("google-login/", LogInWithGoogle.as_view(), name="google-login"),
     path("token/refresh-cookie/", RefreshFromCookie.as_view(), name="refresh-cookie"),
     path("logout/", Logout.as_view(), name="logout"),

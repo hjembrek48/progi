@@ -45,15 +45,37 @@ class HasInterest(models.Model):
         db_table = "hasInterest"
 
 
+class BoardGame(models.Model):
+    bgg_id = models.IntegerField(unique=True)
+    name = models.CharField(max_length=255, db_index=True)
+    min_players = models.IntegerField(null=True, blank=True)
+    max_players = models.IntegerField(null=True, blank=True)
+    playing_time = models.IntegerField(null=True, blank=True)
+    min_playtime = models.IntegerField(null=True, blank=True)
+    max_playtime = models.IntegerField(null=True, blank=True)
+    year_published = models.IntegerField(null=True, blank=True)
+    description = models.TextField(blank=True)
+    image_url = models.URLField(max_length=500, blank=True)
+    thumbnail_url = models.URLField(max_length=500, blank=True)
+
+    rank = models.IntegerField(null=True, blank=True)
+    rating = models.FloatField(null=True, blank=True)
+    complexity = models.FloatField(null=True, blank=True)
+
+    def __str__(self):
+        return self.name
+
+
 class Game(models.Model):
-    name = models.CharField(max_length=200)
+    board_game = models.ForeignKey(
+        BoardGame,
+        on_delete=models.CASCADE,
+        related_name="user_games",
+    )
     description = models.TextField(blank=True)
     photo = models.ImageField(upload_to="game_photos/", blank=True, null=True)
     publisher = models.CharField(max_length=200, blank=True)
     grade = models.IntegerField(null=True, blank=True)
-    number_of_players = models.IntegerField(null=True, blank=True)
-    playing_time = models.IntegerField(null=True, blank=True)
-    complexity = models.IntegerField(null=True, blank=True)
     active = models.BooleanField(default=True)
 
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="games")
@@ -71,7 +93,7 @@ class Game(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.name
+        return f"{self.board_game.name} ({self.profile.user.username})"
 
 
 class Listing(models.Model):
@@ -83,7 +105,7 @@ class Listing(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Listing: {self.game.name} by {self.profile.user.username}"
+        return f"Listing: {self.game.board_game.name} by {self.profile.user.username}"
 
 
 class WishlistEntry(models.Model):
@@ -99,7 +121,7 @@ class WishlistEntry(models.Model):
         unique_together = ("profile", "game")
 
     def __str__(self):
-        return f"{self.profile.user.username} wants {self.game.name}"
+        return f"{self.profile.user.username} wants {self.game.board_game.name}"
 
 
 class Note(models.Model):

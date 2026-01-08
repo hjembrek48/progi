@@ -15,7 +15,7 @@ from rest_framework.permissions import (
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
-from .models import Note, Genre, Game, Listing, WishlistEntry, SwapOffer, Notification
+from .models import Note, Genre, Game, Listing, WishlistEntry, SwapOffer, Notification, BoardGame
 from .serializers import (
     NoteSerializer,
     UserSerializer,
@@ -26,6 +26,7 @@ from .serializers import (
     WishlistSerializer,
     SwapOfferSerializer,
     NotificationSerializer,
+    BoardGameSerializer,
 )
 from decimal import Decimal, ROUND_HALF_UP, InvalidOperation
 from drf_spectacular.utils import extend_schema, OpenApiParameter
@@ -370,27 +371,27 @@ class ListingList(generics.ListCreateAPIView):
 
         min_players = self.request.query_params.get("min_players")
         if min_players:
-            queryset = queryset.filter(game__number_of_players__gte=min_players)
+            queryset = queryset.filter(game__board_game__max_players__gte=min_players)
 
         max_players = self.request.query_params.get("max_players")
         if max_players:
-            queryset = queryset.filter(game__number_of_players__lte=max_players)
+            queryset = queryset.filter(game__board_game__min_players__lte=max_players)
 
         min_playing_time = self.request.query_params.get("min_playing_time")
         if min_playing_time:
-            queryset = queryset.filter(game__playing_time__gte=min_playing_time)
+            queryset = queryset.filter(game__board_game__playing_time__gte=min_playing_time)
 
         max_playing_time = self.request.query_params.get("max_playing_time")
         if max_playing_time:
-            queryset = queryset.filter(game__playing_time__lte=max_playing_time)
+            queryset = queryset.filter(game__board_game__playing_time__lte=max_playing_time)
 
         min_complexity = self.request.query_params.get("min_complexity")
         if min_complexity:
-            queryset = queryset.filter(game__complexity__gte=min_complexity)
+            queryset = queryset.filter(game__board_game__complexity__gte=min_complexity)
 
         max_complexity = self.request.query_params.get("max_complexity")
         if max_complexity:
-            queryset = queryset.filter(game__complexity__lte=max_complexity)
+            queryset = queryset.filter(game__board_game__complexity__lte=max_complexity)
 
         publisher = self.request.query_params.get("publisher")
         if publisher:
@@ -634,3 +635,27 @@ class NotificationMarkRead(APIView):
         notif.read = True
         notif.save()
         return Response(NotificationSerializer(notif).data)
+
+
+class BoardGameAutocompleteView(generics.ListAPIView):
+    serializer_class = BoardGameSerializer
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="query",
+                description="Search query for board game names",
+                required=True,
+                type=str,
+            ),
+        ]
+    )
+    def get(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
+    def get_queryset(self):
+        query = self.request.query_params.get("query", "")
+        if len(query) < 2:
+            return BoardGame.objects.none()
+        return BoardGame.objects.filter(name__istartswith=query)[:10]
