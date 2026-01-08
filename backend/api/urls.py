@@ -1,11 +1,31 @@
-#api-urls.py
+# api-urls.py
 from django.urls import path
 from .views import (
-    NoteListCreate, NoteDelete, CreateUserView,
-    LogInWithGoogle, RefreshFromCookie, Logout, ProfileLocationUpdate,
+    NoteListCreate,
+    NoteDelete,
+    CreateUserView,
+    LogInWithGoogle,
+    RefreshFromCookie,
+    Logout,
+    ProfileLocationUpdate,
+    GenreList,
+    GameListCreate,
+    GameDetail,
+    ListingList,
+    ListingDetail,
+    WishlistListCreate,
+    WishlistDetail,
+    SwapOfferListCreate,
+    SwapOfferDetail,
+    SwapOfferAccept,
+    SwapOfferReject,
+    NotificationList,
+    NotificationMarkRead,
+    BoardGameAutocompleteView,
 )
 
 urlpatterns = [
+    path("boardgames/autocomplete/", BoardGameAutocompleteView.as_view(), name="boardgame-autocomplete"),
     path("google-login/", LogInWithGoogle.as_view(), name="google-login"),
     path("token/refresh-cookie/", RefreshFromCookie.as_view(), name="refresh-cookie"),
     path("logout/", Logout.as_view(), name="logout"),
@@ -13,4 +33,21 @@ urlpatterns = [
     path("notes/", NoteListCreate.as_view(), name="notes"),
     path("notes/<int:pk>/", NoteDelete.as_view(), name="note-delete"),
     path("users/", CreateUserView.as_view(), name="users-create"),
+    path("genres/", GenreList.as_view(), name="genre-list"),
+    path("games/", GameListCreate.as_view(), name="game-list-create"),
+    path("games/<int:pk>/", GameDetail.as_view(), name="game-detail"),
+    path("listings/", ListingList.as_view(), name="listing-list-create"),
+    path("listings/<int:pk>/", ListingDetail.as_view(), name="listing-detail"),
+    path("wishlist/", WishlistListCreate.as_view(), name="wishlist-list-create"),
+    path("wishlist/<int:pk>/", WishlistDetail.as_view(), name="wishlist-detail"),
+    path("swaps/", SwapOfferListCreate.as_view(), name="swap-list-create"),
+    path("swaps/<int:pk>/", SwapOfferDetail.as_view(), name="swap-detail"),
+    path("swaps/<int:pk>/accept/", SwapOfferAccept.as_view(), name="swap-accept"),
+    path("swaps/<int:pk>/reject/", SwapOfferReject.as_view(), name="swap-reject"),
+    path("notifications/", NotificationList.as_view(), name="notification-list"),
+    path(
+        "notifications/<int:pk>/read/",
+        NotificationMarkRead.as_view(),
+        name="notification-read",
+    ),
 ]
