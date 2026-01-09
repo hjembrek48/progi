@@ -27,6 +27,7 @@ from .serializers import (
     SwapOfferSerializer,
     NotificationSerializer,
     BoardGameSerializer,
+    BoardGameDetailSerializer,
 )
 from decimal import Decimal, ROUND_HALF_UP, InvalidOperation
 from drf_spectacular.utils import extend_schema, OpenApiParameter
@@ -659,3 +660,9 @@ class BoardGameAutocompleteView(generics.ListAPIView):
         if len(query) < 2:
             return BoardGame.objects.none()
         return BoardGame.objects.filter(name__istartswith=query)[:10]
+
+class BoardGameDetail(generics.RetrieveAPIView):
+    queryset = BoardGame.objects.all()
+    serializer_class = BoardGameDetailSerializer
+    permission_classes = [IsAuthenticated]
+    lookup_field = 'bgg_id'
