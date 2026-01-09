@@ -25,6 +25,12 @@ class BoardGameSerializer(serializers.ModelSerializer):
         fields = ["id", "bgg_id", "name", "image_url", "year_published"]
 
 
+class BoardGameDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BoardGame
+        fields = "__all__"
+
+
 class ProfileSerializer(serializers.ModelSerializer):
     interests = GenreSerializer(many=True, read_only=True)
     interest_ids = serializers.PrimaryKeyRelatedField(
