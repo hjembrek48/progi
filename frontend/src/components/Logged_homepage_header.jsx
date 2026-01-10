@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import apiAuth from "../services/apiAuth.js";
 import { deleteTokenFromVariable } from "../services/auth.js";
 import './../styles/homepage.css'
+import logo from "../assets/Logo.png"
 
 export function Logged_homepage_header() {
     const {registrationStep, setRegistrationStep} = useAuth();
@@ -33,7 +34,7 @@ export function Logged_homepage_header() {
     return(
         <Row className='home_header p-2'>
             <Col xs={2}>
-                Icon
+                <img src={logo} alt="PlayTrade logo" className="logo img-fluid" />
             </Col>
             <Col xs={5}>
                 <Container>

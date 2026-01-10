@@ -1,10 +1,35 @@
-import { useRef } from "react";
 import { ProfilePageHeader } from "../components/ProfilePageHeader";
 import { Footer } from "../components/Footer";
 import { FaPlus, FaUserCircle } from "react-icons/fa";
+import { useEffect, useState, useRef } from "react";
+import apiAuth from "../services/apiAuth.js";
+
 
 export function Profilepage() {
-  const gamesListRef = useRef(null);
+  const gamesListRef = useRef(null);         //funkcija za scroll igara
+  const [profile, setProfile] = useState(null);    //dodavanje property-a objekta profile
+  const [username, setUsername] = useState("");
+  const [description, setDescription] = useState("");  
+
+
+
+useEffect(() => {
+  const fetchProfile = async () => {
+    try {
+      const res = await apiAuth.get("profile");
+      setProfile(res.data);
+    } catch (err) {
+      console.error("Ne mogu dohvatiti profil:", err);
+    }
+  };
+
+  fetchProfile();
+}, []);
+
+
+if (!profile) {
+  return <div style={{ color: "white" }}>Učitavanje...</div>;
+}
 
   const scrollGames = (direction) => {
     if (gamesListRef.current) {
@@ -32,12 +57,19 @@ export function Profilepage() {
             </div>
 
             <div style={styles.userMeta}>
-              <h2 style={styles.korisnicko_ime}>Ime Prezime</h2>
+              <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Korisničko ime"
+                style={styles.korisnicko_ime_input} 
+              />
+
               <p style={styles.smallInfo}>
-                <strong style={styles.label}>Email:</strong> email@gmail.com
+                <strong style={styles.label}>Email:</strong> {profile.email}
               </p>
               <p style={styles.smallInfo}>
-                <strong style={styles.label}>Lokacija:</strong> Zagreb, Hrvatska
+                <strong style={styles.label}>Lokacija:</strong> {profile.address}
               </p>
               <p style={styles.smallInfo}>
                 <strong style={styles.label}>Aktivne zamjene:</strong> broj
@@ -45,9 +77,13 @@ export function Profilepage() {
             </div>
           </div>
 
-          <p style={styles.opis}>
-            Kratak opis korisnikovih preferencija
-          </p>
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Opis..."
+            style={styles.opis_input}
+          />
+
         </div>
 
         <div style={styles.gamesSection}>
@@ -96,7 +132,7 @@ const styles = {
     height: "100vh",
     display: "flex",
     flexDirection: "column",
-    backgroundColor: "#f8f9fa",
+    backgroundColor: "#354F52",
   },
 
   main: {
@@ -112,7 +148,7 @@ const styles = {
   card: {
     width: "100%",
     maxWidth: "600px",
-    backgroundColor: "#fff",
+    backgroundColor: "#52796F",
     borderRadius: "16px",
     boxShadow: "0 6px 30px rgba(0,0,0,0.25)",
     padding: "28px",
@@ -154,7 +190,7 @@ const styles = {
     position: "absolute",
     bottom: "6px",
     right: "6px",
-    backgroundColor: "#a81c21ff",
+    backgroundColor: "#354F52",
     color: "white",
     border: "none",
     borderRadius: "50%",
@@ -179,19 +215,19 @@ const styles = {
   korisnicko_ime: {
     fontSize: "1.7rem",
     fontWeight: 700,
-    color: "#111",
+    color: "#fff",
     margin: 0,
     letterSpacing: "0.5px",
   },
 
   smallInfo: {
     margin: 0,
-    color: "#444",
+    color: "#fff",
     fontSize: "0.96rem",
   },
 
   opis: {
-    color: "#555",
+    color: "#fff",
     marginTop: "12px",
     lineHeight: 1.5,
     fontSize: "1rem",
@@ -200,7 +236,7 @@ const styles = {
   label: {
     fontWeight: 600,
     marginRight: "6px",
-    color: "#222",
+    color: "#fff",
   },
 
  gamesSection: {
@@ -217,7 +253,7 @@ gamesTitle: {
   textAlign: "center",
   fontSize: "1.4rem",
   fontWeight: "700",
-  color: "#222",
+  color: "#fff",
   marginBottom: "8px",
   letterSpacing: "0.5px",
 },
@@ -228,7 +264,7 @@ gamesWrapper: {
   justifyContent: "center",
   gap: "16px",
   width: "100%",
-  backgroundColor: "#a81c21ff", 
+  backgroundColor: "#52796F", 
   borderRadius: "12px",
   padding: "16px",
   boxShadow: "0 4px 20px rgba(1, 1, 1, 1)", 
@@ -275,4 +311,31 @@ gameItem: {
   boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
   transition: "transform 0.2s ease",
 },
+
+korisnicko_ime_input: {
+  fontSize: "1.7rem",
+  fontWeight: 700,
+  color: "#fff",
+  backgroundColor: "transparent",
+  border: "none",
+  outline: "none",
+  padding: 0,
+  margin: 0,
+  letterSpacing: "0.5px",
+  width: "100%",
+},
+
+opis_input: {
+  color: "#fff",
+  marginTop: "12px",
+  lineHeight: 1.5,
+  fontSize: "1rem",
+  backgroundColor: "transparent",
+  border: "none",
+  outline: "none",
+  resize: "none",
+  width: "100%",
+  minHeight: "60px",
+},
+
 };

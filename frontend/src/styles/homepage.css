@@ -124,3 +124,13 @@
     color: white !important;
     border: #CAD2C5 solid 3px !important;
 }
+.home_header .logo {
+    height: 100px;   
+    max-width: 220px;
+    width: auto;
+    object-fit: contain;
+    display: block;
+}
+
+
+

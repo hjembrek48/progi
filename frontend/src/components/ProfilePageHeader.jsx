@@ -28,7 +28,7 @@ const styles = {
     top: 0,
     left: 0,
     width: "100%",
-    height: "40px",
+    height: "60px",
     boxShadow: "0 2px 8px rgba(0,0,0,0.3)",
     zIndex: 1000,
   },
