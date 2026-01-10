@@ -31,7 +31,14 @@ def create_user_profile(sender, instance, created, **kwargs):
 
 
 class Genre(models.Model):
-    name = models.CharField(max_length=100)
+    GENRE_CHOICES = [
+        ("GENRE1", "Genre1"),
+        ("GENRE2", "Genre2"),
+        ("GENRE3", "Genre3"),
+        ("GENRE4", "Genre4"),
+    ]
+
+    name = models.CharField(max_length=20, choices=GENRE_CHOICES, default="GENRE1")
 
     def __str__(self):
         return self.name
