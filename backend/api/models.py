@@ -38,7 +38,11 @@ class Genre(models.Model):
         ("GENRE4", "Genre4"),
     ]
 
-    name = models.CharField(max_length=20, choices=GENRE_CHOICES, default="GENRE1")
+    name = models.CharField(
+        max_length=20,
+        choices=GENRE_CHOICES,
+        default="GENRE1"        
+    )
 
     def __str__(self):
         return self.name
@@ -75,11 +79,6 @@ class BoardGame(models.Model):
 
 
 class Game(models.Model):
-    class Genre(models.TextChoices):
-        GENRE1 = "GENRE1", "Genre1"
-        GENRE2 = "GENRE2", "Genre2"
-        GENRE3 = "GENRE3", "Genre3"
-        GENRE4 = "GENRE4", "Genre4"
 
     board_game = models.ForeignKey(
         BoardGame,
@@ -100,10 +99,13 @@ class Game(models.Model):
         blank=True,
         related_name="borrowed_games",
     )
-    genre = models.CharField(
-        max_length=20,
-        choices=Genre.choices,
-        default=Genre.GENRE1
+    
+    genre = models.ForeignKey(
+        "Genre", 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True,
+        related_name="games"
     )
 
     created_at = models.DateTimeField(auto_now_add=True)
