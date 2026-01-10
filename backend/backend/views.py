@@ -74,9 +74,13 @@ class LogInWithGoogle(APIView):
                 },
             )
             if created:
-                user.set_password(get_random_string(32))  # npr. 32-znakovna lozinka
+                user.set_password(get_random_string(32))
                 user.save()
 
+            profile, _ = Profile.objects.get_or_create(user=user)
+            if profile.email != email:
+                profile.email = email
+                profile.save()
             return create_cookie_response(user)  
 
         except Exception as e:
