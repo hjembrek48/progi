@@ -31,3 +31,96 @@
     background-color: #2F3E46 !important;
     transform: scale(1.05) !important;
 }
+.add_game_background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    backdrop-filter: blur(10px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.add_game_container {
+    max-height: 95vh;
+    min-height: 400px;
+    overflow-y: auto;
+    background: white;
+    border-radius: 15px;
+    margin-left: 15% !important;
+    margin-right: 15% !important;
+}
+.add_game_label {
+    font-weight: bold;
+     margin-bottom: 1em;
+}
+.rating_container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.add_game_header {
+    font-weight: bold;
+    color: black;
+}
+.photo_preview_div {
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+}
+.photo_preview_div img {
+    max-width: 100%;
+    max-height: 25em;
+    object-fit: contain;
+    border-radius: 10px;
+    border: 3px solid white;
+}
+.autocomplete_group {
+    position: absolute;
+    top: 100%;
+    max-height: 300px;
+    overflow-y: auto;
+}
+.list_group_wrap {
+    position: relative;
+}
+.add_game_button_wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 50px;
+}
+.add_game_button {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 20px 30px !important;
+    gap: 10px !important;
+    font-size: 1rem !important;
+    border-radius: 12px !important;
+    background-color: #5E1914 !important;
+    color: white !important;
+    border: #CAD2C5 solid 3px !important;
+}
+.add_game_button:hover {
+    transform: scale(1.05) !important;
+    background-color: #8d021f !important;
+}
+.games_palette {
+    display: flex;
+    flex-direction: row;
+    padding: 2em;
+    margin: 2em;
+    background-color: #354F52;
+    border: #2F3E46 solid 5px;
+    border-radius: 10px;
+}
+.goButton {
+    font-size: 1rem !important;
+    border-radius: 12px !important;
+    background-color: #5E1914 !important;
+    color: white !important;
+    border: #CAD2C5 solid 3px !important;
+}

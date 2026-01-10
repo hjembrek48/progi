@@ -1,11 +1,11 @@
 import { Row, Col, Container, Button } from "react-bootstrap";
-import apiAuth from './../services/apiAuth.js';
 import { CgProfile } from "react-icons/cg";
 import { RiLogoutBoxLine } from "react-icons/ri";
 import { useAuth } from "./AuthProvider";
-import { deleteTokenFromVariable } from "../services/auth.js";
 import { useState } from "react";
 import { useNavigate } from 'react-router-dom';
+import apiAuth from "../services/apiAuth.js";
+import { deleteTokenFromVariable } from "../services/auth.js";
 import './../styles/homepage.css'
 
 export function Logged_homepage_header() {
