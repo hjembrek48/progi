@@ -1,6 +1,7 @@
 import { Button, Container, Row, Col } from 'react-bootstrap'
 import { useNavigate } from 'react-router';
 import './../styles/homepage.css';
+import logo from "../assets/Logo.png"
 
 export function Homepage_header() {
     const navigate = useNavigate();
@@ -8,7 +9,7 @@ export function Homepage_header() {
     return(
         <Row className='home_header p-2'>
             <Col xs={2}>
-                Icon
+                <img src={logo} alt="PlayTrade logo" className="logo img-fluid" />
             </Col>
             <Col xs={5}>
                 <Container>

@@ -31,3 +31,12 @@
     background-color: #2F3E46 !important;
     transform: scale(1.05) !important;
 }
+.home_header .logo {
+    height: 100px;   
+    max-width: 220px;
+    width: auto;
+    object-fit: contain;
+    display: block;
+}
+
+
