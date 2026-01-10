@@ -148,6 +148,12 @@ class LogInWithGoogle(APIView):
                 first_name=first_name[:150],
                 last_name=last_name[:150],
             )
+        
+        from .models import Profile
+        profile, _ = Profile.objects.get_or_create(user = user)
+        if profile.email != email:
+            profile.email = email
+            profile.save()
 
         # Vrati access + postavi refresh u cookie
         return create_cookie_response(user)
