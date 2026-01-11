@@ -45,6 +45,7 @@ class LogInWithGoogle(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
+        print("HIT LogInWithGoogle.post()")
         try:
             print("USING COOKIE LOGIN >>>", getattr(settings, "USE_SECURE_COOKIES", False))
 
