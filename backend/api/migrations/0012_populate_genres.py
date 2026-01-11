@@ -7,7 +7,13 @@ def create_genres(apps, schema_editor):
     Genre = apps.get_model('api', 'Genre')
     
     # Lista tvojih žanrova iz modela
-    GENRES = ["GENRE1", "GENRE2", "GENRE3", "GENRE4"]
+    GENRES = ["PUZZLE", 
+        "COOP", 
+        "STRATEGY", 
+        "TRIVIA",
+        "RPG",
+        "CHALLENGE", 
+        "CARD"]
     
     for name in GENRES:
         Genre.objects.get_or_create(name=name)
