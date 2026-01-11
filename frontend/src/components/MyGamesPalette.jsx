@@ -10,7 +10,7 @@ import './../styles/homepage.css';
 //uzima po 5 igara i stavlja ih u redak, gumb za redak gore, gumb za redak dolje
 const max_games_per_page = 5;
 
-export function MyGamesPalette({ my_games }) {
+export function MyGamesPalette({ my_games, onGamesChange }) {
     const [index, setIndex] = useState(0); //indeks prve igre na prikazu
     const [games, setGames] = useState([]); //sve aktivne igre
     const [currentlyShowedGames, setCurrentlyShowedGames] = useState([]); //one igre koje su sad na prikazu
@@ -36,10 +36,10 @@ export function MyGamesPalette({ my_games }) {
 
             try {
                 const res = await apiAuth.get("games");
-                if(res.data.length > 0) {
-                    setGames(res.data);
-                    setIndex(0);
-                }
+                setGames(res.data);
+                setIndex(0);
+                setCurrentlySelectedGame(null);
+                onGamesChange();
             } catch (e) {
                 console.log("Failed to fetch your games!");
             }

@@ -18,6 +18,8 @@ export function MyGames() {
                 const res = await apiAuth("games");
                 if(res.data.length > 0) {
                     setMyGames(res.data);
+                } else {
+                    setMyGames([]);
                 }
             } catch (e) {
                 console.log("Failed to fetch your games!");
@@ -39,8 +41,8 @@ export function MyGames() {
                         <Button className='home_button' id="nav_button">Wishlist</Button>
                     </ButtonGroup>
                 </div>
-                {(myGames.length > 0) && <MyGamesPalette my_games={myGames} />}
-                {(myGames.length == 0) && <NoMyGamesPalette />}
+                {(myGames.length > 0) && <MyGamesPalette my_games={myGames} onGamesChange={fetchMyGames}/>}
+                {(myGames.length === 0) && <NoMyGamesPalette />}
 
                 <Container className='add_game_button_wrapper'>
                     <Button className='add_game_button' onClick={() => {setIsAddGameOpen(true)}}>
