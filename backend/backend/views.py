@@ -2,6 +2,8 @@
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils.crypto import get_random_string
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -36,7 +38,7 @@ def create_cookie_response(user):
     )
     return res
 
-
+@method_decorator(csrf_exempt, name="dispatch")
 class LogInWithGoogle(APIView):
 
     authentication_classes = []
