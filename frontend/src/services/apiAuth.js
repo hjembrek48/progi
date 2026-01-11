@@ -5,6 +5,12 @@ import {
   deleteTokenFromVariable,
 } from "./auth.js";
 
+function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(";").shift();
+}
+
 const apiAuth = axios.create({
   baseURL: `${process.env.REACT_APP_API_URL}/api/`,
   withCredentials: true,
@@ -14,6 +20,12 @@ apiAuth.interceptors.request.use((config) => {
   let token = getAccessToken();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
+  }
+  //ako Django pošalje csrf token - preuzmi ga od njega iz cookija:
+  const csrfToken = getCookie("csrftoken");
+  //ako je metoda koju koristimo neka od onih koje mijenjaju podatke, u zahtjev moramo uključiti csrf token
+  if (csrfToken && ["post", "put", "patch", "delete"].includes(config.method.toLowerCase())) {
+    config.headers["X-CSRFToken"] = csrfToken;
   }
   return config;
 });
