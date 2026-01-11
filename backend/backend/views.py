@@ -9,6 +9,8 @@ from rest_framework import generics, status
 from rest_framework_simplejwt.tokens import RefreshToken
 import requests
 import traceback
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 
 from api.models import Profile
 from api.serializers import ProfileSerializer
@@ -36,7 +38,7 @@ def create_cookie_response(user):
     )
     return res
 
-
+@method_decorator(csrf_exempt, name='dispatch')
 class LogInWithGoogle(APIView):
 
     authentication_classes = []
