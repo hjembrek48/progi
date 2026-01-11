@@ -32,6 +32,8 @@ from .serializers import (
 )
 from decimal import Decimal, ROUND_HALF_UP, InvalidOperation
 from drf_spectacular.utils import extend_schema, OpenApiParameter
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 
 
 def round6(value):
@@ -91,7 +93,7 @@ def geocode_address(address: str):
     except requests.RequestException:
         return None
 
-
+@method_decorator(csrf_exempt, name='dispatch')
 class LogInWithGoogle(APIView):
     permission_classes = [AllowAny]
 
