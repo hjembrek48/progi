@@ -21,11 +21,11 @@ USE_SECURE_COOKIES = os.getenv("USE_SECURE_COOKIES", "0") == "1"
 #CSRF_COOKIE_SECURE = USE_SECURE_COOKIES
 
 
-CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = False #kasnije u produkciji staviti u True
+SESSION_COOKIE_SECURE = False #u produkciji isto u True
 
-CSRF_COOKIE_SAMESITE = "None"
-SESSION_COOKIE_SAMESITE = "None"
+CSRF_COOKIE_SAMESITE = "Lax" #kasnije u produkciji staviti u None
+SESSION_COOKIE_SAMESITE = "Lax" #kasnije u produkciji staviti u None
 
 
 # Quick-start development settings - unsuitable for production
