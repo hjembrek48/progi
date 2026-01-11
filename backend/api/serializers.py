@@ -144,6 +144,10 @@ class ListingSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 "You can only list games that belong to you."
             )
+        if Listing.objects.filter(game=value).exists():
+            raise serializers.ValidationError({
+                "This games already has listing"
+            })
         return value
 
 
