@@ -45,7 +45,7 @@ export function Loginpage() {
                     }, 
                     {
                         headers: {"Content-Type": "application/json"},
-                        withCredentials: true
+                        //withCredentials: true
                     });
                     //ako smo ovdje - server je vratio status 200
                     setAccessToken(server_res.data.access);
