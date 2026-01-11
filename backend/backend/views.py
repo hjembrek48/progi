@@ -2,9 +2,12 @@
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils.crypto import get_random_string
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.authentication import SessionAuthentication
 from rest_framework import generics, status
 from rest_framework_simplejwt.tokens import RefreshToken
 import requests
@@ -38,13 +41,18 @@ def create_cookie_response(user):
     )
     return res
 
-@method_decorator(csrf_exempt, name='dispatch')
+class CsrfExemptSessionAuthentication(SessionAuthentication):
+    def enforce_csrf(self, request):
+        return
+
+@method_decorator(csrf_exempt, name="dispatch")
 class LogInWithGoogle(APIView):
 
-    authentication_classes = []
+    authentication_classes = [CsrfExemptSessionAuthentication]
     permission_classes = [AllowAny]
 
     def post(self, request):
+        print("HIT LogInWithGoogle.post()")
         try:
             print("USING COOKIE LOGIN >>>", getattr(settings, "USE_SECURE_COOKIES", False))
 
