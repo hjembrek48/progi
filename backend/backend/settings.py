@@ -181,6 +181,7 @@ CSRF_TRUSTED_ORIGINS = [
     "https://*.githubpreview.dev",
     "https://*.app.github.dev",
     "https://*.onrender.com",
+    "https://progi-backend-lpki.onrender.com"
 ]
 CORS_ALLOW_CREDENTIALS = True
 
