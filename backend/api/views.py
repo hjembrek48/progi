@@ -15,6 +15,7 @@ from rest_framework.permissions import (
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
+from rest_framework.exceptions import ValidationError
 from .models import Note, Genre, Game, Listing, WishlistEntry, SwapOffer, Notification, BoardGame
 from .serializers import (
     NoteSerializer,
@@ -354,6 +355,22 @@ class ListingList(generics.ListCreateAPIView):
             ),
         ]
     )
+    def preform_create(self, serializer):
+        game=serializer.validate_data.get("game")
+        user_profile = self.request.user.profile
+
+        if game.profile!=user_profile:
+            raise ValidationError({
+                "game": "This game does not belong to you"
+            })
+        
+        if Listing.objects.filter(game=game, profile=user_profile).exists():
+            raise ValidationError({
+                "game":"This game is already listed"
+            })
+        
+        serializer.save(profile=user_profile)
+
     def get(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
