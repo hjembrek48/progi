@@ -4,7 +4,7 @@ import "./../styles/homepage.css"
 export function GameCard({ game, onClick}) {
     return(
         <Card
-        className="h-100 game_card"
+        className={game.listing ? "game_card_listed" : "game_card_unlisted"}
         onClick={onClick}
         >
             <Card.Img

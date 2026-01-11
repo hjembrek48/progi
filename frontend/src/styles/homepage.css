@@ -136,12 +136,20 @@
     object-fit: contain;
     display: block;
 }
-.game_card {
+.game_card_listed {
     border: 4px solid #5E1914 !important;
     border-radius: 12px !important;
     overflow: hidden !important;
     background-color: white !important;
     cursor: pointer !important;
+}
+.game_card_unlisted {
+    border: 4px solid #3a1a14 !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    background-color: #e1dfdf !important;
+    cursor: pointer !important;
+    opacity: 0.8 !important; 
 }
 .game-card img {
     height: 180px !important;
@@ -186,4 +194,22 @@
 .button_type3:hover {
     background-color: #2B547E !important;
     transform: scale(1.05) !important;   
+}
+.game_card_bigger_listed {
+    background-color: white !important;
+    position: relative;
+}
+.game_card_bigger_unlisted {
+    background-color: #e1dfe1 !important;
+    opacity: 0.9 !important;
+}
+.listed_bagde {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: white;
+    font-weight: bold;
+    padding: 1em;
+    border-radius: 1px;
+    background-color: #8d021f;
 }

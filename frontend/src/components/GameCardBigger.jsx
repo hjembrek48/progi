@@ -4,42 +4,46 @@ import { FaStar } from "react-icons/fa";
 import { VscPerson } from "react-icons/vsc";
 import { FaPencil } from "react-icons/fa6";
 import './../styles/homepage.css';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { EditGameWindow } from "./EditGameWindow";
 import apiAuth from "../services/apiAuth";
 
 export function GameCardBigger({ game, onClose, onDelete }) {
     const [editing, setEditing] = useState(false);
-    if(!game) {
-        return null;
-    }
+    const [gameListed, setGameListed] = useState(game.listing);
+
+    useEffect(() => {
+        setGameListed(game.listing);
+    }, [game.listing])
+    
     // listing
     const handleListGame = async () => {
         try {
-            await apiAuth.post('listings/', {
+            await apiAuth.post("listings/", {
                 game_id: game.id,
                 description: game.description || ""
             });
-            alert("Igra je uspješno objavljena!");
+            alert("Game successfully listed!");
+            setGameListed(true);
             onClose(); 
         } catch (error) {
-            console.error("Greška pri listanju:", error);
-            alert("Neuspješno listanje.");
+            console.error("Listing error:", error);
+            alert("Listing failed.");
         }
     };
 
     // unlisting
     const handleUnlistGame = async () => {
-        if (!window.confirm("Želiš li povući ovaj oglas? Igra će ostati u tvojoj kolekciji.")) return;
+        if (!window.confirm("Do you want to withdraw this listing? (Game will stay in your collection)")) return;
         
         try {
             await apiAuth.delete(`listings/${game.listing.id}/`);
-            
-            alert("Oglas je uklonjen.");
+            alert("Listing withdrawed.");
+            setGameListed(false);
             onClose(); 
         } catch (error) {
-            console.error("Greška pri uklanjanju oglasa:", error);
-            alert("Neuspješno uklanjanje oglasa.");
+            console.error("Error while withdrawing listing:", error);
+            alert("Listing withdrawal failed!");
         }
     };
 
@@ -52,7 +56,8 @@ export function GameCardBigger({ game, onClose, onDelete }) {
                     {game.name}
                 </Modal.Title>
             </Modal.Header>
-            <Modal.Body>
+            <Modal.Body className={gameListed ? "game_card_bigger_listed" : "game_card_bigger_unlisted"}>
+                {gameListed && !editing && <div className="listed_badge">Listed</div>}
                 {editing == true ? <EditGameWindow game={game} onDone={() => setEditing(false)}/> :
                     (<>
                         <img 
@@ -96,12 +101,12 @@ export function GameCardBigger({ game, onClose, onDelete }) {
                 <Button className="button_type1" onClick={onClose}>
                     Close
                 </Button>
-                {game.listing ? (
-                    <Button variant="warning" onClick={handleUnlistGame}>
+                {gameListed ? (
+                    <Button variant="warning" onClick={() => handleUnlistGame()}>
                         Unlist Game
                     </Button>
                 ) : (
-                    <Button variant="success" onClick={handleListGame}>
+                    <Button variant="success" onClick={() => handleListGame()}>
                         List Game
                     </Button>
                 )}
