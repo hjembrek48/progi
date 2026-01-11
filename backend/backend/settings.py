@@ -14,12 +14,19 @@ DEBUG = True
 USE_SECURE_COOKIES = os.getenv("USE_SECURE_COOKIES", "0") == "1"
 # USE_SECURE_COOKIES = False
 # SAMESITE mora biti "None" ako frontend i backend nisu na istoj domeni
-SESSION_COOKIE_SAMESITE = "None" if USE_SECURE_COOKIES else "Lax"
-CSRF_COOKIE_SAMESITE = "None" if USE_SECURE_COOKIES else "Lax"
 
-# SECURE ovisi o tome radiš li lokalno (HTTP) ili produkcijski (HTTPS)
-SESSION_COOKIE_SECURE = USE_SECURE_COOKIES
-CSRF_COOKIE_SECURE = USE_SECURE_COOKIES
+#SESSION_COOKIE_SAMESITE = "None" if USE_SECURE_COOKIES else "Lax"
+#CSRF_COOKIE_SAMESITE = "None" if USE_SECURE_COOKIES else "Lax"
+#SESSION_COOKIE_SECURE = USE_SECURE_COOKIES
+#CSRF_COOKIE_SECURE = USE_SECURE_COOKIES
+
+
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+
+CSRF_COOKIE_SAMESITE = "None"
+SESSION_COOKIE_SAMESITE = "None"
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
