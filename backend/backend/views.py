@@ -38,6 +38,8 @@ def create_cookie_response(user):
 
 
 class LogInWithGoogle(APIView):
+
+    authentication_classes = []
     permission_classes = [AllowAny]
 
     def post(self, request):
