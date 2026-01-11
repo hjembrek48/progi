@@ -32,10 +32,13 @@ def create_user_profile(sender, instance, created, **kwargs):
 
 class Genre(models.Model):
     GENRE_CHOICES = [
-        ("GENRE1", "Genre1"),
-        ("GENRE2", "Genre2"),
-        ("GENRE3", "Genre3"),
-        ("GENRE4", "Genre4"),
+        ("PUZZLE", "Mozgalica"),
+        ("COOP", "Kooperativna igra"),
+        ("STRATEGY", "Strateška"),
+        ("TRIVIA", "Opće znanje"),
+        ("RPG", "Igranje uloga"),
+        ("CHALLENGE", "Izazovi"),
+        ("CARD", "Kartaška igra"),
     ]
 
     name = models.CharField(
