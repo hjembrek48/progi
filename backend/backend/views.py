@@ -7,6 +7,7 @@ from django.utils.decorators import method_decorator
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.authentication import SessionAuthentication
 from rest_framework import generics, status
 from rest_framework_simplejwt.tokens import RefreshToken
 import requests
@@ -38,10 +39,14 @@ def create_cookie_response(user):
     )
     return res
 
+class CsrfExemptSessionAuthentication(SessionAuthentication):
+    def enforce_csrf(self, request):
+        return
+
 @method_decorator(csrf_exempt, name="dispatch")
 class LogInWithGoogle(APIView):
 
-    authentication_classes = []
+    authentication_classes = [CsrfExemptSessionAuthentication]
     permission_classes = [AllowAny]
 
     def post(self, request):
