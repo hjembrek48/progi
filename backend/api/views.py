@@ -67,6 +67,7 @@ def create_cookie_response(user: User) -> Response:
         secure=settings.USE_SECURE_COOKIES,
         samesite="None" if settings.USE_SECURE_COOKIES else "Lax",
         max_age=14 * 24 * 3600,
+        path="/",
     )
 
     return res
@@ -99,6 +100,7 @@ def geocode_address(address: str):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class LogInWithGoogle(APIView):
+    authentication_classes = []
     permission_classes = [AllowAny]
 
     def post(self, request):
