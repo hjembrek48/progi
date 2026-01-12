@@ -1,7 +1,6 @@
-.search_params_container {
+.dark_green_bg {
   background-color: #52796f;
 }
-
 .results_grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -38,10 +37,6 @@
   margin-bottom: 0;
 }
 
-.search_params_container button {
-  margin-top: 1rem !important;
-}
-
 .listing {
   display: flex;
   flex-direction: column;
@@ -73,4 +68,13 @@
 
 .dark_text {
   color: #2f3e46;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.border_break {
+  border-bottom: 3px solid #ddd;
 }

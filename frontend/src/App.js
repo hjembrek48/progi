@@ -10,7 +10,8 @@ import { ProtectedRoute } from './components/ProtectedRoute.jsx';
 import { AuthProvider } from './components/AuthProvider.jsx';
 import { RestrictedRoute } from './components/RestrictedRoute.jsx';
 import { CategoryWishlist } from './components/CategoryWishlist.jsx';
-import {SearchPage} from './pages/SearchPage.jsx';
+import SearchPage from './pages/SearchPage.jsx';
+import ListingPage from './pages/ListingPage.jsx';
 
 
 function App() {
@@ -36,7 +37,8 @@ function App() {
               <ProtectedRoute minStep={3}>
                 <MyGames />
               </ProtectedRoute>} />
-            <Route path='/search' element={<SearchPage></SearchPage>}></Route>
+            <Route path='/search' element={<SearchPage/>}/>
+            <Route path='/listing/:listingId' element={<ListingPage/>}/>
         </Routes>
       </BrowserRouter>
     </AuthProvider>
