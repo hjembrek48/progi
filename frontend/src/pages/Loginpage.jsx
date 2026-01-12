@@ -18,6 +18,7 @@ export function Loginpage() {
     const { registrationStep, setRegistrationStep } = useAuth();
 
     useEffect(() => {
+        apiAuth.get("csrf/");
         //Stavljamo <script> koji učitava Google Identity Services na page
         const element = document.createElement("script");
         element.src="https://accounts.google.com/gsi/client";

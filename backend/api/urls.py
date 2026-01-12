@@ -23,6 +23,7 @@ from .views import (
     NotificationMarkRead,
     BoardGameAutocompleteView,
     BoardGameDetail,
+    CsrfCookieView
 )
 
 urlpatterns = [
@@ -47,6 +48,7 @@ urlpatterns = [
     path("swaps/<int:pk>/accept/", SwapOfferAccept.as_view(), name="swap-accept"),
     path("swaps/<int:pk>/reject/", SwapOfferReject.as_view(), name="swap-reject"),
     path("notifications/", NotificationList.as_view(), name="notification-list"),
+    path("csrf/", CsrfCookieView.as_view(), name="csrf"),
     path(
         "notifications/<int:pk>/read/",
         NotificationMarkRead.as_view(),

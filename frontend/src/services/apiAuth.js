@@ -14,7 +14,7 @@ function getCookie(name) {
 
 const apiAuth = axios.create({
   baseURL: `${process.env.REACT_APP_API_URL}/api/`,
-  withCredentials: true, // 🔑 OBAVEZNO
+  withCredentials: true,
 });
 
 // REQUEST interceptor
