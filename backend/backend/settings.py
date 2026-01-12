@@ -21,11 +21,11 @@ USE_SECURE_COOKIES = os.getenv("USE_SECURE_COOKIES", "0") == "1"
 #CSRF_COOKIE_SECURE = USE_SECURE_COOKIES
 
 
-CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = False #True
+SESSION_COOKIE_SECURE = False #True
 
-CSRF_COOKIE_SAMESITE = "None"
-SESSION_COOKIE_SAMESITE = "None"
+CSRF_COOKIE_SAMESITE = "Lax" #None
+SESSION_COOKIE_SAMESITE = "Lax" #None
 
 
 # Quick-start development settings - unsuitable for production
@@ -181,7 +181,6 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "https://progi-frontend.onrender.com",
     "https://<tvoj-codespaces>.githubpreview.dev",
-    "https://localhost:3000"
 ]
 
 CSRF_TRUSTED_ORIGINS = [
@@ -191,7 +190,6 @@ CSRF_TRUSTED_ORIGINS = [
     "https://*.app.github.dev",
     "https://*.onrender.com",
     "https://progi-backend-lpki.onrender.com",
-    "https://localhost:3000"
 ]
 CORS_ALLOW_CREDENTIALS = True
 
