@@ -622,12 +622,13 @@ class SwapOfferAccept(APIView):
                 game.profile = offer.target
                 game.active = False
                 game.save()
-                Listing.objects.filter(game=game).delete()
+                Listing.objects.filter(game_id=game.id).delete()
 
             for game in offer.requested_games.all():
                 game.profile = offer.proposer
                 game.active = False
                 game.save()
+                Listing.objects.filter(game_id=game.id).delete()
 
             Notification.objects.create(
                 recieved_profile=offer.proposer,
