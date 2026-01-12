@@ -22,6 +22,8 @@ from .views import (
     NotificationList,
     NotificationMarkRead,
     BoardGameAutocompleteView,
+    BoardGameDetail,
+    CsrfCookieView,
     SubscribeView,
     UnsubscribeView,
 )
@@ -32,6 +34,7 @@ urlpatterns = [
         BoardGameAutocompleteView.as_view(),
         name="boardgame-autocomplete",
     ),
+    path("boardgames/<int:bgg_id>/", BoardGameDetail.as_view(), name="boardgame-detail"),
     path("google-login/", LogInWithGoogle.as_view(), name="google-login"),
     path("token/refresh-cookie/", RefreshFromCookie.as_view(), name="refresh-cookie"),
     path("logout/", Logout.as_view(), name="logout"),
@@ -51,6 +54,7 @@ urlpatterns = [
     path("swaps/<int:pk>/accept/", SwapOfferAccept.as_view(), name="swap-accept"),
     path("swaps/<int:pk>/reject/", SwapOfferReject.as_view(), name="swap-reject"),
     path("notifications/", NotificationList.as_view(), name="notification-list"),
+    path("csrf/", CsrfCookieView.as_view(), name="csrf"),
     path(
         "notifications/<int:pk>/read/",
         NotificationMarkRead.as_view(),

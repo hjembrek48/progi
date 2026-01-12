@@ -2,13 +2,18 @@
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils.crypto import get_random_string
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.authentication import SessionAuthentication
 from rest_framework import generics, status
 from rest_framework_simplejwt.tokens import RefreshToken
 import requests
 import traceback
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 
 from api.models import Profile
 from api.serializers import ProfileSerializer
@@ -36,11 +41,18 @@ def create_cookie_response(user):
     )
     return res
 
+class CsrfExemptSessionAuthentication(SessionAuthentication):
+    def enforce_csrf(self, request):
+        return
 
+@method_decorator(csrf_exempt, name="dispatch")
 class LogInWithGoogle(APIView):
+
+    authentication_classes = [CsrfExemptSessionAuthentication]
     permission_classes = [AllowAny]
 
     def post(self, request):
+        print("HIT LogInWithGoogle.post()")
         try:
             print("USING COOKIE LOGIN >>>", getattr(settings, "USE_SECURE_COOKIES", False))
 
@@ -74,9 +86,13 @@ class LogInWithGoogle(APIView):
                 },
             )
             if created:
-                user.set_password(get_random_string(32))  # npr. 32-znakovna lozinka
+                user.set_password(get_random_string(32))
                 user.save()
 
+            profile, _ = Profile.objects.get_or_create(user=user)
+            if profile.email != email:
+                profile.email = email
+                profile.save()
             return create_cookie_response(user)  
 
         except Exception as e:

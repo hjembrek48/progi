@@ -6,20 +6,23 @@ import { subscribeUserToPush } from "../services/pushNotifications.js";
 const authContext = createContext();
 
 export function AuthProvider({ children }) {
-    const [registrationStep, setRegistrationStep] = useState(1);
+    const [loading, setLoading] = useState(true);
+    const [registrationStep, setRegistrationStep] = useState(null);
     // 0 -> server error
     // 1 -> neregistriran
     // 2 -> prošao samo Google OAuth
     // 3 -> potpuno registriran (Google OAuth i lokacija)
 
-    useEffect(() => {
-        const fetchUserStatus = async () => {
+
+    //funkcija za postavljanje statusa u kojem je korisnik, bit će izložena kroz context u svim komponentama
+    const fetchUserStatus = async () => {
+            setLoading(true);
             try {
                 //prvo provjeravamo ima li korisnik access token (logiran google računom):
                 const user = await checkUser();
                 if (user) { //ako user ima access token, onda provjeravamo lokaciju
                     const location = await apiAuth.get('/profile/location/');
-                    if(location.data.latitude != null && location.data.longitude != null) {
+                    if(location.data.latitude && location.data.longitude) {
                         setRegistrationStep(3);
                     } else {
                         setRegistrationStep(2);
@@ -29,8 +32,12 @@ export function AuthProvider({ children }) {
                 }
             } catch(err) {
                 setRegistrationStep(0);
+            } finally {
+                setLoading(false);
             }
         }
+
+    useEffect(() => {
         fetchUserStatus();
     }, []); //odmah pri mountanju wrappera provjeri userStatus
 
@@ -42,7 +49,7 @@ export function AuthProvider({ children }) {
 
     return(
         //Omata djecu i daje im pristup nad contextom
-        <authContext.Provider value={{registrationStep, setRegistrationStep}}>
+        <authContext.Provider value={{registrationStep, setRegistrationStep, fetchUserStatus, loading}}>
             { children }
         </authContext.Provider>
     );

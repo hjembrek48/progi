@@ -21,3 +21,5 @@ gunicorn
 dj-database-url
 whitenoise[brotli]
 uvicorn
+boto3
+django-storages

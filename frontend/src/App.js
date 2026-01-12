@@ -1,9 +1,9 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { Add_game } from './pages/Add_game.jsx';
 import { Homepage } from './pages/Homepage.jsx';
 import { Profilepage } from './pages/Profilepage.jsx';
 import { Loginpage } from './pages/Loginpage.jsx';
 import { Login_add_location } from './pages/Login_add_location.jsx';
+import { MyGames } from './pages/MyGames.jsx';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './styles/App.css'
 import { ProtectedRoute } from './components/ProtectedRoute.jsx';
@@ -28,9 +28,9 @@ function App() {
               <ProtectedRoute minStep={3}>
                 <Profilepage />
               </ProtectedRoute>} />
-            <Route path='/profile/add_game' element={
+            <Route path='/my_games' element={
               <ProtectedRoute minStep={3}>
-                  <Add_game />
+                <MyGames />
               </ProtectedRoute>} />
         </Routes>
       </BrowserRouter>

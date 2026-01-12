@@ -1,0 +1,124 @@
+import { Button, Modal, Container } from "react-bootstrap";
+import ReactStars from "react-rating-stars-component";
+import { FaStar } from "react-icons/fa";
+import { VscPerson } from "react-icons/vsc";
+import { FaPencil } from "react-icons/fa6";
+import './../styles/homepage.css';
+import { useEffect, useState } from "react";
+import { EditGameWindow } from "./EditGameWindow";
+import apiAuth from "../services/apiAuth";
+
+export function GameCardBigger({ game, onClose, onDelete }) {
+    const [editing, setEditing] = useState(false);
+    const [gameListed, setGameListed] = useState(game.listing);
+
+    useEffect(() => {
+        setGameListed(game.listing);
+    }, [game.listing])
+    
+    // listing
+    const handleListGame = async () => {
+        try {
+            await apiAuth.post("listings/", {
+                game_id: game.id,
+                description: game.description || ""
+            });
+            alert("Game successfully listed!");
+            setGameListed(true);
+            onClose(); 
+        } catch (error) {
+            console.error("Listing error:", error);
+            alert("Listing failed.");
+        }
+    };
+
+    // unlisting
+    const handleUnlistGame = async () => {
+        if (!window.confirm("Do you want to withdraw this listing? (Game will stay in your collection)")) return;
+        
+        try {
+            await apiAuth.delete(`listings/${game.listing.id}/`);
+            alert("Listing withdrawed.");
+            setGameListed(false);
+            onClose(); 
+        } catch (error) {
+            console.error("Error while withdrawing listing:", error);
+            alert("Listing withdrawal failed!");
+        }
+    };
+
+    const maxPlayers = Number(game.max_players) || 0;
+
+    return(
+        <Modal show centered size="lg" onHide={onClose}>
+            <Modal.Header closeButton>
+                <Modal.Title>
+                    {game.name}
+                </Modal.Title>
+            </Modal.Header>
+            <Modal.Body className={gameListed ? "game_card_bigger_listed" : "game_card_bigger_unlisted"}>
+                {gameListed && !editing && <div className="listed_badge">Listed</div>}
+                {editing == true ? <EditGameWindow game={game} onDone={() => setEditing(false)}/> :
+                    (<>
+                        <img 
+                        src={game.photo || game.board_game?.image_url}
+                        alt={game.board_game?.name}
+                        className="img-fluid mb-3"
+                        />
+
+                        <p>Publisher: <br/> {game.publisher}</p>
+                        {game.description &&
+                        <p>Description: <br/> {game.description}</p>}
+                        <p>Year of Publication: <br/> {game.board_game?.year_published}</p>
+                        <p>Number of Players:</p>
+                        <Container className="rating_container">
+                            <ReactStars
+                                count={maxPlayers}
+                                size={30}
+                                value={maxPlayers}
+                                emptyIcon={<VscPerson />}
+                                filledIcon={<VscPerson />}
+                                activeColor="#100071"
+                            />
+                        </Container>
+                        <p>Playing Time: <br/> {game.playing_time}</p>
+                        <p>Complexity: <br/> {parseFloat(game.complexity).toFixed(1)}</p>
+                        <p>Preservation Rate:</p>
+                        <Container className="rating_container">
+                            <ReactStars
+                                count={5}
+                                size={30}
+                                value={game.grade}
+                                emptyIcon={<FaStar />}
+                                filledIcon={<FaStar />}
+                                activeColor="#ffd700"
+                            />
+                        </Container>
+                    </>)
+                }
+            </Modal.Body>
+            <Modal.Footer>
+                <Button className="button_type1" onClick={onClose}>
+                    Close
+                </Button>
+                {gameListed ? (
+                    <Button variant="warning" onClick={() => handleUnlistGame()}>
+                        Unlist Game
+                    </Button>
+                ) : (
+                    <Button variant="success" onClick={() => handleListGame()}>
+                        List Game
+                    </Button>
+                )}
+                <Button className="button_type3" onClick={() => setEditing(true)}>
+                    <FaPencil />
+                    Edit Game
+                </Button>
+                <Button className="button_type1"
+                onClick={() => {onDelete(game.id); onClose();}}>
+                    Delete Game
+                </Button>
+            </Modal.Footer>
+        </Modal>
+    );
+}

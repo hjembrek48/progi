@@ -26,6 +26,12 @@ class BoardGameSerializer(serializers.ModelSerializer):
         fields = ["id", "bgg_id", "name", "image_url", "year_published"]
 
 
+class BoardGameDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BoardGame
+        fields = "__all__"
+
+
 class ProfileSerializer(serializers.ModelSerializer):
     interests = GenreSerializer(many=True, read_only=True)
     interest_ids = serializers.PrimaryKeyRelatedField(
@@ -46,6 +52,7 @@ class ProfileSerializer(serializers.ModelSerializer):
             "updated_at",
             "interests",
             "interest_ids",
+            "email"
         ]
         read_only_fields = ["updated_at"]
 
@@ -53,7 +60,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["id", "username", "password"]
+        fields = ["id", "username", "password", "email"]
         extra_kwargs = {"password": {"write_only": True}}
 
     def create(self, validated_data):
@@ -138,6 +145,10 @@ class ListingSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 "You can only list games that belong to you."
             )
+        if Listing.objects.filter(game=value).exists():
+            raise serializers.ValidationError({
+                "This games already has listing"
+            })
         return value
 
 

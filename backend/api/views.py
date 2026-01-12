@@ -4,6 +4,10 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import transaction
 from django.db.models import Q
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.utils.decorators import method_decorator
+from rest_framework.views import APIView
+from rest_framework.response import Response
 import requests
 import secrets
 from rest_framework import generics, status
@@ -15,6 +19,7 @@ from rest_framework.permissions import (
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
+from rest_framework.exceptions import ValidationError
 from .models import Note, Genre, Game, Listing, WishlistEntry, SwapOffer, Notification, BoardGame, PushSubscription
 from .serializers import (
     NoteSerializer,
@@ -27,10 +32,13 @@ from .serializers import (
     SwapOfferSerializer,
     NotificationSerializer,
     BoardGameSerializer,
+    BoardGameDetailSerializer,
     PushSubscriptionSerializer,
 )
 from decimal import Decimal, ROUND_HALF_UP, InvalidOperation
 from drf_spectacular.utils import extend_schema, OpenApiParameter
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 
 
 def round6(value):
@@ -60,6 +68,7 @@ def create_cookie_response(user: User) -> Response:
         secure=settings.USE_SECURE_COOKIES,
         samesite="None" if settings.USE_SECURE_COOKIES else "Lax",
         max_age=14 * 24 * 3600,
+        path="/",
     )
 
     return res
@@ -90,8 +99,9 @@ def geocode_address(address: str):
     except requests.RequestException:
         return None
 
-
+@method_decorator(csrf_exempt, name='dispatch')
 class LogInWithGoogle(APIView):
+    authentication_classes = []
     permission_classes = [AllowAny]
 
     def post(self, request):
@@ -148,10 +158,23 @@ class LogInWithGoogle(APIView):
                 first_name=first_name[:150],
                 last_name=last_name[:150],
             )
+        
+        from .models import Profile
+        profile, _ = Profile.objects.get_or_create(user = user)
+        if profile.email != email:
+            profile.email = email
+            profile.save()
 
         # Vrati access + postavi refresh u cookie
         return create_cookie_response(user)
 
+@method_decorator(ensure_csrf_cookie, name="dispatch")
+class CsrfCookieView(APIView):
+    permission_classes = [AllowAny]
+    authentication_classes = []
+
+    def get(self, request):
+        return Response({"detail": "CSRF cookie set"})
 
 class RefreshFromCookie(APIView):
     authentication_classes = []
@@ -348,6 +371,22 @@ class ListingList(generics.ListCreateAPIView):
             ),
         ]
     )
+    def preform_create(self, serializer):
+        game=serializer.validate_data.get("game")
+        user_profile = self.request.user.profile
+
+        if game.profile!=user_profile:
+            raise ValidationError({
+                "game": "This game does not belong to you"
+            })
+        
+        if Listing.objects.filter(game=game, profile=user_profile).exists():
+            raise ValidationError({
+                "game":"This game is already listed"
+            })
+        
+        serializer.save(profile=user_profile)
+
     def get(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
@@ -698,3 +737,37 @@ class UnsubscribeView(APIView):
         if endpoint:
             PushSubscription.objects.filter(user=request.user, endpoint=endpoint).delete()
         return Response({"detail": "Unsubscribed"}, status=status.HTTP_200_OK)
+
+
+class SubscribeView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = PushSubscriptionSerializer(data=request.data)
+        if serializer.is_valid():
+            PushSubscription.objects.update_or_create(
+                user=request.user,
+                endpoint=serializer.validated_data['endpoint'],
+                defaults={
+                    'p256dh': serializer.validated_data['p256dh'],
+                    'auth': serializer.validated_data['auth']
+                }
+            )
+            return Response({"detail": "Subscribed"}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UnsubscribeView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        endpoint = request.data.get("endpoint")
+        if endpoint:
+            PushSubscription.objects.filter(user=request.user, endpoint=endpoint).delete()
+        return Response({"detail": "Unsubscribed"}, status=status.HTTP_200_OK)
+
+class BoardGameDetail(generics.RetrieveAPIView):
+    queryset = BoardGame.objects.all()
+    serializer_class = BoardGameDetailSerializer
+    permission_classes = [IsAuthenticated]
+    lookup_field = 'bgg_id'

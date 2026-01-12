@@ -18,6 +18,7 @@ class Profile(models.Model):
         "Genre", through="HasInterest", related_name="interested_profiles", blank=True
     )
     updated_at = models.DateTimeField(auto_now=True)
+    email=models.CharField(max_length=255, blank=True, default="")
 
     def __str__(self):
         return f"Profile({self.user.username})"
@@ -30,7 +31,21 @@ def create_user_profile(sender, instance, created, **kwargs):
 
 
 class Genre(models.Model):
-    name = models.CharField(max_length=100)
+    GENRE_CHOICES = [
+        ("PUZZLE", "Mozgalica"),
+        ("COOP", "Kooperativna igra"),
+        ("STRATEGY", "Strateška"),
+        ("TRIVIA", "Opće znanje"),
+        ("RPG", "Igranje uloga"),
+        ("CHALLENGE", "Izazovi"),
+        ("CARD", "Kartaška igra"),
+    ]
+
+    name = models.CharField(
+        max_length=20,
+        choices=GENRE_CHOICES,
+        default="GENRE1"        
+    )
 
     def __str__(self):
         return self.name
@@ -67,6 +82,7 @@ class BoardGame(models.Model):
 
 
 class Game(models.Model):
+
     board_game = models.ForeignKey(
         BoardGame,
         on_delete=models.CASCADE,
@@ -86,8 +102,13 @@ class Game(models.Model):
         blank=True,
         related_name="borrowed_games",
     )
+    
     genre = models.ForeignKey(
-        Genre, on_delete=models.SET_NULL, null=True, blank=True, related_name="games"
+        "Genre", 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True,
+        related_name="games"
     )
 
     created_at = models.DateTimeField(auto_now_add=True)
