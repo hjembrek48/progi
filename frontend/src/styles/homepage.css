@@ -213,3 +213,7 @@
     border-radius: 1px;
     background-color: #8d021f;
 }
+
+.home_search_bar {
+    flex: 0.9;
+}

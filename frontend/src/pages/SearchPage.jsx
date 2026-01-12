@@ -167,6 +167,7 @@ function SearchPage() {
               type="text"
               name="query"
               defaultValue={searchParams.get("search")}
+              placeholder="Search games by name"
             ></Form.Control>
           </Form.Group>
           <Form.Group>
