@@ -9,6 +9,7 @@ import './styles/App.css'
 import { ProtectedRoute } from './components/ProtectedRoute.jsx';
 import { AuthProvider } from './components/AuthProvider.jsx';
 import { RestrictedRoute } from './components/RestrictedRoute.jsx';
+import { CategoryWishlist } from './components/CategoryWishlist.jsx';
 
 
 function App() {
@@ -18,6 +19,8 @@ function App() {
         <Routes>
             <Route path='/' element={<Homepage />} />
             <Route path='/login' element={<Loginpage />} />
+            <Route path="/my-games" element={<MyGames/>}/>
+            <Route path="/category-wishlist" element={<CategoryWishlist />}></Route>
             <Route path='/login/add_location' element={
               <ProtectedRoute minStep={2}>
                 <RestrictedRoute maxStep={2}>
