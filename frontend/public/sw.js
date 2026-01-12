@@ -1,16 +1,26 @@
 self.addEventListener('push', function(event) {
     if (event.data) {
-        const data = event.data.json();
+        let data;
+        try {
+            data = event.data.json();
+        } catch (e) {
+            data = {
+                title: "Play Trade",
+                body: event.data.text(),
+                url: "/"
+            };
+        }
+
         const options = {
             body: data.body,
             icon: '/Logo.png',
             badge: '/Logo.png',
             data: {
-                url: data.url
+                url: data.url || '/'
             }
         };
         event.waitUntil(
-            self.registration.showNotification(data.title, options)
+            self.registration.showNotification(data.title || "New Notification", options)
         );
     }
 });
