@@ -9,6 +9,7 @@ import './styles/App.css'
 import { ProtectedRoute } from './components/ProtectedRoute.jsx';
 import { AuthProvider } from './components/AuthProvider.jsx';
 import { RestrictedRoute } from './components/RestrictedRoute.jsx';
+import {SearchPage} from './pages/SearchPage.jsx';
 
 
 function App() {
@@ -32,6 +33,7 @@ function App() {
               <ProtectedRoute minStep={3}>
                 <MyGames />
               </ProtectedRoute>} />
+            <Route path='/search' element={<SearchPage></SearchPage>}></Route>
         </Routes>
       </BrowserRouter>
     </AuthProvider>
