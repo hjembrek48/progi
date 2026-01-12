@@ -1,14 +1,14 @@
 import { Button, Container, Form, Spinner } from "react-bootstrap";
 import { useAuth } from "../components/AuthProvider";
-import { Logged_homepage_header } from "../components/Logged_homepage_header";
-import { Homepage_header } from "../components/Homepage_header";
 import "../styles/SearchPage.css";
 import { CgSearch } from "react-icons/cg";
 import { useEffect, useState } from "react";
 import ListingGridElement from "../components/ListingGridElement";
 import apiAuth from "../services/apiAuth";
+import SmartHomepageHeader from "../components/SmartHomepageHeader";
+import { useSearchParams } from "react-router";
 
-export const SearchPage = () => {
+function SearchPage() {
   const { registrationStep, setRegistrationStep } = useAuth();
   const sampleGames = [
     {
@@ -75,6 +75,8 @@ export const SearchPage = () => {
     },
   ];
 
+  const [searchParams, setSearchParams] = useSearchParams();
+
   const [filteredGames, setFilteredGames] = useState([]);
   const [pageLoading, setPageLoading] = useState(true);
   const [resultsLoading, setResultsLoading] = useState(true);
@@ -93,7 +95,10 @@ export const SearchPage = () => {
       }
     };
     const getInitialListing = async () => {
-      try {
+      const query = searchParams.get("search");
+      setSearchParams("");
+      filterGames({ query: query });
+      /*try {
         const res = await apiAuth.get(
           `${process.env.REACT_APP_API_URL}/api/listings`
         );
@@ -101,32 +106,29 @@ export const SearchPage = () => {
         setResultsLoading(false);
       } catch (error) {
         console.error("Ne mogu dohvatiti igre u ponudi.");
-      }
+      }*/
     };
     getCategories();
     getInitialListing();
   }, []);
 
-  async function filterGames(formEvent) {
+  async function filterGames(queryObject) {
     setResultsLoading(true);
     setSearchError(false);
-    formEvent.preventDefault();
-    const formData = new FormData(formEvent.target);
-    console.log(formData);
-    const query = formData.get("query");
-    const category = formData.get("category");
+    const query = queryObject.query;
+    const category = queryObject.category;
 
     let newGames = sampleGames;
 
     let params = {};
 
-    if (query != "") {
+    if (query && query != "") {
       newGames = newGames.filter((e) =>
         e.game.name.toLowerCase().match(query.toLowerCase())
       );
       params.search = query;
     }
-    if (category != "all") {
+    if (category && category != "all") {
       newGames = newGames.filter((e) => e.game.genre.id == category);
       params.genre_id = category;
     }
@@ -145,14 +147,27 @@ export const SearchPage = () => {
     }
   }
 
+  function handleSubmit(formEvent) {
+    formEvent.preventDefault();
+    const formData = new FormData(formEvent.target);
+    const query = formData.get("query");
+    const category = formData.get("category");
+
+    filterGames({ query: query, category: category });
+  }
+
   return (
     <Container>
-      {registrationStep > 2 ? <Logged_homepage_header /> : <Homepage_header />}
-      <div className="search_params_container p-3">
-        <Form onSubmit={filterGames}>
+      <SmartHomepageHeader />
+      <div className="dark_green_bg p-3">
+        <Form onSubmit={handleSubmit}>
           <Form.Group>
             <Form.Label>Search by name:</Form.Label>
-            <Form.Control type="text" name="query"></Form.Control>
+            <Form.Control
+              type="text"
+              name="query"
+              defaultValue={searchParams.get("search")}
+            ></Form.Control>
           </Form.Group>
           <Form.Group>
             <Form.Label>Filter by category</Form.Label>
@@ -167,7 +182,7 @@ export const SearchPage = () => {
               })}
             </Form.Select>
           </Form.Group>
-          <Button className="home_button m-2" type="submit">
+          <Button className="home_button mt-3 m-2" type="submit">
             Search/Filter <CgSearch />
           </Button>
         </Form>
@@ -199,4 +214,6 @@ export const SearchPage = () => {
       )}
     </Container>
   );
-};
+}
+
+export default SearchPage;

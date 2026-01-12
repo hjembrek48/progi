@@ -1,3 +1,4 @@
+import { Link } from "react-router";
 import placeHolderImage from "../assets/placeholder_image.png";
 
 function ListingGridElement({ listing }) {
@@ -8,12 +9,14 @@ function ListingGridElement({ listing }) {
   return (
     <div className="listing p-2">
       {" "}
-      <div className="listing_img_container p-1">
+      <Link to={`/listing/${listing.id}`} className="listing_img_container p-1">
         <img src={photo} />
-      </div>
+      </Link>
       <div>
-        <h4>{listing.game.name}</h4>
-        <div>Owned by: {listing.profile.email}</div>
+        <Link to={`/listing/${listing.id}`}>
+          <h4>{listing.game.name}</h4>
+        </Link>
+        <div>Owned by: {listing.profile.email.split("@")[0]}</div>
       </div>
     </div>
   );
