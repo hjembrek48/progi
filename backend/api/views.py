@@ -4,6 +4,10 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import transaction
 from django.db.models import Q
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.utils.decorators import method_decorator
+from rest_framework.views import APIView
+from rest_framework.response import Response
 import requests
 import secrets
 from rest_framework import generics, status
@@ -161,6 +165,13 @@ class LogInWithGoogle(APIView):
         # Vrati access + postavi refresh u cookie
         return create_cookie_response(user)
 
+@method_decorator(ensure_csrf_cookie, name="dispatch")
+class CsrfCookieView(APIView):
+    permission_classes = [AllowAny]
+    authentication_classes = []
+
+    def get(self, request):
+        return Response({"detail": "CSRF cookie set"})
 
 class RefreshFromCookie(APIView):
     authentication_classes = []
