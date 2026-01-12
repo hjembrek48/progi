@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("api", "0008_remove_game_name_alter_game_board_game"),
+        ("api", "0012_populate_genres"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
