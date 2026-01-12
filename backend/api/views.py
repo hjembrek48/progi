@@ -399,7 +399,7 @@ class ListingList(generics.ListCreateAPIView):
 
         search = self.request.query_params.get("search")
         if search:
-            queryset = queryset.filter(game__name__icontains=search)
+            queryset = queryset.filter(game__board_game__name__icontains=search)
 
         min_grade = self.request.query_params.get("min_grade")
         if min_grade:
@@ -436,6 +436,10 @@ class ListingList(generics.ListCreateAPIView):
         publisher = self.request.query_params.get("publisher")
         if publisher:
             queryset = queryset.filter(game__publisher__icontains=publisher)
+
+        profile_id = self.request.query_params.get("profile_id")
+        if profile_id:
+            queryset = queryset.filter(game__profile__id=profile_id)
 
         return queryset
 

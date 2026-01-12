@@ -17,7 +17,7 @@ export function Homepage_header() {
                 </Container>
             </Col>
             <Col xs={5} className='d-flex justify-content-end'>
-                <Button className='home_button' onClick={() => {navigate('login')}}>
+                <Button className='home_button' onClick={() => {navigate('/login')}}>
                     Log In
                 </Button>
             </Col>
