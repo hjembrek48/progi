@@ -193,7 +193,7 @@ class RefreshFromCookie(APIView):
 class Logout(APIView):
     def post(self, request):
         res = Response({"detail": "Logged out"}, status=200)
-        res.delete_cookie("refresh_token", path="/")
+        res.delete_cookie("refresh_token", path="/", samesite="None", secure=settings.USE_SECURE_COOKIES)
         return res
 
 
