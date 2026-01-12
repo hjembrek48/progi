@@ -184,12 +184,7 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:3000",
     "https://progi-frontend.onrender.com",
-    "https://*.githubpreview.dev",
-    "https://*.app.github.dev",
-    "https://*.onrender.com",
-    "https://progi-backend-lpki.onrender.com",
 ]
 CORS_ALLOW_CREDENTIALS = True
 
