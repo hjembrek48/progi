@@ -23,11 +23,17 @@ from .views import (
     NotificationMarkRead,
     BoardGameAutocompleteView,
     BoardGameDetail,
-    CsrfCookieView
+    CsrfCookieView,
+    SubscribeView,
+    UnsubscribeView,
 )
 
 urlpatterns = [
-    path("boardgames/autocomplete/", BoardGameAutocompleteView.as_view(), name="boardgame-autocomplete"),
+    path(
+        "boardgames/autocomplete/",
+        BoardGameAutocompleteView.as_view(),
+        name="boardgame-autocomplete",
+    ),
     path("boardgames/<int:bgg_id>/", BoardGameDetail.as_view(), name="boardgame-detail"),
     path("google-login/", LogInWithGoogle.as_view(), name="google-login"),
     path("token/refresh-cookie/", RefreshFromCookie.as_view(), name="refresh-cookie"),
@@ -53,5 +59,15 @@ urlpatterns = [
         "notifications/<int:pk>/read/",
         NotificationMarkRead.as_view(),
         name="notification-read",
+    ),
+    path(
+        "notifications/subscribe/",
+        SubscribeView.as_view(),
+        name="notification-subscribe",
+    ),
+    path(
+        "notifications/unsubscribe/",
+        UnsubscribeView.as_view(),
+        name="notification-unsubscribe",
     ),
 ]

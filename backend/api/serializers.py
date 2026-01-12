@@ -10,6 +10,7 @@ from .models import (
     SwapOffer,
     Notification,
     BoardGame,
+    PushSubscription,
 )
 
 
@@ -263,3 +264,9 @@ class NotificationSerializer(serializers.ModelSerializer):
             "swap_offer",
         ]
         read_only_fields = ["recieved_profile", "profile", "time", "swap_offer"]
+
+
+class PushSubscriptionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PushSubscription
+        fields = ["endpoint", "p256dh", "auth"]

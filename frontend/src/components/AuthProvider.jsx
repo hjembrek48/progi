@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { checkUser } from "../services/checkUser.js";
 import  apiAuth from './../services/apiAuth.js';
+import { subscribeUserToPush } from "../services/pushNotifications.js";
 
 const authContext = createContext();
 
@@ -39,6 +40,12 @@ export function AuthProvider({ children }) {
     useEffect(() => {
         fetchUserStatus();
     }, []); //odmah pri mountanju wrappera provjeri userStatus
+
+    useEffect(() => {
+        if (registrationStep === 3) {
+            subscribeUserToPush();
+        }
+    }, [registrationStep]);
 
     return(
         //Omata djecu i daje im pristup nad contextom

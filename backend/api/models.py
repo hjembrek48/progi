@@ -185,6 +185,18 @@ class SwapOffer(models.Model):
         return f"Swap {self.id}: {self.proposer.user.username} -> {self.target.user.username} ({self.status})"
 
 
+class PushSubscription(models.Model):
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="push_subscriptions"
+    )
+    endpoint = models.URLField(max_length=500)
+    p256dh = models.CharField(max_length=255)
+    auth = models.CharField(max_length=255)
+
+    def __str__(self):
+        return f"Subscription for {self.user.username}"
+
+
 class Notification(models.Model):
     recieved_profile = models.ForeignKey(
         Profile, on_delete=models.CASCADE, related_name="notifications"
@@ -209,3 +221,11 @@ class Notification(models.Model):
         return (
             f"Notif for {self.recieved_profile.user.username}: {self.description[:20]}"
         )
+
+
+@receiver(post_save, sender=Notification)
+def send_notification_push(sender, instance, created, **kwargs):
+    if created:
+        from .utils import send_push_notification
+
+        send_push_notification(instance.recieved_profile.user, instance.description)

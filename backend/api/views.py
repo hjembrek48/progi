@@ -20,7 +20,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 from rest_framework.exceptions import ValidationError
-from .models import Note, Genre, Game, Listing, WishlistEntry, SwapOffer, Notification, BoardGame
+from .models import Note, Genre, Game, Listing, WishlistEntry, SwapOffer, Notification, BoardGame, PushSubscription
 from .serializers import (
     NoteSerializer,
     UserSerializer,
@@ -33,6 +33,7 @@ from .serializers import (
     NotificationSerializer,
     BoardGameSerializer,
     BoardGameDetailSerializer,
+    PushSubscriptionSerializer,
 )
 from decimal import Decimal, ROUND_HALF_UP, InvalidOperation
 from drf_spectacular.utils import extend_schema, OpenApiParameter
@@ -193,7 +194,16 @@ class RefreshFromCookie(APIView):
 class Logout(APIView):
     def post(self, request):
         res = Response({"detail": "Logged out"}, status=200)
-        res.delete_cookie("refresh_token", path="/")
+        res.set_cookie(
+            "refresh_token",
+            value="",
+            path="/",
+            samesite="None" if settings.USE_SECURE_COOKIES else "Lax",
+            secure=settings.USE_SECURE_COOKIES,
+            httponly=True,
+            max_age=0,
+            expires="Thu, 01 Jan 1970 00:00:00 GMT",
+        )
         return res
 
 
@@ -398,7 +408,7 @@ class ListingList(generics.ListCreateAPIView):
 
         search = self.request.query_params.get("search")
         if search:
-            queryset = queryset.filter(game__name__icontains=search)
+            queryset = queryset.filter(game__board_game__name__icontains=search)
 
         min_grade = self.request.query_params.get("min_grade")
         if min_grade:
@@ -436,10 +446,24 @@ class ListingList(generics.ListCreateAPIView):
         if publisher:
             queryset = queryset.filter(game__publisher__icontains=publisher)
 
+        profile_id = self.request.query_params.get("profile_id")
+        if profile_id:
+            queryset = queryset.filter(game__profile__id=profile_id)
+
         return queryset
 
     def perform_create(self, serializer):
-        serializer.save(profile=self.request.user.profile)
+        listing = serializer.save(profile=self.request.user.profile)
+        
+        wishlist_entries = WishlistEntry.objects.filter(game__board_game=listing.game.board_game)
+        for entry in wishlist_entries:
+            if entry.profile != listing.profile:
+                Notification.objects.create(
+                    recieved_profile=entry.profile,
+                    profile=listing.profile,
+                    description=f"Good news! {listing.game.board_game.name} from your wishlist is now available!",
+                    swap_offer=None
+                )
 
 
 class ListingDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -595,12 +619,12 @@ class SwapOfferAccept(APIView):
 
             # Transfer igara
             for game in offer.offered_games.all():
-                game.borrower_profile = offer.target
+                game.profile = offer.target
                 game.active = False
                 game.save()
 
             for game in offer.requested_games.all():
-                game.borrower_profile = offer.proposer
+                game.profile = offer.proposer
                 game.active = False
                 game.save()
 
@@ -698,6 +722,62 @@ class BoardGameAutocompleteView(generics.ListAPIView):
         if len(query) < 2:
             return BoardGame.objects.none()
         return BoardGame.objects.filter(name__istartswith=query)[:10]
+
+
+class SubscribeView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = PushSubscriptionSerializer(data=request.data)
+        if serializer.is_valid():
+            PushSubscription.objects.update_or_create(
+                user=request.user,
+                endpoint=serializer.validated_data['endpoint'],
+                defaults={
+                    'p256dh': serializer.validated_data['p256dh'],
+                    'auth': serializer.validated_data['auth']
+                }
+            )
+            return Response({"detail": "Subscribed"}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UnsubscribeView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        endpoint = request.data.get("endpoint")
+        if endpoint:
+            PushSubscription.objects.filter(user=request.user, endpoint=endpoint).delete()
+        return Response({"detail": "Unsubscribed"}, status=status.HTTP_200_OK)
+
+
+class SubscribeView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = PushSubscriptionSerializer(data=request.data)
+        if serializer.is_valid():
+            PushSubscription.objects.update_or_create(
+                user=request.user,
+                endpoint=serializer.validated_data['endpoint'],
+                defaults={
+                    'p256dh': serializer.validated_data['p256dh'],
+                    'auth': serializer.validated_data['auth']
+                }
+            )
+            return Response({"detail": "Subscribed"}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UnsubscribeView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        endpoint = request.data.get("endpoint")
+        if endpoint:
+            PushSubscription.objects.filter(user=request.user, endpoint=endpoint).delete()
+        return Response({"detail": "Unsubscribed"}, status=status.HTTP_200_OK)
 
 class BoardGameDetail(generics.RetrieveAPIView):
     queryset = BoardGame.objects.all()
