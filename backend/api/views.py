@@ -618,7 +618,9 @@ class SwapOfferAccept(APIView):
             offer.save()
 
             # Transfer igara
+            print(f"Ponuđene: {offer.offered_games.all()}")
             for game in offer.offered_games.all():
+                print("Ulazak u petlju")
                 game.borrower_profile = offer.target
                 game.active = False
                 game.save()
