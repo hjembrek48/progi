@@ -15,7 +15,7 @@ from rest_framework.permissions import (
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
-from .models import Note, Genre, Game, Listing, WishlistEntry, SwapOffer, Notification, BoardGame
+from .models import Note, Genre, Game, Listing, WishlistEntry, SwapOffer, Notification, BoardGame, PushSubscription
 from .serializers import (
     NoteSerializer,
     UserSerializer,
@@ -27,6 +27,7 @@ from .serializers import (
     SwapOfferSerializer,
     NotificationSerializer,
     BoardGameSerializer,
+    PushSubscriptionSerializer,
 )
 from decimal import Decimal, ROUND_HALF_UP, InvalidOperation
 from drf_spectacular.utils import extend_schema, OpenApiParameter
@@ -400,7 +401,17 @@ class ListingList(generics.ListCreateAPIView):
         return queryset
 
     def perform_create(self, serializer):
-        serializer.save(profile=self.request.user.profile)
+        listing = serializer.save(profile=self.request.user.profile)
+        
+        wishlist_entries = WishlistEntry.objects.filter(game__board_game=listing.game.board_game)
+        for entry in wishlist_entries:
+            if entry.profile != listing.profile:
+                Notification.objects.create(
+                    recieved_profile=entry.profile,
+                    profile=listing.profile,
+                    description=f"Good news! {listing.game.board_game.name} from your wishlist is now available!",
+                    swap_offer=None
+                )
 
 
 class ListingDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -659,3 +670,31 @@ class BoardGameAutocompleteView(generics.ListAPIView):
         if len(query) < 2:
             return BoardGame.objects.none()
         return BoardGame.objects.filter(name__istartswith=query)[:10]
+
+
+class SubscribeView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = PushSubscriptionSerializer(data=request.data)
+        if serializer.is_valid():
+            PushSubscription.objects.update_or_create(
+                user=request.user,
+                endpoint=serializer.validated_data['endpoint'],
+                defaults={
+                    'p256dh': serializer.validated_data['p256dh'],
+                    'auth': serializer.validated_data['auth']
+                }
+            )
+            return Response({"detail": "Subscribed"}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UnsubscribeView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        endpoint = request.data.get("endpoint")
+        if endpoint:
+            PushSubscription.objects.filter(user=request.user, endpoint=endpoint).delete()
+        return Response({"detail": "Unsubscribed"}, status=status.HTTP_200_OK)
