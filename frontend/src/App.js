@@ -9,7 +9,9 @@ import './styles/App.css'
 import { ProtectedRoute } from './components/ProtectedRoute.jsx';
 import { AuthProvider } from './components/AuthProvider.jsx';
 import { RestrictedRoute } from './components/RestrictedRoute.jsx';
-import {SearchPage} from './pages/SearchPage.jsx';
+import { CategoryWishlist } from './components/CategoryWishlist.jsx';
+import SearchPage from './pages/SearchPage.jsx';
+import ListingPage from './pages/ListingPage.jsx';
 
 function App() {
   return (
@@ -18,6 +20,8 @@ function App() {
         <Routes>
             <Route path='/' element={<Homepage />} />
             <Route path='/login' element={<Loginpage />} />
+            <Route path="/my-games" element={<MyGames/>}/>
+            <Route path="/category-wishlist" element={<CategoryWishlist />}></Route>
             <Route path='/login/add_location' element={
               <ProtectedRoute minStep={2}>
                 <RestrictedRoute maxStep={2}>
@@ -32,7 +36,8 @@ function App() {
               <ProtectedRoute minStep={3}>
                 <MyGames />
               </ProtectedRoute>} />
-            <Route path='/search' element={<SearchPage></SearchPage>}></Route>
+            <Route path='/search' element={<SearchPage/>}/>
+            <Route path='/listing/:listingId' element={<ListingPage/>}/>
         </Routes>
       </BrowserRouter>
     </AuthProvider>

@@ -1,341 +1,271 @@
-import { ProfilePageHeader } from "../components/ProfilePageHeader";
-import { Footer } from "../components/Footer";
-import { FaPlus, FaUserCircle } from "react-icons/fa";
-import { useEffect, useState, useRef } from "react";
-import apiAuth from "../services/apiAuth.js";
+  import { ProfilePageHeader } from "../components/ProfilePageHeader";
+  import { Footer } from "../components/Footer";
+  import { FaPlus, FaUserCircle } from "react-icons/fa";
+  import { useEffect, useState } from "react";
+  import { useNavigate } from "react-router";
 
+  import apiAuth from "../services/apiAuth.js";
 
-export function Profilepage() {
-  const gamesListRef = useRef(null);         //funkcija za scroll igara
-  const [profile, setProfile] = useState(null);    //dodavanje property-a objekta profile
-  const [username, setUsername] = useState("");
-  const [description, setDescription] = useState("");  
+  export function Profilepage() {
+    const [profile, setProfile] = useState(null);
+    const navigate = useNavigate();
+    const [username, setUsername] = useState("");
+    const [description, setDescription] = useState("");
 
+    useEffect(() => {
+      const fetchProfile = async () => {
+        try {
+          const res = await apiAuth.get("profile");
+          setProfile(res.data);
+          setUsername(res.data.username || "");
+          setDescription(res.data.description || "");
+        } catch (err) {
+          console.error("Ne mogu dohvatiti profil:", err);
+        }
+      };
 
+      fetchProfile();
+    }, []);
 
-useEffect(() => {
-  const fetchProfile = async () => {
-    try {
-      const res = await apiAuth.get("profile");
-      setProfile(res.data);
-    } catch (err) {
-      console.error("Ne mogu dohvatiti profil:", err);
+    if (!profile) {
+      return <div style={{ color: "white" }}>Učitavanje...</div>;
     }
-  };
 
-  fetchProfile();
-}, []);
+    return (
+      <div style={styles.page}>
+        <ProfilePageHeader />
 
+        <main style={styles.main}>
+          <div style={styles.card}
+            onMouseOver={(e) => (e.currentTarget.style.transform = "scale(1.02)")}
+            onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+          >
+            <div style={styles.cardHeader}>
+              <div style={styles.imageContainer}>
+                <FaUserCircle style={styles.defaultIcon} />
+                <button style={styles.addButton}>
+                  <FaPlus size={14} />
+                </button>
+              </div>
 
-if (!profile) {
-  return <div style={{ color: "white" }}>Učitavanje...</div>;
-}
+              <div style={styles.userMeta}>
+                <input
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="Korisničko ime"
+                  style={styles.korisnicko_ime_input}
+                />
 
-  const scrollGames = (direction) => {
-    if (gamesListRef.current) {
-      const container = gamesListRef.current;
-      const scrollAmount = container.offsetWidth * 0.15; 
-      container.scrollBy({
-        left: direction === "left" ? -scrollAmount : scrollAmount,
-        behavior: "smooth",
-      });
-    }
-  };
-
-  return (
-    <div style={styles.page}>
-      <ProfilePageHeader />
-
-      <main style={styles.main}>
-        <div style={styles.card}>
-          <div style={styles.cardHeader}>
-            <div style={styles.imageContainer}>
-              <FaUserCircle style={styles.defaultIcon} />
-              <button style={styles.addButton}>
-                <FaPlus size={14} />
-              </button>
+                <p style={styles.smallInfo}>
+                  <strong style={styles.label}>Email:</strong> {profile.email}
+                </p>
+                <p style={styles.smallInfo}>
+                  <strong style={styles.label}>Lokacija:</strong> {profile.address}
+                </p>
+                <p style={styles.smallInfo}>
+                  <strong style={styles.label}>Aktivne zamjene:</strong> broj
+                </p>
+              </div>
             </div>
-
-            <div style={styles.userMeta}>
-              <input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Korisničko ime"
-                style={styles.korisnicko_ime_input} 
-              />
-
-              <p style={styles.smallInfo}>
-                <strong style={styles.label}>Email:</strong> {profile.email}
-              </p>
-              <p style={styles.smallInfo}>
-                <strong style={styles.label}>Lokacija:</strong> {profile.address}
-              </p>
-              <p style={styles.smallInfo}>
-                <strong style={styles.label}>Aktivne zamjene:</strong> broj
-              </p>
-            </div>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Opis..."
+              style={styles.opis_input}
+            />
           </div>
-
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="Opis..."
-            style={styles.opis_input}
-          />
-
-        </div>
-
-        <div style={styles.gamesSection}>
-          <h3 style={styles.gamesTitle}>Your Games</h3>
-          <div style={styles.gamesWrapper}>
-            <button
-              style={styles.scrollButton}
-              onClick={() => scrollGames("left")}
+          <div style={styles.profileButtons}>
+            <button style={styles.profileButton} 
+              onClick={() => navigate("/my-games")}
+              onMouseDown={(e) => (e.currentTarget.style.transform = "scale(0.95)")}
+              onMouseOver={(e) => (e.currentTarget.style.transform = "scale(1.07)")}
+              onMouseUp={(e) => (e.currentTarget.style.transform = "scale(1.03)")}
+              onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}  
             >
-              ‹
+              MyGames
             </button>
-
-            <div style={styles.gamesList} ref={gamesListRef}>
-              <div style={styles.gameItem}>No Game</div>
-              <div style={styles.gameItem}>No Game</div>
-              <div style={styles.gameItem}>No Game</div>
-              <div style={styles.gameItem}>No Game</div>
-              <div style={styles.gameItem}>No Game</div>
-              <div style={styles.gameItem}>No Game</div>
-              <div style={styles.gameItem}>No Game</div>
-              <div style={styles.gameItem}>No Game</div>
-            </div>
-
-            <button
-              style={styles.scrollButton}
-              onClick={() => scrollGames("right")}
+            <button style={styles.profileButton}
+              onClick={() => navigate("/category-wishlist")}
+              onMouseDown={(e) => (e.currentTarget.style.transform = "scale(0.95)")}
+              onMouseUp={(e) => (e.currentTarget.style.transform = "scale(1.03)")}
+              onMouseOver={(e) => (e.currentTarget.style.transform = "scale(1.07)")}
+              onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}  
             >
-              ›
+              CategoryWishlist
             </button>
           </div>
-        </div>
-      </main>
 
-      <Footer />
-    </div>
-  );
-}
+        </main>
+        
+        <Footer />
+      </div>
+    );
+  }
 
 
-const styles = {
-  page: {
-    position: "fixed",
-    top: 0,
-    left: 0,
-    width: "100vw",
-    height: "100vh",
-    display: "flex",
-    flexDirection: "column",
-    backgroundColor: "#354F52",
-  },
 
-  main: {
-    flex: 1,
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "flex-start",
-    paddingTop: "90px",
-    paddingBottom: "50px",
-  },
+  const styles = {
+    page: {
+      position: "fixed",
+      top: 0,
+      left: 0,
+      width: "100vw",
+      height: "100vh",
+      display: "flex",
+      flexDirection: "column",
+      backgroundColor: "#354F52",
+    },
 
-  card: {
-    width: "100%",
-    maxWidth: "600px",
-    backgroundColor: "#52796F",
-    borderRadius: "16px",
-    boxShadow: "0 6px 30px rgba(0,0,0,0.25)",
-    padding: "28px",
-    textAlign: "left",
-    boxSizing: "border-box",
-  },
+    main: {
+      flex: 1,
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "flex-start",
+      paddingTop: "90px",
+      paddingBottom: "50px",
+    },
 
-  cardHeader: {
-    display: "flex",
-    alignItems: "flex-start",
-    gap: "20px",
-    marginBottom: "18px",
-  },
+    card: {
+      width: "100%",
+      maxWidth: "600px",
+      backgroundColor: "#52796F",
+      borderRadius: "16px",
+      boxShadow: "0 6px 30px rgba(0,0,0,0.25)",
+      padding: "28px",
+      textAlign: "left",
+      boxSizing: "border-box",
+    },
 
-  imageContainer: {
-    position: "relative",
-    width: "140px",
-    height: "140px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
+    cardHeader: {
+      display: "flex",
+      alignItems: "flex-start",
+      gap: "20px",
+      marginBottom: "18px",
+    },
 
-  slika: {
-    width: "140px",
-    height: "140px",
-    borderRadius: "12px",
-    objectFit: "cover",
-    border: "4px solid #e0e7ff",
-    boxShadow: "0 4px 12px rgba(0,0,0,1)",
-  },
+    imageContainer: {
+      position: "relative",
+      width: "140px",
+      height: "140px",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+    },
 
-  defaultIcon: {
-    fontSize: "120px",
-    color: "#c0c0c0",
-  },
+    slika: {
+      width: "140px",
+      height: "140px",
+      borderRadius: "12px",
+      objectFit: "cover",
+      border: "4px solid #e0e7ff",
+      boxShadow: "0 4px 12px rgba(0,0,0,1)",
+    },
 
-  addButton: {
-    position: "absolute",
-    bottom: "6px",
-    right: "6px",
-    backgroundColor: "#354F52",
-    color: "white",
-    border: "none",
-    borderRadius: "50%",
-    width: "28px",
-    height: "28px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    cursor: "pointer",
-    boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-  },
+    defaultIcon: {
+      fontSize: "120px",
+      color: "#c0c0c0",
+    },
 
-  userMeta: {
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "flex-start",
-    gap: "6px",
-    minWidth: 0,
-    marginTop: "10px",
-  },
+    addButton: {
+      position: "absolute",
+      bottom: "6px",
+      right: "6px",
+      backgroundColor: "#354F52",
+      color: "white",
+      border: "none",
+      borderRadius: "50%",
+      width: "28px",
+      height: "28px",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      cursor: "pointer",
+      boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+    },
 
-  korisnicko_ime: {
+    userMeta: {
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "flex-start",
+      gap: "6px",
+      minWidth: 0,
+      marginTop: "10px",
+    },
+
+    korisnicko_ime: {
+      fontSize: "1.7rem",
+      fontWeight: 700,
+      color: "#fff",
+      margin: 0,
+      letterSpacing: "0.5px",
+    },
+
+    smallInfo: {
+      margin: 0,
+      color: "#fff",
+      fontSize: "0.96rem",
+    },
+
+    opis: {
+      color: "#fff",
+      marginTop: "12px",
+      lineHeight: 1.5,
+      fontSize: "1rem",
+    },
+
+    label: {
+      fontWeight: 600,
+      marginRight: "6px",
+      color: "#fff",
+    },
+
+  korisnicko_ime_input: {
     fontSize: "1.7rem",
     fontWeight: 700,
     color: "#fff",
+    backgroundColor: "transparent",
+    border: "none",
+    outline: "none",
+    padding: 0,
     margin: 0,
     letterSpacing: "0.5px",
+    width: "100%",
   },
 
-  smallInfo: {
-    margin: 0,
-    color: "#fff",
-    fontSize: "0.96rem",
-  },
-
-  opis: {
+  opis_input: {
     color: "#fff",
     marginTop: "12px",
     lineHeight: 1.5,
     fontSize: "1rem",
+    backgroundColor: "transparent",
+    border: "none",
+    outline: "none",
+    resize: "none",
+    width: "100%",
+    minHeight: "60px",
+  },
+  profileButtons: {
+    marginTop: "16px",
+    display: "flex",
+    gap: "16px",
+    justifyContent: "center",
+    width: "100%",
+    maxWidth: "600px",
   },
 
-  label: {
-    fontWeight: 600,
-    marginRight: "6px",
+  profileButton: {
+    flex: 1,
+    padding: "12px 0",
+    backgroundColor: "#52796F",
     color: "#fff",
+    border: "none",
+    borderRadius: "10px",
+    fontSize: "1rem",
+    fontWeight: 600,
+    cursor: "pointer",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.25)",
+    transition: "transform 0.2s ease, background-color 0.2s ease",
   },
-
- gamesSection: {
-  marginTop: "40px",
-  width: "90%",
-  maxWidth: "800px",
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  gap: "12px",
-},
-
-gamesTitle: {
-  textAlign: "center",
-  fontSize: "1.4rem",
-  fontWeight: "700",
-  color: "#fff",
-  marginBottom: "8px",
-  letterSpacing: "0.5px",
-},
-
-gamesWrapper: {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  gap: "16px",
-  width: "100%",
-  backgroundColor: "#52796F", 
-  borderRadius: "12px",
-  padding: "16px",
-  boxShadow: "0 4px 20px rgba(1, 1, 1, 1)", 
-},
-
-scrollButton: {
-  backgroundColor: "#fff", 
-  border: "none",
-  color: "black",
-  fontSize: "1.8rem",
-  width: "40px",
-  height: "40px",
-  borderRadius: "50%",
-  cursor: "pointer",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  transition: "all 0.2s ease",
-  boxShadow: "0 3px 10px rgba(0,0,0,0.2)",
-},
-scrollButtonHover: {
-  backgroundColor: "#d62839",
-},
-
-gamesList: {
-  display: "flex",
-  gap: "12px",
-  overflowX: "auto",
-  scrollBehavior: "smooth",
-  width: "80%",
-  padding: "10px 0",
-},
-
-gameItem: {
-  flex: "0 0 120px",
-  height: "120px",
-  backgroundColor: "#fff",
-  borderRadius: "10px",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  fontWeight: "600",
-  color: "#333",
-  boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
-  transition: "transform 0.2s ease",
-},
-
-korisnicko_ime_input: {
-  fontSize: "1.7rem",
-  fontWeight: 700,
-  color: "#fff",
-  backgroundColor: "transparent",
-  border: "none",
-  outline: "none",
-  padding: 0,
-  margin: 0,
-  letterSpacing: "0.5px",
-  width: "100%",
-},
-
-opis_input: {
-  color: "#fff",
-  marginTop: "12px",
-  lineHeight: 1.5,
-  fontSize: "1rem",
-  backgroundColor: "transparent",
-  border: "none",
-  outline: "none",
-  resize: "none",
-  width: "100%",
-  minHeight: "60px",
-},
-
-};
+  };

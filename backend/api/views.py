@@ -619,14 +619,16 @@ class SwapOfferAccept(APIView):
 
             # Transfer igara
             for game in offer.offered_games.all():
-                game.borrower_profile = offer.target
-                game.active = False
+                game.profile = offer.target
+                #game.active = False
                 game.save()
+                Listing.objects.filter(game_id=game.id).delete()
 
             for game in offer.requested_games.all():
-                game.borrower_profile = offer.proposer
-                game.active = False
+                game.profile = offer.proposer
+                #game.active = False
                 game.save()
+                Listing.objects.filter(game_id=game.id).delete()
 
             Notification.objects.create(
                 recieved_profile=offer.proposer,

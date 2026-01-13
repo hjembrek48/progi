@@ -234,3 +234,7 @@
     transition: transform 0.2s ease-in-out;
     cursor: pointer;
 }
+
+.home_search_bar {
+    flex: 0.9;
+}

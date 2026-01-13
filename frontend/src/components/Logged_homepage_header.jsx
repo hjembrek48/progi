@@ -7,7 +7,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import apiAuth from "../services/apiAuth.js";
 import { deleteTokenFromVariable } from "../services/auth.js";
 import "./../styles/homepage.css";
-import logo from "../assets/Logo.png";
+import logo from "../assets/Logo_cropped.png";
 
 export function Logged_homepage_header() {
   const { registrationStep, setRegistrationStep } = useAuth();
