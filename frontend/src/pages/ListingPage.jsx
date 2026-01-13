@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import apiAuth from "../services/apiAuth";
-import { useParams } from "react-router";
+import { Link, useParams } from "react-router";
 import { Button, Container, Spinner } from "react-bootstrap";
 import "../styles/SearchPage.css";
 import SmartHomepageHeader from "../components/SmartHomepageHeader";
@@ -78,7 +78,9 @@ function ListingPage() {
               <br />
               Publisher: {listing.game.publisher}
             </p>
-            <Button className="home_button m-2">Request trade</Button>
+            <Link to={`/gameexchange?listingId=${listing.id}`}>
+              <Button className="home_button m-2">Request trade</Button>
+            </Link>
           </div>
         </div>
       )}
