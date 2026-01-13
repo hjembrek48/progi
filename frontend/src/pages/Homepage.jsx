@@ -5,6 +5,7 @@ import { useAuth } from '../components/AuthProvider.jsx';
 import { ButtonGroup } from 'react-bootstrap';
 import { useNavigate } from 'react-router';
 import './../styles/homepage.css';
+import { Welcome } from '../components/Welcome.jsx';
 
 export function Homepage() {
     const {registrationStep, loading} = useAuth();
@@ -31,6 +32,7 @@ export function Homepage() {
                         <Button className='home_button' id="nav_button">Wishlist</Button>
                     </ButtonGroup>
                 </div>}
+            <Welcome />
         </Container>
     )
 };

@@ -234,7 +234,37 @@
     transition: transform 0.2s ease-in-out;
     cursor: pointer;
 }
-
 .home_search_bar {
     flex: 0.9;
+}
+.welcome_background {
+    width: 100%;
+    min-height: 60vh;
+    background: url("../assets/pexels-pixabay-207924.jpg");
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.welcome_container {
+    color: white;
+    max-width: 700px;
+}
+
+.welcome_title {
+    font-size: 5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+
+.welcome_subtitle {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}
+
+.welcome_button {
+    padding: 0.7rem 2.5rem;
+    font-size: 1.1rem;
 }

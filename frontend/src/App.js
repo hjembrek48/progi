@@ -42,14 +42,38 @@ function App() {
               <ProtectedRoute minStep={3}>
                 <MyGames />
               </ProtectedRoute>} />
-            <Route path='/marketplace' element={<Marketplace />} />
-            <Route path='/gameexchange' element={<GameExchange />} />
-            <Route path='/offers' element={<OffersList />} />
-            <Route path='/offers/:id' element={<OfferDetail />} />
-            <Route path='/offers/:id/edit' element={<EditOffer />} />
-            <Route path='/mytrades' element={<MyTrades />} />
-            <Route path='/search' element={<SearchPage/>}/>
-            <Route path='/listing/:listingId' element={<ListingPage/>}/>
+            <Route path='/marketplace' element={
+              <ProtectedRoute minStep={3}>
+                <Marketplace />
+              </ProtectedRoute>} />
+            <Route path='/gameexchange' element={
+              <ProtectedRoute minStep={3} >
+                <GameExchange />
+              </ProtectedRoute>} />
+            <Route path='/offers' element={
+              <ProtectedRoute minStep={3}>
+                <OffersList />
+              </ProtectedRoute>} />
+            <Route path='/offers/:id' element={
+              <ProtectedRoute minStep={3}>
+                <OfferDetail />
+              </ProtectedRoute>} />
+            <Route path='/offers/:id/edit' element={
+              <ProtectedRoute minStep={3}>
+                <EditOffer />
+              </ProtectedRoute>} />
+            <Route path='/mytrades' element={
+              <ProtectedRoute minStep={3}>
+                <MyTrades />
+              </ProtectedRoute>} />
+            <Route path='/search' element={
+              <ProtectedRoute minStep={3}>
+                <SearchPage/>
+              </ProtectedRoute>}/>
+            <Route path='/listing/:listingId' element={
+              <ProtectedRoute minStep={3}>
+                <ListingPage/>
+              </ProtectedRoute>}/>
         </Routes>
       </BrowserRouter>
     </AuthProvider>
