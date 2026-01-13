@@ -14,7 +14,7 @@ import { GameExchange } from './pages/GameExchange.jsx';
 import { EditOffer } from './pages/EditOffer.jsx';
 import { OffersList } from './pages/OffersList.jsx';
 import { OfferDetail } from './pages/OfferDetail.jsx';
-import { SearchPage } from './pages/SearchPage.jsx';
+import SearchPage from './pages/SearchPage.jsx';
 import { MyTrades } from './pages/MyTrades.jsx';
 import { CategoryWishlist } from './components/CategoryWishlist.jsx';
 import ListingPage from './pages/ListingPage.jsx';
