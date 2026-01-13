@@ -9,8 +9,14 @@ import './styles/App.css'
 import { ProtectedRoute } from './components/ProtectedRoute.jsx';
 import { AuthProvider } from './components/AuthProvider.jsx';
 import { RestrictedRoute } from './components/RestrictedRoute.jsx';
+import { Marketplace } from './pages/Marketplace.jsx';
+import { GameExchange } from './pages/GameExchange.jsx';
+import { EditOffer } from './pages/EditOffer.jsx';
+import { OffersList } from './pages/OffersList.jsx';
+import { OfferDetail } from './pages/OfferDetail.jsx';
+import { SearchPage } from './pages/SearchPage.jsx';
+import { MyTrades } from './pages/MyTrades.jsx';
 import { CategoryWishlist } from './components/CategoryWishlist.jsx';
-import SearchPage from './pages/SearchPage.jsx';
 import ListingPage from './pages/ListingPage.jsx';
 
 function App() {
@@ -36,6 +42,12 @@ function App() {
               <ProtectedRoute minStep={3}>
                 <MyGames />
               </ProtectedRoute>} />
+            <Route path='/marketplace' element={<Marketplace />} />
+            <Route path='/gameexchange' element={<GameExchange />} />
+            <Route path='/offers' element={<OffersList />} />
+            <Route path='/offers/:id' element={<OfferDetail />} />
+            <Route path='/offers/:id/edit' element={<EditOffer />} />
+            <Route path='/mytrades' element={<MyTrades />} />
             <Route path='/search' element={<SearchPage/>}/>
             <Route path='/listing/:listingId' element={<ListingPage/>}/>
         </Routes>

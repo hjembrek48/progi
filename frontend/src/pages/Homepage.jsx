@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router';
 import './../styles/homepage.css';
 
 export function Homepage() {
-    const {registrationStep, setRegistrationStep, loading} = useAuth();
+    const {registrationStep, loading} = useAuth();
     const navigate = useNavigate();
 
     if(loading) {
@@ -26,8 +26,8 @@ export function Homepage() {
                 <div className='homepage-button-bar-container p-2'>
                     <ButtonGroup>
                         <Button className='home_button' id="nav_button" onClick={() => navigate('my_games')}>My Games</Button>
-                        <Button className='home_button' id="nav_button">My Trades</Button>
-                        <Button className='home_button' id="nav_button">Offers</Button>
+                        <Button className='home_button' id="nav_button" onClick={() => navigate('mytrades')}>My Trades</Button>
+                        <Button className='home_button' id="nav_button" onClick={() => navigate('offers')}>Offers</Button>
                         <Button className='home_button' id="nav_button">Wishlist</Button>
                     </ButtonGroup>
                 </div>}
