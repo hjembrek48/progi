@@ -52,7 +52,8 @@ class ProfileSerializer(serializers.ModelSerializer):
             "updated_at",
             "interests",
             "interest_ids",
-            "email"
+            "email",
+            "description"
         ]
         read_only_fields = ["updated_at"]
 
