@@ -615,6 +615,21 @@ class SwapOfferAccept(APIView):
             offer.status = "ACCEPTED"
             offer.save()
 
+            offered_game_ids = list(offer.offered_games.values_list('id', flat=True))
+            requested_game_ids = list(offer.requested_games.values_list('id', flat=True))
+            all_involved_game_ids = offered_game_ids + requested_game_ids
+
+            conflicting_offers = SwapOffer.objects.filter(
+                status="PENDING"
+            ).exclude(
+                pk=offer.pk  # Isključi trenutnu ponudu koju upravo prihvaćamo
+            ).filter(
+                Q(offered_games__id__in=all_involved_game_ids) | 
+                Q(requested_games__id__in=all_involved_game_ids)
+            ).distinct()
+
+            conflicting_offers.update(status="CANCELLED")
+
             # Transfer igara
             for game in offer.offered_games.all():
                 game.profile = offer.target
