@@ -41,7 +41,7 @@ export function Logged_homepage_header() {
 
   return (
     <div className="home_header p-2 d-flex justify-content-between align-items-center">
-      <Link to="/" style={{ minWidth: "300px" }}>
+      <Link to="/" style={{ minWidth: "300px" }} className="logo_nav">
         <img src={logo} alt="PlayTrade logo" className="logo img-fluid" />
       </Link>
       <div className="home_search_bar">
