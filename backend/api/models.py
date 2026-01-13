@@ -19,7 +19,6 @@ class Profile(models.Model):
     )
     updated_at = models.DateTimeField(auto_now=True)
     email=models.CharField(max_length=255, blank=True, default="")
-    description=models.CharField(max_length=512, blank=True, default="")
 
     def __str__(self):
         return f"Profile({self.user.username})"
