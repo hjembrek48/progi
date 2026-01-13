@@ -1,10 +1,14 @@
 import { Card } from "react-bootstrap";
 import "./../styles/homepage.css"
 
-export function GameCard({ game, onClick}) {
+export function GameCard({ game, listings, onClick }) {
+
+    const isGameListed = listings.find((l) => l.game.id === game.id);
+    const resultListing = Boolean(isGameListed);
+
     return(
         <Card
-        className={game.listing ? "game_card_listed" : "game_card_unlisted"}
+        className={resultListing ? "game_card_listed" : "game_card_unlisted"}
         onClick={onClick}
         >
             <Card.Img

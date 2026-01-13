@@ -10,7 +10,7 @@ import './../styles/homepage.css';
 //uzima po 5 igara i stavlja ih u redak, gumb za redak gore, gumb za redak dolje
 const max_games_per_page = 5;
 
-export function MyGamesPalette({ my_games, onGamesChange }) {
+export function MyGamesPalette({ my_games, onGamesChange, myListings }) {
     const [index, setIndex] = useState(0); //indeks prve igre na prikazu
     const [games, setGames] = useState([]); //sve aktivne igre
     const [currentlyShowedGames, setCurrentlyShowedGames] = useState([]); //one igre koje su sad na prikazu
@@ -80,7 +80,8 @@ export function MyGamesPalette({ my_games, onGamesChange }) {
                         {currentlyShowedGames.map((game) => (
                             <GameCard 
                             key={game.id} 
-                            game={game} 
+                            game={game}
+                            listings={myListings}
                             onClick={() => {setCurrentlySelectedGame(game)}}
                             />
                         ))}
@@ -99,7 +100,9 @@ export function MyGamesPalette({ my_games, onGamesChange }) {
                 className="game_card_whole" 
                 game={currentlySelectedGame}
                 onClose={() => setCurrentlySelectedGame(null)}
-                onDelete={(gameId) => {handleDelete(gameId)}}
+                onDelete={(gameId) => handleDelete(gameId)}
+                listings={myListings}
+                onListingChange={() => {onGamesChange()}}
                 />
             }
         </Container>

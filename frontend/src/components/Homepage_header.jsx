@@ -8,10 +8,15 @@ export function Homepage_header() {
 
     return(
         <Row className='home_header p-2'>
-            <Col xs={2}>
-                <img src={logo} alt="PlayTrade logo" className="logo img-fluid" />
+            <Col xs={2} className="d-flex align-items-center">
+                <div 
+                className="logo_nav"
+                onClick={() => navigate('/')}
+                >
+                    <img src={logo} alt="PlayTrade logo" className="logo img-fluid" />
+                </div>
             </Col>
-            <Col xs={5}>
+            <Col xs={5} className="d-flex align-items-center">
                 <Container>
                     <h1>PlayTrade</h1>
                 </Container>

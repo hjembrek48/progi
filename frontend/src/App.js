@@ -11,7 +11,6 @@ import { AuthProvider } from './components/AuthProvider.jsx';
 import { RestrictedRoute } from './components/RestrictedRoute.jsx';
 import {SearchPage} from './pages/SearchPage.jsx';
 
-
 function App() {
   return (
     <AuthProvider>

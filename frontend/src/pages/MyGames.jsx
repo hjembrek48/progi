@@ -12,22 +12,33 @@ import { FaPlusCircle } from "react-icons/fa";
 export function MyGames() {
     const [isAddGameOpen, setIsAddGameOpen] = useState(false);
     const [myGames, setMyGames] = useState([]);
+    const [myListings, setMyListings] = useState([]);
 
     const fetchMyGames = async () => { //pozivat ćemo kod mounta i kod dodavanja igre
-            try {
-                const res = await apiAuth("games");
-                if(res.data.length > 0) {
-                    setMyGames(res.data);
-                } else {
-                    setMyGames([]);
-                }
-            } catch (e) {
-                console.log("Failed to fetch your games!");
+        try {
+            const res = await apiAuth("games");
+            if(res.data.length > 0) {
+                setMyGames(res.data);
+            } else {
+                setMyGames([]);
             }
+        } catch (e) {
+            console.log("Failed to fetch your games!");
         }
+    }
+
+    const fetchMyListings = async () => { //pozivamo kod dodavanja igre da se listing odmah vizualno zabilježđi
+        try {
+            const res = await apiAuth.get("listings/");
+            setMyListings(res.data);
+        } catch (e) {
+            console.log(e);
+        }
+    }
 
     useEffect(() => {
         fetchMyGames();
+        fetchMyListings();
     }, []) //samo kod mounta komponente
 
     return(
@@ -41,7 +52,11 @@ export function MyGames() {
                         <Button className='home_button' id="nav_button">Wishlist</Button>
                     </ButtonGroup>
                 </div>
-                {(myGames.length > 0) && <MyGamesPalette my_games={myGames} onGamesChange={fetchMyGames}/>}
+                {(myGames.length > 0) && <MyGamesPalette 
+                                            my_games={myGames} 
+                                            onGamesChange={() => {fetchMyGames(); fetchMyListings();}}
+                                            myListings={myListings}
+                                            />}
                 {(myGames.length === 0) && <NoMyGamesPalette />}
 
                 <Container className='add_game_button_wrapper'>
@@ -52,7 +67,7 @@ export function MyGames() {
                 </Container>
                 {isAddGameOpen && <AddGameWindow 
                                     onClose={() => {setIsAddGameOpen(false)}} 
-                                    onGameAdded={() => {fetchMyGames()}}
+                                    onGameAdded={() => {fetchMyGames(); fetchMyListings();}}
                                     />}
         </Container>
     )

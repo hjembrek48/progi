@@ -13,6 +13,7 @@ export function AddGameWindow({ onClose, onGameAdded }) {
     const [gamesFromBGG, setGamesFromBGG] = useState([]); //sve igre koje server vrati kao objekt s BGG
     const [formError, setFormError] = useState(""); //UX podsjetnik na errore kod Confirma
     const [addToListing, setAddToListing] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const [bgName, setBgName] = useState(""); //kada korisnik upisuje name, svako slovo se na promjenu sprema ovdje
     const [selectedBoardGame, setSelectedBoardGame] = useState(null); //ovdje se sprema odabrani board game iz padajućeg izbornika
@@ -72,6 +73,8 @@ export function AddGameWindow({ onClose, onGameAdded }) {
 
 
     const handleConfirm = async () => {
+        if(isSubmitting) return;
+        setIsSubmitting(true);
         let hasErrors = false;
 
         //Odabrana igra:
@@ -135,6 +138,12 @@ export function AddGameWindow({ onClose, onGameAdded }) {
             form_data.append("description", bgDesc);
             form_data.append("publisher", bgPublisher);
 
+            if(addToListing) {
+                form_data.append("active", Boolean(true));
+            } else {
+                form_data.append("active", Boolean(false));
+            }
+
             const grade = parseInt(bgPreservation);
             if(!isNaN(grade)) {
                 form_data.append("grade", grade);
@@ -170,14 +179,17 @@ export function AddGameWindow({ onClose, onGameAdded }) {
                     }
                 }
                 
-                onGameAdded(res.data); //vraćamo novu igru roditelju - pozivamo fetch
+                onGameAdded(); //vraćamo novu igru roditelju - pozivamo fetch
                 onClose();
             } catch (err) {
                 console.log(err.response?.data);
                 console.log("Error while adding game!");
                 setFormError("Failed to add game! Try again!");
+            } finally {
+                setIsSubmitting(false);
             }
         }
+        setIsSubmitting(false);
     }
 
     const handleNameChange = (e) => {
@@ -391,7 +403,7 @@ export function AddGameWindow({ onClose, onGameAdded }) {
                         </Container>
                     </Form.Group>
 
-                    <FloatingLabel controlId="gamePlayTime" className="add_game_label" label="Playing Time (h)">
+                    <FloatingLabel controlId="gamePlayTime" className="add_game_label" label="Playing Time (min)">
                         <Form.Control 
                         type="number"
                         value={parseInt(bgPlayTime)}
@@ -446,7 +458,13 @@ export function AddGameWindow({ onClose, onGameAdded }) {
             </Form>
             <div className="d-flex justify-content-end mt-3 gap-2">
                 <Button className="home_button" onClick={onClose}>Cancel</Button>
-                <Button className="home_button" onClick={handleConfirm}>Confirm</Button>
+                <Button 
+                className="home_button" 
+                onClick={handleConfirm}
+                disabled={isSubmitting ? true : false}
+                >
+                {isSubmitting ? "Adding..." : "Confirm"}
+                </Button>
             </div>
         </Container>
     </div>);
