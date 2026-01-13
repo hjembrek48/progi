@@ -8,11 +8,13 @@ import apiAuth from '../services/apiAuth.js';
 import { NoMyGamesPalette } from '../components/NoMyGamesPalette.jsx';
 import { MyGamesPalette } from '../components/MyGamesPalette.jsx';
 import { FaPlusCircle } from "react-icons/fa";
+import { useNavigate } from 'react-router';
 
 export function MyGames() {
     const [isAddGameOpen, setIsAddGameOpen] = useState(false);
     const [myGames, setMyGames] = useState([]);
     const [myListings, setMyListings] = useState([]);
+    const navigate = useNavigate();
 
     const fetchMyGames = async () => { //pozivat ćemo kod mounta i kod dodavanja igre
         try {
@@ -46,9 +48,9 @@ export function MyGames() {
             <Logged_homepage_header />
                 <div className='homepage-button-bar-container p-2'>
                     <ButtonGroup>
-                        <Button className='home_button' id="nav_button">My Games</Button>
-                        <Button className='home_button' id="nav_button">My Trades</Button>
-                        <Button className='home_button' id="nav_button">Offers</Button>
+                        <Button className='home_button' id="nav_button" onClick={() => navigate('/')}>Homepage</Button>
+                        <Button className='home_button' id="nav_button" onClick={() => navigate('/mytrades')}>My Trades</Button>
+                        <Button className='home_button' id="nav_button" onClick={() => navigate('/offers')}>Offers</Button>
                         <Button className='home_button' id="nav_button">Wishlist</Button>
                     </ButtonGroup>
                 </div>

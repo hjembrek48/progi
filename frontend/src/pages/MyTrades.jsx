@@ -1,12 +1,16 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { Button } from 'react-bootstrap';
 import apiAuth from '../services/apiAuth.js';
+import "./../styles/homepage.css";
+import { useNavigate } from 'react-router';
 
 export function MyTrades() {
   const [trades, setTrades] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
+    const navigate = useNavigate();
 
   useEffect(function() {
     async function fetchTrades() {
@@ -57,7 +61,7 @@ export function MyTrades() {
     <div className="container py-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2>Trade History</h2>
-        <Link className="btn btn-sm btn-outline-secondary" to={'/'}>Back to Home</Link>
+        <Button className="home_button" onClick={() => {navigate('/')}}>Back to Home</Button>
       </div>
 
       {trades.length === 0 ? (
