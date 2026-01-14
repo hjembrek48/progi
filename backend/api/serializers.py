@@ -46,6 +46,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         model = Profile
         fields = [
             "id",
+            "username",
             "address",
             "latitude",
             "longitude",

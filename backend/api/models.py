@@ -7,6 +7,7 @@ from django.dispatch import receiver
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
+    username=models.CharField(max_length=255, blank=True, default="")
     latitude = models.DecimalField(
         max_digits=9, decimal_places=6, null=True, blank=True
     )
