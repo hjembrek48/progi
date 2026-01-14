@@ -10,12 +10,12 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import generics, status
 from rest_framework.permissions import (
-import requests
-import secrets
     IsAuthenticated,
     AllowAny,
     IsAuthenticatedOrReadOnly,
 )
+import requests
+import secrets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
