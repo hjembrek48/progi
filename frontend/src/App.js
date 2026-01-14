@@ -17,6 +17,7 @@ import { OfferDetail } from './pages/OfferDetail.jsx';
 import SearchPage from './pages/SearchPage.jsx';
 import { MyTrades } from './pages/MyTrades.jsx';
 import { CategoryWishlist } from './components/CategoryWishlist.jsx';
+import { Wishlist } from './pages/Wishlist.jsx';
 import ListingPage from './pages/ListingPage.jsx';
 
 function App() {
@@ -73,6 +74,10 @@ function App() {
             <Route path='/listing/:listingId' element={
               <ProtectedRoute minStep={3}>
                 <ListingPage/>
+              </ProtectedRoute>}/>
+            <Route path='/wishlist' element={
+              <ProtectedRoute minStep={3}>
+                <Wishlist/>
               </ProtectedRoute>}/>
         </Routes>
       </BrowserRouter>
