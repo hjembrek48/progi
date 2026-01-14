@@ -9,11 +9,13 @@ import { NoMyGamesPalette } from '../components/NoMyGamesPalette.jsx';
 import { MyGamesPalette } from '../components/MyGamesPalette.jsx';
 import { FaPlusCircle } from "react-icons/fa";
 import { useNavigate } from 'react-router';
+import Loading from '../components/Loading';
 
 export function MyGames() {
     const [isAddGameOpen, setIsAddGameOpen] = useState(false);
     const [myGames, setMyGames] = useState([]);
     const [myListings, setMyListings] = useState([]);
+    const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
     const fetchMyGames = async () => { //pozivat ćemo kod mounta i kod dodavanja igre
@@ -39,8 +41,18 @@ export function MyGames() {
     }
 
     useEffect(() => {
-        fetchMyGames();
-        fetchMyListings();
+        const refreshData = async () => {
+            try {
+                setLoading(true);
+                await Promise.all([
+                    fetchMyGames(),
+                    fetchMyListings(),
+                ]);
+            } finally {
+                setLoading(false);
+            }
+        };
+        refreshData();
     }, []) //samo kod mounta komponente
 
     return(
@@ -54,12 +66,22 @@ export function MyGames() {
                         <Button className='home_button' id="nav_button">Wishlist</Button>
                     </ButtonGroup>
                 </div>
-                {(myGames.length > 0) && <MyGamesPalette 
-                                            my_games={myGames} 
-                                            onGamesChange={() => {fetchMyGames(); fetchMyListings();}}
-                                            myListings={myListings}
-                                            />}
-                {(myGames.length === 0) && <NoMyGamesPalette />}
+                {loading && <Loading size="lg" fullPage={false} className="py-5" />}
+                {!loading && (myGames.length > 0) && (
+                    <MyGamesPalette 
+                        my_games={myGames} 
+                        onGamesChange={async () => {
+                            setLoading(true);
+                            try {
+                                await Promise.all([fetchMyGames(), fetchMyListings()]);
+                            } finally {
+                                setLoading(false);
+                            }
+                        }}
+                        myListings={myListings}
+                    />
+                )}
+                {!loading && (myGames.length === 0) && <NoMyGamesPalette />}
 
                 <Container className='add_game_button_wrapper'>
                     <Button className='add_game_button' onClick={() => {setIsAddGameOpen(true)}}>
@@ -67,10 +89,19 @@ export function MyGames() {
                         <span>Add Game</span>
                     </Button>
                 </Container>
-                {isAddGameOpen && <AddGameWindow 
-                                    onClose={() => {setIsAddGameOpen(false)}} 
-                                    onGameAdded={() => {fetchMyGames(); fetchMyListings();}}
-                                    />}
+                {isAddGameOpen && (
+                    <AddGameWindow 
+                        onClose={() => {setIsAddGameOpen(false)}} 
+                        onGameAdded={async () => {
+                            setLoading(true);
+                            try {
+                                await Promise.all([fetchMyGames(), fetchMyListings()]);
+                            } finally {
+                                setLoading(false);
+                            }
+                        }}
+                    />
+                )}
         </Container>
     )
 };

@@ -10,6 +10,7 @@ import {
   Button, 
   Badge
 } from 'react-bootstrap';
+import Loading from '../components/Loading';
 
 export function OfferDetail() {
   const { id } = useParams();
@@ -113,15 +114,7 @@ export function OfferDetail() {
     }
   }
 
-  if (loading) {
-    return (
-      <div className="container py-5 text-center">
-        <div className="spinner-border" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </div>
-      </div>
-    );
-  }
+  if (loading) return <Loading size="lg" fullPage />;
 
   if (error) {
     return (
@@ -135,84 +128,95 @@ export function OfferDetail() {
     return null;
   }
 
-  const proposerName = offer.proposer && offer.proposer.email ? offer.proposer.email : "—";
-  const targetName = offer.target && offer.target.email ? offer.target.email : "—";
   const isCurrentUserProposer = currentUser && offer.proposer && currentUser.id === offer.proposer.id;
   const isCurrentUserTarget = currentUser && offer.target && currentUser.id === offer.target.id;
+  
+  const proposerName = isCurrentUserProposer ? "Me" : (offer.proposer && offer.proposer.email ? offer.proposer.email : "—");
+  const targetName = isCurrentUserTarget ? "Me" : (offer.target && offer.target.email ? offer.target.email : "—");
 
   return (
-    <Container className="py-5">
-      <div className="bg-light border rounded-4 shadow-sm p-4 p-md-5">
-        <Row className="mb-5 align-items-center">
-          <Col>
-            <h1 className="h3 fw-bold mb-1">
-              {proposerName} 
-              <span className="text-primary mx-3">→</span> 
-              {targetName}
-            </h1>
-            <div className="text-muted small">
-              {new Date(offer.updated_at || offer.created_at).toLocaleString()}
-            </div>
-          </Col>
-          <Col xs="auto">
-            <Badge pill bg="white" className="text-dark border p-2 px-3 shadow-sm">
-              <span className="me-2 text-warning">●</span> {offer.status}
-            </Badge>
-          </Col>
-        </Row>
+    <Container fluid className="py-5">
+      <Container>
+        <h2 className="mb-4 fw-bold text-dark">Offer Details</h2>
+      </Container>
 
-        <Row className="g-4">
-          <Col lg={6}>
-            <div className="bg-white rounded-4 shadow-sm h-100 overflow-hidden">
-              <div className="bg-primary bg-opacity-10 p-3 border-bottom">
-                <h6 className="mb-0 fw-bold text-primary text-uppercase small">Offered Games</h6>
+      <Container className="py-3">
+        <div className="bg-light border rounded-4 shadow-sm p-4 p-md-5">
+          <Row className="mb-5 align-items-center">
+            <Col>
+              <h1 className="h3 fw-bold mb-1 text-dark">
+                {proposerName} 
+                <span className="text-primary mx-3">→</span> 
+                {targetName}
+              </h1>
+              <div className="text-muted small">
+                {new Date(offer.updated_at || offer.created_at).toLocaleString()}
               </div>
-              {renderGamesList(offer.offered_games)}
-            </div>
-          </Col>
+            </Col>
+            <Col xs="auto">
+              <Badge pill bg="white" className="text-dark border p-2 px-3 shadow-sm">
+                <span className="me-2 text-warning">●</span> {offer.status}
+              </Badge>
+            </Col>
+          </Row>
 
-          <Col lg={6}>
-            <div className="bg-white rounded-4 shadow-sm h-100 overflow-hidden">
-              <div className="bg-success bg-opacity-10 p-3 border-bottom">
-                <h6 className="mb-0 fw-bold text-success text-uppercase small">Requested Games</h6>
+          <Row className="g-4">
+            <Col lg={6}>
+              <div className="bg-white rounded-4 shadow-sm h-100 overflow-hidden">
+                <div className="bg-primary bg-opacity-10 p-3 border-bottom">
+                  <h6 className="mb-0 fw-bold text-primary text-uppercase small">Offered Games</h6>
+                </div>
+                <div style={{ maxHeight: "280px", overflowY: "auto" }}>
+                  {renderGamesList(offer.offered_games)}
+                </div>
               </div>
-              {renderGamesList(offer.requested_games)}
-            </div>
-          </Col>
-        </Row>
+            </Col>
 
-        <div className="mt-5 pt-4 border-top d-flex flex-wrap align-items-center gap-3">
-          {isCurrentUserTarget && offer.status === "PENDING" && (
-            <>
-              <Button variant="success" size="lg" className="px-5 shadow-sm" onClick={handleAccept} disabled={actionLoading}>
-                Accept Trade
-              </Button>
-              <Button variant="outline-danger" size="lg" className="px-4" onClick={handleReject} disabled={actionLoading}>
-                Decline
-              </Button>
-            </>
-          )}
+            <Col lg={6}>
+              <div className="bg-white rounded-4 shadow-sm h-100 overflow-hidden">
+                <div className="bg-success bg-opacity-10 p-3 border-bottom">
+                  <h6 className="mb-0 fw-bold text-success text-uppercase small">Requested Games</h6>
+                </div>
+                <div style={{ maxHeight: "280px", overflowY: "auto" }}>
+                  {renderGamesList(offer.requested_games)}
+                </div>
+              </div>
+            </Col>
+          </Row>
 
-          {isCurrentUserProposer && offer.status === "PENDING" && (
-            <Button as={Link} to={`/offers/${offer.id}/edit`} variant="primary" size="lg" className="px-5">
-              Edit Offer
+          <div className="mt-5 pt-4 border-top d-flex flex-wrap align-items-center gap-3">
+            {isCurrentUserTarget && offer.status === "PENDING" && (
+              <>
+                <Button variant="success" size="lg" className="px-5 shadow-sm" onClick={handleAccept} disabled={actionLoading}>
+                  Accept Trade
+                </Button>
+                <Button variant="outline-danger" size="lg" className="px-4" onClick={handleReject} disabled={actionLoading}>
+                  Decline
+                </Button>
+              </>
+            )}
+
+            {isCurrentUserProposer && offer.status === "PENDING" && (
+              <Button as={Link} to={`/offers/${offer.id}/edit`} variant="primary" size="lg" className="px-5">
+                Edit Offer
+              </Button>
+            )}
+            
+            <Button as={Link} to="/offers" variant="link" className="ms-md-auto text-decoration-none text-muted fw-semibold">
+              ← Back to all offers
             </Button>
-          )}
-          
-          <Button as={Link} to="/offers" variant="link" className="ms-md-auto text-decoration-none text-muted">
-            ← Back to all offers
-          </Button>
+          </div>
         </div>
-      </div>
 
-      {selectedGame && 
-        <GameCardBigger 
-          game={selectedGame}
-          onClose={() => setSelectedGame(null)}
-          listings={[]}
-          readOnly={true}
-        />
-      }
+        {selectedGame && 
+          <GameCardBigger 
+            game={selectedGame}
+            onClose={() => setSelectedGame(null)}
+            listings={[]}
+            readOnly={true}
+          />
+        }
+      </Container>
     </Container>
   );
 }

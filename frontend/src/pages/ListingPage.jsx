@@ -1,42 +1,58 @@
 import { useEffect, useState } from "react";
 import apiAuth from "../services/apiAuth";
 import { Link, useParams } from "react-router";
-import { Button, Container, Spinner } from "react-bootstrap";
+import { Button, Container } from "react-bootstrap";
 import "../styles/SearchPage.css";
 import SmartHomepageHeader from "../components/SmartHomepageHeader";
 import ReactStars from "react-rating-stars-component";
 import { FaStar } from "react-icons/fa";
+import Loading from "../components/Loading";
 
 function ListingPage() {
   const [listing, setListing] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [error, setError] = useState(null);
   const params = useParams();
   useEffect(() => {
-    const getListingData = async () => {
+    const load = async () => {
       try {
-        const res = await apiAuth.get(
-          `${process.env.REACT_APP_API_URL}/api/listings/${params.listingId}`
-        );
-        setListing(res.data);
-        setLoading(false);
+        setLoading(true);
+        setError(null);
+        const [listingRes, profileRes] = await Promise.all([
+          apiAuth.get(
+            `${process.env.REACT_APP_API_URL}/api/listings/${params.listingId}`
+          ),
+          apiAuth.get('profile/')
+        ]);
+        setListing(listingRes.data);
+        setCurrentUser(profileRes.data);
       } catch (error) {
-        console.error("Ne mogu dohvatiti podatke o igri.");
+        console.error("Ne mogu dohvatiti podatke o igri.", error);
+        setError(error.response?.status === 404 ? "Listing not found." : "Failed to load listing data.");
+      } finally {
+        setLoading(false);
       }
     };
-    getListingData();
-  }, []);
+    load();
+  }, [params.listingId]);
   return (
     <Container>
       <SmartHomepageHeader />
-      {listing == null ? (
-        <div className="info_container dark_text">
-          <Spinner style={{ width: "6rem", height: "6rem" }}></Spinner>
+      {loading ? (
+        <Loading size="lg" fullPage={false} className="info_container dark_text" />
+      ) : error ? (
+        <div className="alert alert-danger m-5 text-center">
+          <h4>{error}</h4>
+          <Link to="/" className="btn btn-primary mt-3">Go to Homepage</Link>
         </div>
       ) : (
         <div className="dark_green_bg">
           <div className="p-3">
             <h1>{listing.game.name}</h1>
-            Owned by: {listing.profile.email.split("@")[0]}
+            Owned by: {currentUser && currentUser.id === listing.profile.id
+              ? 'Me'
+              : listing.profile.email.split("@")[0]}
             {listing.description ? (
               <p className="fs-5">Description: {listing.description}</p>
             ) : (
@@ -78,9 +94,11 @@ function ListingPage() {
               <br />
               Publisher: {listing.game.publisher}
             </p>
-            <Link to={`/gameexchange?listingId=${listing.id}`}>
-              <Button className="home_button m-2">Request trade</Button>
-            </Link>
+            {currentUser && currentUser.id !== listing.profile.id && (
+              <Link to={`/gameexchange?listingId=${listing.id}`}>
+                <Button className="home_button m-2">Request trade</Button>
+              </Link>
+            )}
           </div>
         </div>
       )}

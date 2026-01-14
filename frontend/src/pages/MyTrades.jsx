@@ -4,6 +4,7 @@ import { Button } from 'react-bootstrap';
 import apiAuth from '../services/apiAuth.js';
 import "./../styles/homepage.css";
 import { useNavigate } from 'react-router';
+import Loading from '../components/Loading';
 
 export function MyTrades() {
   const [trades, setTrades] = useState([]);
@@ -39,15 +40,7 @@ export function MyTrades() {
     fetchTrades();
   }, []);
 
-  if (loading) {
-    return (
-      <div className="container py-5 text-center">
-        <div className="spinner-border" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </div>
-      </div>
-    );
-  }
+  if (loading) return <Loading size="lg" fullPage />;
 
   if (error) {
     return (
@@ -59,7 +52,7 @@ export function MyTrades() {
 
   return (
     <div className="container py-4">
-      <div className="d-flex justify-content-between align-items-center mb-4">
+      <div className="d-flex justify-content-between align-items-center mb-4 text-dark">
         <h2>Trade History</h2>
         <Button className="home_button" onClick={() => {navigate('/')}}>Back to Home</Button>
       </div>

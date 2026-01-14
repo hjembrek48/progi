@@ -377,6 +377,12 @@ class ListingList(generics.ListCreateAPIView):
                 required=False,
                 type=str,
             ),
+            OpenApiParameter(
+                name="exclude_own_listings",
+                description="Isključi vlastite listinge",
+                required=False,
+                type=bool,
+            ),
         ]
     )
     def preform_create(self, serializer):
@@ -448,6 +454,10 @@ class ListingList(generics.ListCreateAPIView):
         profile_id = self.request.query_params.get("profile_id")
         if profile_id:
             queryset = queryset.filter(game__profile__id=profile_id)
+
+        exclude_own = self.request.query_params.get("exclude_own_listings")
+        if exclude_own and self.request.user.is_authenticated:
+            queryset = queryset.exclude(profile=self.request.user.profile)
 
         return queryset
 

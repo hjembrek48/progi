@@ -82,6 +82,7 @@ function SearchPage() {
   const [resultsLoading, setResultsLoading] = useState(true);
   const [genres, setGenres] = useState([]);
   const [searchError, setSearchError] = useState(false);
+  const [excludeMyListings, setExcludeMyListings] = useState(false);
 
   useEffect(() => {
     const getCategories = async () => {
@@ -117,6 +118,7 @@ function SearchPage() {
     setSearchError(false);
     const query = queryObject.query;
     const category = queryObject.category;
+    const exclude = queryObject.exclude !== undefined ? queryObject.exclude : excludeMyListings;
 
     let newGames = sampleGames;
 
@@ -131,6 +133,9 @@ function SearchPage() {
     if (category && category != "all") {
       newGames = newGames.filter((e) => e.game.genre.id == category);
       params.genre_id = category;
+    }
+    if (exclude) {
+      params.exclude_own_listings = true;
     }
     try {
       const res = await apiAuth.get(
@@ -185,6 +190,17 @@ function SearchPage() {
           </Form.Group>
           <Button className="home_button mt-3 m-2" type="submit">
             Search/Filter <CgSearch />
+          </Button>
+          <Button 
+            className={`mt-3 m-2 ${excludeMyListings ? 'btn-danger' : 'btn-secondary'}`}
+            onClick={() => {
+              const newExclude = !excludeMyListings;
+              setExcludeMyListings(newExclude);
+              const formData = new FormData(document.querySelector('form'));
+              filterGames({ query: formData.get("query"), category: formData.get("category"), exclude: newExclude });
+            }}
+          >
+            {excludeMyListings ? 'Include My Listings' : 'Exclude My Listings'}
           </Button>
         </Form>
       </div>
