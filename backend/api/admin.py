@@ -1,7 +1,7 @@
 from django.contrib import admin
 from .models import (
     Genre, Game, Profile, BoardGame, Listing, 
-    WishlistEntry, SwapOffer, Notification, Note
+    WishlistEntry, SwapOffer, Report, Notification, Note
 )
 
 admin.site.register(Genre)
@@ -11,5 +11,6 @@ admin.site.register(BoardGame)
 admin.site.register(Listing)
 admin.site.register(WishlistEntry)
 admin.site.register(SwapOffer)
+admin.site.register(Report)
 admin.site.register(Notification)
 admin.site.register(Note)

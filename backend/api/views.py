@@ -20,7 +20,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 from rest_framework.exceptions import ValidationError
-from .models import Note, Genre, Game, Listing, WishlistEntry, SwapOffer, Notification, BoardGame, PushSubscription
+from .models import Note, Genre, Game, Listing, WishlistEntry, SwapOffer, Report, Notification, BoardGame, PushSubscription
 from .serializers import (
     NoteSerializer,
     UserSerializer,
@@ -30,6 +30,7 @@ from .serializers import (
     ListingSerializer,
     WishlistSerializer,
     SwapOfferSerializer,
+    ReportSerializer,
     NotificationSerializer,
     BoardGameSerializer,
     BoardGameDetailSerializer,
@@ -685,6 +686,13 @@ class SwapOfferReject(APIView):
 
         return Response(SwapOfferSerializer(offer).data)
 
+class ReportCreate(generics.CreateAPIView):
+    queryset = Report.objects.all()
+    serializer_class = ReportSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(sender=self.request.user.profile)
 
 class NotificationList(generics.ListAPIView):
     serializer_class = NotificationSerializer

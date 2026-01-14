@@ -19,6 +19,7 @@ from .views import (
     SwapOfferDetail,
     SwapOfferAccept,
     SwapOfferReject,
+    ReportCreate,
     NotificationList,
     NotificationMarkRead,
     BoardGameAutocompleteView,
@@ -53,6 +54,7 @@ urlpatterns = [
     path("swaps/<int:pk>/", SwapOfferDetail.as_view(), name="swap-detail"),
     path("swaps/<int:pk>/accept/", SwapOfferAccept.as_view(), name="swap-accept"),
     path("swaps/<int:pk>/reject/", SwapOfferReject.as_view(), name="swap-reject"),
+    path("reports/", ReportCreate.as_view(), name="create_report"),
     path("notifications/", NotificationList.as_view(), name="notification-list"),
     path("csrf/", CsrfCookieView.as_view(), name="csrf"),
     path(

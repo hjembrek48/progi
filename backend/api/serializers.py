@@ -8,11 +8,11 @@ from .models import (
     Listing,
     WishlistEntry,
     SwapOffer,
+    Report,
     Notification,
     BoardGame,
     PushSubscription,
 )
-
 
 class GenreSerializer(serializers.ModelSerializer):
     class Meta:
@@ -248,6 +248,19 @@ class SwapOfferSerializer(serializers.ModelSerializer):
 
         return data
 
+class ReportSerializer(serializers.ModelSerializer):
+    sender_username = serializers.ReadOnlyField(source='sender.user.username')
+    class Meta:
+        model = Report
+        fields = [
+            "id", 
+            "sender", 
+            "sender_username", 
+            "target_listing", 
+            "description", 
+            "created_at"
+        ]
+        read_only_fields = ["sender", "sender_username", "created_at"]
 
 class NotificationSerializer(serializers.ModelSerializer):
     swap_offer = SwapOfferSerializer(read_only=True)

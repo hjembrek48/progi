@@ -153,7 +153,19 @@ class Note(models.Model):
 
     def __str__(self):
         return self.title
+    
+class Report(models.Model):
+    sender = models.ForeignKey(
+        Profile, on_delete=models.CASCADE, related_name="reports_sent"
+    )
+    target_listing = models.ForeignKey(
+        Listing, on_delete=models.CASCADE, related_name="reports_received"
+    )
+    description = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return self.description
 
 class SwapOffer(models.Model):
     STATUS_CHOICES = [
