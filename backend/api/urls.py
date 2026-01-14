@@ -27,6 +27,7 @@ from .views import (
     CsrfCookieView,
     SubscribeView,
     UnsubscribeView,
+    UsernameUpdateView
 )
 
 urlpatterns = [
@@ -72,4 +73,5 @@ urlpatterns = [
         UnsubscribeView.as_view(),
         name="notification-unsubscribe",
     ),
+    path("username/", UsernameUpdateView.as_view(), name="username-update"),
 ]

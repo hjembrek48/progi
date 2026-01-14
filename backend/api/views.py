@@ -8,10 +8,10 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.utils.decorators import method_decorator
 from rest_framework.views import APIView
 from rest_framework.response import Response
-import requests
-import secrets
 from rest_framework import generics, status
 from rest_framework.permissions import (
+import requests
+import secrets
     IsAuthenticated,
     AllowAny,
     IsAuthenticatedOrReadOnly,
@@ -35,6 +35,7 @@ from .serializers import (
     BoardGameSerializer,
     BoardGameDetailSerializer,
     PushSubscriptionSerializer,
+    UsernameUpdateSerializer
 )
 from decimal import Decimal, ROUND_HALF_UP, InvalidOperation
 from drf_spectacular.utils import extend_schema, OpenApiParameter
@@ -817,3 +818,16 @@ class BoardGameDetail(generics.RetrieveAPIView):
     serializer_class = BoardGameDetailSerializer
     permission_classes = [IsAuthenticated]
     lookup_field = 'bgg_id'
+
+
+class UsernameUpdateView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request):
+        serializer = UsernameUpdateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        request.user.username = serializer.validated_data["username"]
+        request.user.save(update_fields=["username"])
+
+        return Response({"username": request.user.username}, status=status.HTTP_200_OK)

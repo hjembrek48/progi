@@ -283,3 +283,13 @@ class PushSubscriptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = PushSubscription
         fields = ["endpoint", "p256dh", "auth"]
+
+
+class UsernameUpdateSerializer(serializers.Serializer):
+    username = serializers.CharField(min_length=3, max_length=150)
+
+    def validate_username(self, value):
+        value = value.strip()
+        if User.objects.filter(username__iexact=value).exists():
+            raise serializers.ValidationError("Username is already taken.")
+        return value
