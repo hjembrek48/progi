@@ -9,7 +9,7 @@ import { EditGameWindow } from "./EditGameWindow";
 import { useEffect } from "react";
 import apiAuth from "../services/apiAuth";
 
-export function GameCardBigger({ game, onClose, onDelete, listings, onListingChange }) {
+export function GameCardBigger({ game, onClose, onDelete, listings, onListingChange, readOnly = false }) {
     const [editing, setEditing] = useState(false);
     const [gameInListing, setGameInListing] = useState(false);
     const [gameInUnlisting, setGameInUnlisting] = useState(false);
@@ -142,31 +142,35 @@ export function GameCardBigger({ game, onClose, onDelete, listings, onListingCha
                 <Button className="button_type1" onClick={onClose}>
                     Close
                 </Button>
-                {gameListed ? (
-                    <Button
-                    variant="warning" 
-                    onClick={() => handleUnlistGame()}
-                    disabled={gameInUnlisting ? true : false}
-                    >
-                        {gameInUnlisting ? "Unlisting Game ..." : "Unlist Game"}
-                    </Button>
-                ) : (
-                    <Button
-                    variant="success" 
-                    onClick={() => handleListGame()}
-                    disabled={gameInUnlisting ? true : false}
-                    >
-                        {gameInListing ? "Listing Game ..." : "List Game"}
-                    </Button>
+                {!readOnly && (
+                    <>
+                        {gameListed ? (
+                            <Button
+                            variant="warning" 
+                            onClick={() => handleUnlistGame()}
+                            disabled={gameInUnlisting ? true : false}
+                            >
+                                {gameInUnlisting ? "Unlisting Game ..." : "Unlist Game"}
+                            </Button>
+                        ) : (
+                            <Button
+                            variant="success" 
+                            onClick={() => handleListGame()}
+                            disabled={gameInUnlisting ? true : false}
+                            >
+                                {gameInListing ? "Listing Game ..." : "List Game"}
+                            </Button>
+                        )}
+                        <Button className="button_type3" onClick={() => setEditing(true)}>
+                            <FaPencil />
+                            Edit Game
+                        </Button>
+                        <Button className="button_type1"
+                        onClick={() => {onDelete(currentGame.id); onClose();}}>
+                            Delete Game
+                        </Button>
+                    </>
                 )}
-                <Button className="button_type3" onClick={() => setEditing(true)}>
-                    <FaPencil />
-                    Edit Game
-                </Button>
-                <Button className="button_type1"
-                onClick={() => {onDelete(currentGame.id); onClose();}}>
-                    Delete Game
-                </Button>
             </Modal.Footer>
         </Modal>
     );

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import apiAuth from '../services/apiAuth.js';
+import { GameCardBigger } from '../components/GameCardBigger';
 import { 
   Container, 
   Row, 
@@ -19,6 +20,7 @@ export function OfferDetail() {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [selectedGame, setSelectedGame] = useState(null);
 
   useEffect(function() {
     async function fetchData() {
@@ -53,7 +55,8 @@ export function OfferDetail() {
             <Card
               key={g.id}
               className="border-0 shadow-sm"
-              style={{ width: "120px", flex: "0 0 auto", overflow: "hidden" }}
+              style={{ width: "120px", flex: "0 0 auto", overflow: "hidden", cursor: "pointer" }}
+              onClick={() => setSelectedGame(g)}
             >
               {g.photo ? (
                 <Card.Img 
@@ -201,6 +204,15 @@ export function OfferDetail() {
           </Button>
         </div>
       </div>
+
+      {selectedGame && 
+        <GameCardBigger 
+          game={selectedGame}
+          onClose={() => setSelectedGame(null)}
+          listings={[]}
+          readOnly={true}
+        />
+      }
     </Container>
   );
 }

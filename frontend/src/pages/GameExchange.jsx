@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import apiAuth from '../services/apiAuth.js';
+import { GameCardBigger } from '../components/GameCardBigger';
 import { Container, Spinner } from 'react-bootstrap';
 
 export function GameExchange() {
@@ -17,6 +18,7 @@ export function GameExchange() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  const [selectedGame, setSelectedGame] = useState(null);
 
   useEffect(function() {
     async function fetchData() {
@@ -170,8 +172,8 @@ export function GameExchange() {
                     checked={selectedWantedGameIds.includes(game.id)}
                     onChange={() => handleWantedGameToggle(game.id)}
                   />
-                  {game.photo && <img src={game.photo} alt="" style={{width: "50px", height: "50px", objectFit: "cover"}} />}
-                  <div>
+                  {game.photo && <img src={game.photo} alt="" style={{width: "50px", height: "50px", objectFit: "cover", cursor: "pointer"}} onClick={() => setSelectedGame(game)} />}
+                  <div style={{cursor: "pointer"}} onClick={() => setSelectedGame(game)}>
                     <div className="font-weight-bold">{game.name}</div>
                     <small className="text-muted">Preservation rating: {game.grade}/5</small>
                   </div>
@@ -209,8 +211,8 @@ export function GameExchange() {
                         checked={selectedOfferedGameIds.includes(game.id)}
                         onChange={() => handleOfferedGameToggle(game.id)}
                       />
-                      {game.photo && <img src={game.photo} alt="" style={{width: "50px", height: "50px", objectFit: "cover"}} />}
-                      <div>
+                      {game.photo && <img src={game.photo} alt="" style={{width: "50px", height: "50px", objectFit: "cover", cursor: "pointer"}} onClick={() => setSelectedGame(game)} />}
+                      <div style={{cursor: "pointer"}} onClick={() => setSelectedGame(game)}>
                         <div className="font-weight-bold">{game.name}</div>
                         <small className="text-muted">Preservation rating: {game.grade}/5</small>
                       </div>
@@ -232,6 +234,15 @@ export function GameExchange() {
           </div>
         </div>
       </div>
+
+      {selectedGame && 
+        <GameCardBigger 
+          game={selectedGame}
+          onClose={() => setSelectedGame(null)}
+          listings={[]}
+          readOnly={true}
+        />
+      }
     </div>
   );
 }
