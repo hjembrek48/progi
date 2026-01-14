@@ -465,7 +465,7 @@ class ListingList(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         listing = serializer.save(profile=self.request.user.profile)
         
-        wishlist_entries = WishlistEntry.objects.filter(game__board_game=listing.game.board_game)
+        wishlist_entries = WishlistEntry.objects.filter(board_game=listing.game.board_game)
         for entry in wishlist_entries:
             if entry.profile != listing.profile:
                 Notification.objects.create(
