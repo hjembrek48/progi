@@ -134,16 +134,16 @@ class WishlistEntry(models.Model):
     profile = models.ForeignKey(
         Profile, on_delete=models.CASCADE, related_name="wishlist"
     )
-    game = models.ForeignKey(
-        Game, on_delete=models.CASCADE, related_name="wishlisted_by"
+    board_game = models.ForeignKey(
+        BoardGame, on_delete=models.CASCADE, related_name="wishlisted_by"
     )
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ("profile", "game")
+        unique_together = ("profile", "board_game")
 
     def __str__(self):
-        return f"{self.profile.user.username} wants {self.game.board_game.name}"
+        return f"{self.profile.user.username} wants {self.board_game.name}"
 
 
 class Note(models.Model):

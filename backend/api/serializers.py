@@ -154,23 +154,19 @@ class ListingSerializer(serializers.ModelSerializer):
 
 
 class WishlistSerializer(serializers.ModelSerializer):
-    game = GameSerializer(read_only=True)
-    game_id = serializers.PrimaryKeyRelatedField(
-        queryset=Game.objects.all(), source="game", write_only=True
+    board_game = BoardGameSerializer(read_only=True)
+    board_game_id = serializers.PrimaryKeyRelatedField(
+        queryset=BoardGame.objects.all(), source="board_game", write_only=True
     )
+    display_name = serializers.SerializerMethodField()
 
     class Meta:
         model = WishlistEntry
-        fields = ["id", "game", "game_id", "created_at"]
-        read_only_fields = ["created_at"]
+        fields = ["id", "board_game", "board_game_id", "display_name", "created_at"]
+        read_only_fields = ["created_at", "display_name"]
 
-    def validate_game_id(self, value):
-        request = self.context.get("request")
-        if request and value.profile == request.user.profile:
-            raise serializers.ValidationError(
-                "You cannot add your own game to the wishlist."
-            )
-        return value
+    def get_display_name(self, obj):
+        return obj.board_game.name
 
 
 class SwapOfferSerializer(serializers.ModelSerializer):
