@@ -5,7 +5,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('api', '0015_report'),
+        ('api', '0016_profile_username'),
     ]
 
     operations = [
