@@ -465,7 +465,7 @@ class ListingList(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         listing = serializer.save(profile=self.request.user.profile)
         
-        wishlist_entries = WishlistEntry.objects.filter(game__board_game=listing.game.board_game)
+        wishlist_entries = WishlistEntry.objects.filter(board_game=listing.game.board_game)
         for entry in wishlist_entries:
             if entry.profile != listing.profile:
                 Notification.objects.create(
@@ -710,9 +710,15 @@ class NotificationList(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Notification.objects.filter(
+        qs = Notification.objects.filter(
             recieved_profile=self.request.user.profile
         ).order_by("-time")
+
+        unread_only = self.request.query_params.get("unread_only")
+        if unread_only:
+            qs = qs.filter(read=False)
+
+        return qs
 
 
 class NotificationMarkRead(APIView):
