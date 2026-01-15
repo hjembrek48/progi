@@ -50,7 +50,7 @@ export function OffersList() {
   return (
     <div className="container py-4">
       <div className="d-flex justify-content-between align-items-center mb-4 text-dark">
-        <h2>My Pending Offers</h2>
+        <h2 className="fw-bold">My Pending Offers</h2>
         <Button className="home_button" onClick={() => {navigate('/')}}>Back to Home</Button>
       </div>
       

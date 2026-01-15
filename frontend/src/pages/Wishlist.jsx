@@ -117,7 +117,7 @@ export function Wishlist() {
   return (
     <Container className="py-5">
       <div className="d-flex justify-content-between align-items-center mb-4 text-dark">
-          <h2>My Wishlist</h2>
+          <h2 className="fw-bold">My Wishlist</h2>
           <Button className="home_button" onClick={() => {navigate('/')}}>Back to Home</Button>
       </div>
     

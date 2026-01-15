@@ -55,7 +55,7 @@ export function NotificationBell() {
         )}
       </Dropdown.Toggle>
 
-      <Dropdown.Menu style={{ width: "320px", maxHeight: "420px", overflowY: "auto" }}>
+      <Dropdown.Menu style={{ width: "320px", maxHeight: "420px", overflowY: "auto", overflowX: "hidden" }}>
         <div className="d-flex justify-content-between align-items-center px-3 py-2">
           <span className="fw-semibold">Notifications</span>
           {loading ? <Spinner animation="border" size="sm" /> : null}
@@ -72,8 +72,9 @@ export function NotificationBell() {
               key={notif.id}
               onClick={() => markAsRead(notif.id)}
               className={!notif.read ? "fw-semibold bg-light" : ""}
+              style={{ whiteSpace: "normal" }}
             >
-              <div className="small">{notif.description}</div>
+              <div className="small" style={{ wordBreak: "break-word", overflowWrap: "break-word" }}>{notif.description}</div>
               <div className="text-muted" style={{ fontSize: "0.75rem" }}>
                 {new Date(notif.time).toLocaleString()}
               </div>
