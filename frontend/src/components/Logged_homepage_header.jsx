@@ -8,6 +8,7 @@ import apiAuth from "../services/apiAuth.js";
 import { deleteTokenFromVariable } from "../services/auth.js";
 import "./../styles/homepage.css";
 import logo from "../assets/Logo_cropped.png";
+import { NotificationBell } from "./NotificationBell";
 
 export function Logged_homepage_header() {
   const { registrationStep, setRegistrationStep } = useAuth();
@@ -66,9 +67,10 @@ export function Logged_homepage_header() {
       </div>
       {registrationStep > 2 ? (
         <div
-          className="d-flex gap-3 justify-content-end"
+          className="d-flex gap-3 justify-content-end align-items-center"
           style={{ minWidth: "300px" }}
         >
+          <NotificationBell />
           <Button
             className="home_button d-flex flex-column align-items-center"
             onClick={() => {
