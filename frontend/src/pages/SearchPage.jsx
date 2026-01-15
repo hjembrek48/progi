@@ -4,6 +4,7 @@ import "../styles/SearchPage.css";
 import { CgSearch } from "react-icons/cg";
 import { useEffect, useState } from "react";
 import ListingGridElement from "../components/ListingGridElement";
+import { GameCardBigger } from "../components/GameCardBigger";
 import apiAuth from "../services/apiAuth";
 import SmartHomepageHeader from "../components/SmartHomepageHeader";
 import { useSearchParams } from "react-router";
@@ -83,6 +84,8 @@ function SearchPage() {
   const [genres, setGenres] = useState([]);
   const [searchError, setSearchError] = useState(false);
   const [excludeMyListings, setExcludeMyListings] = useState(false);
+  const [selectedListing, setSelectedListing] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
     const getCategories = async () => {
@@ -95,6 +98,16 @@ function SearchPage() {
         console.error("Ne mogu dohvatiti kategorije igara.");
       }
     };
+
+    const getCurrentUser = async () => {
+      try {
+        const res = await apiAuth.get('profile/');
+        setCurrentUser(res.data);
+      } catch (error) {
+        console.error("Failed to fetch current user.");
+      }
+    };
+
     const getInitialListing = async () => {
       const query = searchParams.get("search");
       setSearchParams("");
@@ -110,6 +123,7 @@ function SearchPage() {
       }*/
     };
     getCategories();
+    getCurrentUser();
     getInitialListing();
   }, []);
 
@@ -192,7 +206,7 @@ function SearchPage() {
             Search/Filter <CgSearch />
           </Button>
           <Button 
-            className={`mt-3 m-2 ${excludeMyListings ? 'btn-danger' : 'btn-secondary'}`}
+            className={`home_button mt-3 m-2 ${excludeMyListings ? "active" : ""}`}
             onClick={() => {
               const newExclude = !excludeMyListings;
               setExcludeMyListings(newExclude);
@@ -200,7 +214,7 @@ function SearchPage() {
               filterGames({ query: formData.get("query"), category: formData.get("category"), exclude: newExclude });
             }}
           >
-            {excludeMyListings ? 'Include My Listings' : 'Exclude My Listings'}
+            {excludeMyListings ? "Include My Listings" : "Exclude My Listings"}
           </Button>
         </Form>
       </div>
@@ -216,11 +230,13 @@ function SearchPage() {
         <div>
           {filteredGames.length > 0 ? (
             <div className="results_grid p-2">
-              {filteredGames.map((element) => {
-                return (
-                  <ListingGridElement listing={element} key={element.id} />
-                );
-              })}
+              {filteredGames.map((element) => (
+                <ListingGridElement
+                  listing={element}
+                  key={element.id}
+                  onOpen={(l) => setSelectedListing(l)}
+                />
+              ))}
             </div>
           ) : (
             <div className="info_container dark_text">
@@ -228,6 +244,17 @@ function SearchPage() {
             </div>
           )}
         </div>
+      )}
+
+      {selectedListing && (
+        <GameCardBigger
+          game={selectedListing.game}
+          onClose={() => setSelectedListing(null)}
+          listings={[selectedListing]}
+          readOnly={true}
+          showRequestTrade={currentUser && currentUser.id !== selectedListing.profile.id}
+          listingId={selectedListing.id}
+        />
       )}
     </Container>
   );

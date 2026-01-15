@@ -3,13 +3,15 @@ import ReactStars from "react-rating-stars-component";
 import { FaStar } from "react-icons/fa";
 import { VscPerson } from "react-icons/vsc";
 import { FaPencil } from "react-icons/fa6";
+import { Link } from "react-router";
 import './../styles/homepage.css';
 import { useState } from "react";
 import { EditGameWindow } from "./EditGameWindow";
+import { ReportButton } from "./ReportButton";
 import { useEffect } from "react";
 import apiAuth from "../services/apiAuth";
 
-export function GameCardBigger({ game, onClose, onDelete, listings, onListingChange, readOnly = false }) {
+export function GameCardBigger({ game, onClose, onDelete, listings, onListingChange, readOnly = false, showRequestTrade = false, listingId = null, disableReport = false }) {
     const [editing, setEditing] = useState(false);
     const [gameInListing, setGameInListing] = useState(false);
     const [gameInUnlisting, setGameInUnlisting] = useState(false);
@@ -139,9 +141,18 @@ export function GameCardBigger({ game, onClose, onDelete, listings, onListingCha
                 }
             </Modal.Body>
             <Modal.Footer>
-                <Button className="button_type1" onClick={onClose}>
-                    Close
-                </Button>
+                {(showRequestTrade && listingId) && (
+                    <>
+                        {!disableReport && listingId && (
+                            <ReportButton className="button_type1" listingId={listingId} />
+                        )}
+
+                        <Link to={`/gameexchange?listingId=${listingId}`}>
+                            <Button className="button_type3">Request trade</Button>
+                        </Link>
+                    </>
+                )}
+
                 {!readOnly && (
                     <>
                         {gameListed ? (
@@ -171,6 +182,10 @@ export function GameCardBigger({ game, onClose, onDelete, listings, onListingCha
                         </Button>
                     </>
                 )}
+
+                <Button className="button_type1" onClick={onClose}>
+                    Close
+                </Button>
             </Modal.Footer>
         </Modal>
     );
