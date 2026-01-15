@@ -22,8 +22,15 @@ export function Profilepage() {
       try {
         const res = await apiAuth.get("profile");
         setProfile(res.data);
-        setUsername(res.data.username || "");
+        //setUsername(res.data.username || "");
         setDescription(res.data.description || "");
+
+        if(res.data.username){
+          setUsername(res.data.username)
+        } else{
+          const u = await apiAuth.get("username/");
+          setUsername(u.data.username || "");
+        }
       } catch (err) {
         console.error("Ne mogu dohvatiti profil:", err);
       }
