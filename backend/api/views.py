@@ -710,9 +710,15 @@ class NotificationList(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Notification.objects.filter(
+        qs = Notification.objects.filter(
             recieved_profile=self.request.user.profile
         ).order_by("-time")
+
+        unread_only = self.request.query_params.get("unread_only")
+        if unread_only:
+            qs = qs.filter(read=False)
+
+        return qs
 
 
 class NotificationMarkRead(APIView):
