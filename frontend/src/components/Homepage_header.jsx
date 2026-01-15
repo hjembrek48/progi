@@ -2,7 +2,6 @@ import { Button, FormControl } from "react-bootstrap";
 import { Link, useLocation, useNavigate } from "react-router";
 import "./../styles/homepage.css";
 import logo from "../assets/Logo_cropped.png";
-import { CgSearch } from "react-icons/cg";
 
 export function Homepage_header() {
   const navigate = useNavigate();

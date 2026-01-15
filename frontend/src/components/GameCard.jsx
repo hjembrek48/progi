@@ -1,4 +1,4 @@
-import { Card } from "react-bootstrap";
+import { Card, Container } from "react-bootstrap";
 import "./../styles/homepage.css"
 
 export function GameCard({ game, listings, onClick }) {
@@ -11,18 +11,22 @@ export function GameCard({ game, listings, onClick }) {
         className={resultListing ? "game_card_listed" : "game_card_unlisted"}
         onClick={onClick}
         >
-            <Card.Img
-            variant="top"
-            src={game.photo || game.board_game?.image_url}
-            >
-            </Card.Img>
+            <Container>
+                <Card.Img
+                variant="top"
+                src={game.photo || game.board_game?.image_url}
+                >
+                </Card.Img>
+            </Container>
             <Card.Body className="card_body">
-                <Card.Title className="fs-6 card_title">
+                <Card.Title className="fs-7 card_title">
                     {game.board_game.name}
                 </Card.Title>
-                <Card.Text className="small">
-                    {new Date(game.created_at).toLocaleString()}
-                </Card.Text>
+                <Container className="date_container badge bg-primary">
+                    <Card.Text className="small">
+                        {new Date(game.created_at).toLocaleString()}
+                    </Card.Text>
+                </Container>
             </Card.Body>
         </Card>
     );

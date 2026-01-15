@@ -5,6 +5,7 @@ import { GameCardBigger } from "./GameCardBigger";
 import { FaArrowAltCircleDown } from "react-icons/fa";
 import { FaArrowAltCircleUp } from "react-icons/fa";
 import apiAuth from "../services/apiAuth";
+import { Link, Element } from "react-scroll";
 import './../styles/homepage.css';
 
 //uzima po 5 igara i stavlja ih u redak, gumb za redak gore, gumb za redak dolje
@@ -68,14 +69,18 @@ export function MyGamesPalette({ my_games, onGamesChange, myListings }) {
 
     return(
         <Container className="games_palette">
-            <Button 
-            className="goButton" 
-            onClick={tryGoingBack}
-            disabled={index == 0}
-            >
-                Go Up <FaArrowAltCircleUp />
-            </Button>
+            <Link to="scroll_point" smooth={true} duration={500}>
+                <Button 
+                className="goButton" 
+                onClick={tryGoingBack}
+                disabled={index == 0}
+                >
+                    <span className='arrow'>&#128897;</span>
+                    <p>Go Up</p>
+                </Button>
+            </Link>
                 <Container className="games_palette">
+                    <Element id="scroll_point"></Element>
                     <Container className="game_palette_row">
                         {currentlyShowedGames.map((game) => (
                             <GameCard 
@@ -87,13 +92,16 @@ export function MyGamesPalette({ my_games, onGamesChange, myListings }) {
                         ))}
                     </Container>
                 </Container>
-            <Button 
-            className="goButton"
-            onClick={tryGoingForward}
-            disabled={index + max_games_per_page >= games.length}
-            >
-                Go Down <FaArrowAltCircleDown />
-            </Button>
+            <Link to="scroll_point" smooth={true} duration={500}>
+                <Button 
+                className="goButton"
+                onClick={tryGoingForward}
+                disabled={index + max_games_per_page >= games.length}
+                >
+                    <span className='arrow'>&#128899;</span>
+                    <p>Go Down</p>
+                </Button>
+            </Link>
 
             {currentlySelectedGame && 
                 <GameCardBigger 

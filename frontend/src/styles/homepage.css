@@ -117,6 +117,8 @@
     background-color: #354F52;
     border: #2F3E46 solid 5px;
     border-radius: 10px;
+    align-items: center;
+    column-gap: 1em;
 }
 .game_palette_row {
     display: grid;
@@ -124,6 +126,8 @@
     gap: 1rem;
 }
 .goButton {
+    width: 5em;
+    height: 10em;
     font-size: 1rem !important;
     border-radius: 12px !important;
     background-color: #5E1914 !important;
@@ -143,8 +147,10 @@
     border: 4px solid #5E1914 !important;
     border-radius: 12px !important;
     overflow: hidden !important;
-    background-color: rgb(163, 221, 149) !important;
+    background-color: rgb(126, 201, 108) !important;
     cursor: pointer !important;
+    max-height: 320px !important;
+    padding: 4% !important;
 }
 .game_card_unlisted {
     display: flex !important;
@@ -154,7 +160,9 @@
     overflow: hidden !important;
     background-color: #c2c4c2 !important;
     cursor: pointer !important;
-    opacity: 0.8 !important; 
+    opacity: 0.8 !important;
+    max-height: 320px !important;
+    padding: 4% !important;
 }
 .game_card_unlisted img {
     height: 150px !important;
@@ -165,12 +173,17 @@
     object-fit: contain !important;
 }
 .card_body {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
     margin-top: auto;
     padding: 0.75rem !important;
 }
 .card_title {
     font-size: larger !important;
     margin-bottom: 0.5em !important;
+    text-align: center !important;
 }
 .button_type1 {
     font-size: 1rem !important;
@@ -251,20 +264,109 @@
     color: white;
     max-width: 700px;
 }
-
 .welcome_title {
     font-size: 5rem;
     font-weight: bold;
     margin-bottom: 1rem;
 }
-
 .welcome_subtitle {
     font-size: 2rem;
     margin-bottom: 2rem;
     line-height: 1.6;
 }
-
 .welcome_button {
     padding: 0.7rem 2.5rem;
     font-size: 1.1rem;
+}
+.button {
+    width: fit-content;
+    display: flex;
+    padding: 1.2em 1rem;
+    cursor: pointer;
+    border: #c2c4c2 solid 3px;
+    gap: 0.4rem;
+    font-weight: bold;
+    border-radius: 30px;
+    text-shadow: 2px 2px 3px rgba(0, 100, 0, 0.5);
+    background: linear-gradient(
+        15deg,
+        #1b5e20,
+        #2e7d32,
+        #66bb6a,
+        #a5d6a7,
+        #66bb6a,
+        #2e7d32,
+        #1b5e20
+        ) no-repeat;
+    background-size: 300%;
+    color: #fff;
+    background-position: left center;
+    box-shadow: 0 30px 10px -20px rgba(0, 100, 0, 0.2);
+    transition: background 0.3s ease;
+}
+
+.button:hover {
+    background-size: 320%;
+    background-position: right center;
+}
+
+.button svg {
+    width: 23px;
+    fill: #a5d6a7;
+    transition: 0.3s ease;
+}
+.button:hover svg {
+    fill: #fff;
+}
+.logo_wrapper {
+    min-width: 4em;
+}
+.home_header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+.date_container {
+    padding-left: 0% !important;
+    padding-right: 0% !important;
+    padding-bottom: 2% !important;
+    padding-top: 2% !important; 
+}
+
+
+
+@media (max-width: 1200px) {
+    .game_palette_row {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+        justify-items: center;
+    }
+    .games_palette {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        padding: 1.5em;
+        margin: 1.5em;
+    }
+    .game_card_listed {
+        height: 100% !important;
+        min-height: 340px !important;
+        width: 23em !important;
+    }
+    .game_card_unlisted {
+        height: 100% !important;
+        min-height: 340px !important;
+        width: 23em !important;
+    }
+    .goButton{
+        width: 10em;
+        height: 5em;
+    }
+}
+.arrow {
+    height: 100px !important;
+    width: 100px !important;
 }

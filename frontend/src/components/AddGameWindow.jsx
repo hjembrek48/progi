@@ -137,12 +137,7 @@ export function AddGameWindow({ onClose, onGameAdded }) {
 
             form_data.append("description", bgDesc);
             form_data.append("publisher", bgPublisher);
-
-            if(addToListing) {
-                form_data.append("active", Boolean(true));
-            } else {
-                form_data.append("active", Boolean(false));
-            }
+            form_data.append("active", Boolean(true));
 
             const grade = parseInt(bgPreservation);
             if(!isNaN(grade)) {
