@@ -68,6 +68,7 @@ export function CategoryWishlist() {
         (profileRes.data?.interests || []).map((g) => g.id)
       );
 
+      alert("Spremljeno!");
     } catch (err) {
       console.error(
         "Greška kod spremanja",
@@ -77,71 +78,79 @@ export function CategoryWishlist() {
     }
   };
 
-return (
-  <div style={styles.page}>
-    <div style={styles.shell}>
-      <div style={styles.header}>
-        <div>
-          <h2 style={styles.title}>Odaberi omiljene žanrove</h2>
-          <p style={styles.caption}>
-            Klikni na kartice. Odabrano:{" "}
-            <span style={styles.countPill}>{selectedGenres.length}</span>
-          </p>
+  return (
+    <div style={styles.page}>
+      <div style={styles.shell}>
+        <div style={styles.header}>
+          <div>
+            <h2 style={styles.title}>Odaberi omiljene žanrove</h2>
+            <p style={styles.caption}>
+              Odabrano:
+              <span style={styles.countPill}>
+                {selectedGenres.length}
+              </span>
+            </p>
+          </div>
+
+          <button
+            style={styles.saveButton}
+            onClick={saveWishlist}
+            onMouseDown={(e) =>
+              (e.currentTarget.style.transform = "scale(0.97)")
+            }
+            onMouseUp={(e) =>
+              (e.currentTarget.style.transform = "scale(1)")
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.transform = "scale(1)")
+            }
+          >
+            Spremi
+          </button>
         </div>
 
-        <button style={styles.saveButton} onClick={saveWishlist}>
-          Spremi ({selectedGenres.length})
-        </button>
-      </div>
+        <div style={styles.grid}>
+          {genres.map((genre) => {
+            const isSelected = selectedGenres.includes(genre.id);
 
-      <div style={styles.grid}>
-        {genres.map((genre) => {
-          const isChecked = selectedGenres.includes(genre.id);
-
-          return (
-            <label
-              key={genre.id}
-              style={{
-                ...styles.genreCard,
-                ...(isChecked ? styles.genreCardActive : {}),
-              }}
-            >
-              <input
-                type="checkbox"
-                checked={isChecked}
-                onChange={() => toggleGenre(genre.id)}
-                style={styles.checkboxHidden}
-              />
-
-              <div style={styles.cardInner}>
-                <span style={styles.genreName}>{genre.name}</span>
-
-                <span
-                  style={{
-                    ...styles.badge,
-                    ...(isChecked ? styles.badgeOn : styles.badgeOff),
-                  }}
-                >
-                  {isChecked ? "Odabrano" : "Dodaj"}
-                </span>
-              </div>
-
-              <div
+            return (
+              <label
+                key={genre.id}
                 style={{
-                  ...styles.glow,
-                  opacity: isChecked ? 1 : 0,
+                  ...styles.genreCard,
+                  ...(isSelected ? styles.genreCardActive : {}),
                 }}
-              />
-            </label>
-          );
-        })}
+                onMouseDown={(e) =>
+                  (e.currentTarget.style.transform = "scale(0.98)")
+                }
+                onMouseUp={(e) =>
+                  (e.currentTarget.style.transform = "scale(1)")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.transform = "scale(1)")
+                }
+              >
+               
+                <div style={styles.genreContent}>
+                  <input
+                    type="checkbox"
+                    checked={isSelected}
+                    onChange={() => toggleGenre(genre.id)}
+                    style={styles.checkbox}
+                  />
+
+                  <span style={styles.genreName}>
+                    {genre.name}
+                  </span>
+                </div>
+              </label>
+            );
+          })}
+        </div>
       </div>
     </div>
-  </div>
-);
-
+  );
 }
-
 
 const styles = {
   page: {
@@ -149,7 +158,7 @@ const styles = {
     padding: "48px 18px",
     color: "white",
     background:
-      "radial-gradient(1000px 600px at 15% 10%, rgba(140,255,213,0.12), transparent 60%), radial-gradient(900px 600px at 80% 20%, rgba(140,190,255,0.12), transparent 55%), linear-gradient(180deg, #0b1416 0%, #0e1b1d 55%, #0b1416 100%)",
+      "linear-gradient(180deg, #0b1416 0%, #0e1b1d 55%, #0b1416 100%)",
     display: "flex",
     justifyContent: "center",
   },
@@ -159,162 +168,88 @@ const styles = {
     maxWidth: "980px",
     borderRadius: "26px",
     padding: "22px",
-    background:
-      "linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04))",
+    background: "rgba(255,255,255,0.06)",
     border: "1px solid rgba(255,255,255,0.10)",
     boxShadow: "0 30px 90px rgba(0,0,0,0.55)",
-    backdropFilter: "blur(10px)",
   },
 
   header: {
     display: "flex",
-    alignItems: "flex-end",
     justifyContent: "space-between",
-    gap: "18px",
-    padding: "10px 10px 16px 10px",
-    borderBottom: "1px solid rgba(255,255,255,0.10)",
-    marginBottom: "18px",
+    alignItems: "flex-end",
+    marginBottom: "24px",
   },
 
   title: {
     margin: 0,
     fontSize: "28px",
     fontWeight: 800,
-    letterSpacing: "0.2px",
-    lineHeight: 1.1,
-    background:
-      "linear-gradient(90deg, rgba(220,255,245,1) 0%, rgba(190,230,255,1) 40%, rgba(255,220,245,1) 100%)",
-    WebkitBackgroundClip: "text",
-    WebkitTextFillColor: "transparent",
   },
 
   caption: {
-    margin: "10px 0 0 0",
+    marginTop: "6px",
     fontSize: "14px",
     opacity: 0.85,
-    color: "rgba(245,255,255,0.9)",
   },
 
   countPill: {
-    display: "inline-flex",
-    alignItems: "center",
-    justifyContent: "center",
-    minWidth: "28px",
-    height: "22px",
-    padding: "0 10px",
+    marginLeft: "8px",
+    padding: "2px 10px",
     borderRadius: "999px",
-    marginLeft: "6px",
-    fontWeight: 800,
+    background: "rgba(255,255,255,0.12)",
     fontSize: "12px",
-    color: "#071213",
-    background:
-      "linear-gradient(90deg, rgba(140,255,213,1), rgba(140,190,255,1))",
-    boxShadow: "0 10px 24px rgba(0,0,0,0.35)",
+    fontWeight: 700,
   },
 
   grid: {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-    gap: "14px",
-    marginTop: "10px",
-    width: "100%",
+    gap: "16px",
   },
 
   genreCard: {
-    position: "relative",
-    borderRadius: "18px",
-    padding: "16px 16px",
-    cursor: "pointer",
-    userSelect: "none",
-    overflow: "hidden",
-    background:
-      "linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.03))",
+    borderRadius: "16px",
+    padding: "20px",
+    background: "rgba(255,255,255,0.08)",
     border: "1px solid rgba(255,255,255,0.12)",
-    boxShadow: "0 18px 55px rgba(0,0,0,0.45)",
-    transform: "translateY(0px) scale(1)",
-    transition:
-      "transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease, background 180ms ease",
+    cursor: "pointer",
+    transition: "transform 0.15s ease",
   },
 
   genreCardActive: {
-    border: "1px solid rgba(140,255,213,0.55)",
-    boxShadow:
-      "0 22px 70px rgba(0,0,0,0.55), 0 0 0 1px rgba(140,255,213,0.25) inset",
-    background:
-      "linear-gradient(180deg, rgba(140,255,213,0.18), rgba(255,255,255,0.04))",
-    transform: "translateY(-2px) scale(1.01)",
+    background: "rgba(255,255,255,0.14)",
   },
 
-  cardInner: {
-    position: "relative",
-    zIndex: 2,
+  
+  genreContent: {
     display: "flex",
+    flexDirection: "column",
     alignItems: "center",
-    justifyContent: "space-between",
-    gap: "14px",
+    justifyContent: "center",
+    gap: "10px",
+    textAlign: "center",
   },
 
   genreName: {
     fontSize: "15px",
-    fontWeight: 800,
+    fontWeight: 600,
     letterSpacing: "0.4px",
-    color: "rgba(245,255,255,0.95)",
-    textTransform: "capitalize",
   },
 
-  badge: {
-    fontSize: "12px",
-    fontWeight: 800,
-    padding: "8px 10px",
-    borderRadius: "999px",
-    border: "1px solid rgba(255,255,255,0.14)",
-    transition: "transform 180ms ease, opacity 180ms ease",
-    transform: "translateY(0px)",
-    whiteSpace: "nowrap",
-  },
-
-  badgeOn: {
-    color: "#061212",
-    background:
-      "linear-gradient(90deg, rgba(140,255,213,1), rgba(140,190,255,1))",
-    boxShadow: "0 12px 26px rgba(0,0,0,0.35)",
-  },
-
-  badgeOff: {
-    color: "rgba(255,255,255,0.88)",
-    background: "rgba(255,255,255,0.06)",
-  },
-
-  glow: {
-    position: "absolute",
-    inset: "-40px -40px auto -40px",
-    height: "160px",
-    background:
-      "radial-gradient(closest-side, rgba(140,255,213,0.38), transparent 70%)",
-    filter: "blur(8px)",
-    transition: "opacity 180ms ease",
-    zIndex: 1,
-    pointerEvents: "none",
-  },
-
-  checkboxHidden: {
-    position: "absolute",
-    opacity: 0,
-    pointerEvents: "none",
+  checkbox: {
+    transform: "scale(1.2)",
+    accentColor: "#cad2c5",
+    cursor: "pointer",
   },
 
   saveButton: {
-    border: "none",
-    borderRadius: "16px",
-    padding: "12px 16px",
-    fontWeight: 900,
-    letterSpacing: "0.4px",
-    color: "#061212",
+    padding: "12px 18px",
+    borderRadius: "14px",
+    background: "rgba(255,255,255,0.12)",
+    border: "1px solid rgba(255,255,255,0.14)",
+    color: "white",
+    fontWeight: 700,
     cursor: "pointer",
-    background:
-      "linear-gradient(90deg, rgba(140,255,213,1), rgba(140,190,255,1), rgba(255,220,245,1))",
-    boxShadow: "0 18px 40px rgba(0,0,0,0.45)",
-    transform: "translateY(0px)",
-    transition: "transform 140ms ease, box-shadow 140ms ease, filter 140ms ease",
+    transition: "transform 0.15s ease",
   },
 };
