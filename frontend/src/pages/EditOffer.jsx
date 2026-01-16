@@ -31,17 +31,45 @@ export function EditOffer() {
         setCurrentUser(me);
 
         const myGamesRes = await apiAuth.get('games/');
-        setMyGames(myGamesRes.data);
+        const myGamesFromApi = myGamesRes.data;
         
         const isCurrentUserProposer = me?.id === offerData?.proposer?.id;
         const counterpartId = isCurrentUserProposer ? offerData.target.id : offerData.proposer.id;
+
+        const myGamesInOffer = isCurrentUserProposer 
+          ? (offerData.offered_games || [])
+          : (offerData.requested_games || []);
+        
+        const myGamesMap = new Map();
+        myGamesFromApi.forEach(game => myGamesMap.set(game.id, game));
+        myGamesInOffer.forEach(game => {
+          if (!myGamesMap.has(game.id)) {
+            myGamesMap.set(game.id, game);
+          }
+        });
+        
+        const allMyGames = Array.from(myGamesMap.values());
+        setMyGames(allMyGames);
 
         const listingsRes = await apiAuth.get('listings/');
         const counterpartGamesFromListings = listingsRes.data
           .filter((listing) => (listing.profile?.id) === counterpartId)
           .map((listing) => listing.game);
 
-        setTargetGames(counterpartGamesFromListings);
+        const gamesInOffer = isCurrentUserProposer 
+          ? (offerData.requested_games || [])
+          : (offerData.offered_games || []);
+        
+        const counterpartGamesMap = new Map();
+        counterpartGamesFromListings.forEach(game => counterpartGamesMap.set(game.id, game));
+        gamesInOffer.forEach(game => {
+          if (!counterpartGamesMap.has(game.id)) {
+            counterpartGamesMap.set(game.id, game);
+          }
+        });
+        
+        const allCounterpartGames = Array.from(counterpartGamesMap.values());
+        setTargetGames(allCounterpartGames);
 
         const offeredIds = (offerData.offered_games || []).map(g => g.id);
         const requestedIds = (offerData.requested_games || []).map(g => g.id);

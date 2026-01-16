@@ -114,6 +114,20 @@ export function OfferDetail() {
     }
   }
 
+  async function handleDelete() {
+    if (!window.confirm("Are you sure you want to delete this offer? This action cannot be undone.")) return;
+    try {
+      setActionLoading(true);
+      await apiAuth.delete('swaps/' + id + '/');
+      navigate('/offers');
+    } catch (err) {
+      console.error("Delete failed", err);
+      setError("Failed to delete offer.");
+    } finally {
+      setActionLoading(false);
+    }
+  }
+
   if (loading) return <Loading size="lg" fullPage />;
 
   if (error) {
@@ -199,6 +213,12 @@ export function OfferDetail() {
             {offer.status === "PENDING" && (
               <Button as={Link} to={`/offers/${offer.id}/edit`} variant="primary" size="lg" className="px-5">
                 Edit Offer
+              </Button>
+            )}
+
+            {isCurrentUserProposer && offer.status === "PENDING" && (
+              <Button variant="danger" size="lg" className="px-5" onClick={handleDelete} disabled={actionLoading}>
+                Delete Offer
               </Button>
             )}
             
