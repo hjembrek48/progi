@@ -107,8 +107,8 @@ export function EditOffer() {
         : {
             proposer_id: offer.target.id,
             target_id: offer.proposer.id,
-            offered_game_ids: selectedRequestedGames,
-            requested_game_ids: selectedOfferedGames
+            offered_game_ids: selectedOfferedGames,
+            requested_game_ids: selectedRequestedGames
           };
       
       await apiAuth.patch('swaps/' + id + '/', payload);
