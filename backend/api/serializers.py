@@ -187,6 +187,9 @@ class SwapOfferSerializer(serializers.ModelSerializer):
     target_id = serializers.PrimaryKeyRelatedField(
         queryset=Profile.objects.all(), source="target", write_only=True, required=False
     )
+    proposer_id = serializers.PrimaryKeyRelatedField(
+        queryset=Profile.objects.all(), source="proposer", write_only=True, required=False
+    )
 
     class Meta:
         model = SwapOffer
@@ -194,6 +197,7 @@ class SwapOfferSerializer(serializers.ModelSerializer):
             "id",
             "proposer",
             "target",
+            "proposer_id",
             "target_id",
             "status",
             "offered_games",
@@ -203,7 +207,7 @@ class SwapOfferSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
-        read_only_fields = ["proposer", "status", "created_at", "updated_at"]
+        read_only_fields = ["status", "created_at", "updated_at"]
 
     def validate(self, data):
         request = self.context.get("request")
@@ -211,8 +215,12 @@ class SwapOfferSerializer(serializers.ModelSerializer):
             return data
 
         if self.instance:
-            proposer = self.instance.proposer
-            target = self.instance.target
+            current_user = request.user.profile
+            if current_user != self.instance.proposer and current_user != self.instance.target:
+                raise serializers.ValidationError("You can only edit your own offers.")
+            
+            proposer = data.get("proposer", self.instance.proposer)
+            target = data.get("target", self.instance.target)
         else:
             proposer = request.user.profile
             target = data.get("target")
@@ -222,6 +230,9 @@ class SwapOfferSerializer(serializers.ModelSerializer):
                 )
             if proposer == target:
                 raise serializers.ValidationError("You cannot swap with yourself.")
+        
+        if proposer == target:
+            raise serializers.ValidationError("Proposer and target cannot be the same person.")
 
         offered_games = data.get("offered_games", [])
         for game in offered_games:

@@ -62,9 +62,9 @@ export function MyTrades() {
       ) : (
         <ul className="list-group">
           {trades.map(function(offer) {
-            const proposer = offer.proposer && offer.proposer.email ? offer.proposer.email : "—";
-            const target = offer.target && offer.target.email ? offer.target.email : "—";
-            
+            const proposer = (offer.proposer && offer.proposer.username) ? offer.proposer.username : offer.proposer?.email.split("@")[0] || "—";
+            const target = (offer.target && offer.target.username) ? offer.target.username : offer.target?.email.split("@")[0] || "—";
+
             const isCurrentUserProposer = currentUser && offer.proposer && currentUser.id === offer.proposer.id;
 
             let statusBadgeClass = "bg-secondary";

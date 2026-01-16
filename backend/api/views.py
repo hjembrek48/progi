@@ -589,11 +589,13 @@ class SwapOfferDetail(generics.RetrieveUpdateDestroyAPIView):
 
         updated_offer = serializer.save()
 
-        recieved_profile = (
-            instance.target if user_profile == instance.proposer else instance.proposer
-        )
+        if user_profile == instance.proposer:
+            notification_recipient = updated_offer.target
+        else:
+            notification_recipient = updated_offer.proposer
+
         Notification.objects.create(
-            recieved_profile=recieved_profile,
+            recieved_profile=notification_recipient,
             profile=user_profile,
             description=f"Swap offer updated by {user_profile.user.username}",
             swap_offer=updated_offer,

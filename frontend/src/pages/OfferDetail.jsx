@@ -131,8 +131,8 @@ export function OfferDetail() {
   const isCurrentUserProposer = currentUser && offer.proposer && currentUser.id === offer.proposer.id;
   const isCurrentUserTarget = currentUser && offer.target && currentUser.id === offer.target.id;
   
-  const proposerName = isCurrentUserProposer ? "Me" : (offer.proposer && offer.proposer.email ? offer.proposer.email : "—");
-  const targetName = isCurrentUserTarget ? "Me" : (offer.target && offer.target.email ? offer.target.email : "—");
+  const proposerName = isCurrentUserProposer ? "Me" : (offer.proposer && offer.proposer.username ? offer.proposer.username : offer.proposer?.email.split("@")[0] || "—");
+  const targetName = isCurrentUserTarget ? "Me" : (offer.target && offer.target.username ? offer.target.username : offer.target?.email.split("@")[0] || "—");
 
   return (
     <Container fluid className="py-5">
@@ -196,7 +196,7 @@ export function OfferDetail() {
               </>
             )}
 
-            {isCurrentUserProposer && offer.status === "PENDING" && (
+            {offer.status === "PENDING" && (
               <Button as={Link} to={`/offers/${offer.id}/edit`} variant="primary" size="lg" className="px-5">
                 Edit Offer
               </Button>
