@@ -17,6 +17,11 @@ export function Profilepage() {
   const [usernameError, setUsernameError] = useState("");
   const [usernameSuccess, setUsernameSuccess] = useState("");
 
+  const [isSavingDescription, setIsSavingDescription] = useState(false);
+  const [descriptionError, setDescriptionError] = useState("");
+  const [descriptionSuccess, setDescriptionSuccess] = useState("");
+
+
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -77,6 +82,44 @@ export function Profilepage() {
       setIsSavingUsername(false);
     }
   };
+
+  const saveDescription = async () => {
+  setDescriptionError("");
+  setDescriptionSuccess("");
+
+  const trimmed = description.trim();
+
+  // nema promjene → ne šalji
+  if (trimmed === (profile?.description || "")) {
+    setDescriptionSuccess("Nema promjena.");
+    return;
+  }
+
+  try {
+    setIsSavingDescription(true);
+
+    const res = await apiAuth.patch("profile/", {
+      description: trimmed,
+    });
+
+    const newDescription = res.data.description || "";
+
+    setDescription(newDescription);
+    setProfile((p) => ({ ...p, description: newDescription }));
+    setDescriptionSuccess("Opis spremljen!");
+  } catch (err) {
+    const data = err?.response?.data;
+    const msg =
+      data?.description?.[0] ||
+      data?.detail ||
+      "Greška pri spremanju opisa.";
+
+    setDescriptionError(msg);
+  } finally {
+    setIsSavingDescription(false);
+  }
+};
+
 
   if (!profile) {
     return <div style={{ color: "white" }}>Učitavanje...</div>;
@@ -167,10 +210,16 @@ export function Profilepage() {
 
           <textarea
             value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="Opis..."
+            onChange={(e) => {
+              setDescription(e.target.value);
+              setDescriptionError("");
+              setDescriptionSuccess("");
+            }}
+            onBlur={saveDescription}
+            placeholder="Dodaj Opis..."
             style={styles.opis_input}
           />
+
         </div>
 
         <div style={styles.profileButtons}>
@@ -364,4 +413,5 @@ const styles = {
     boxShadow: "0 4px 12px rgba(0,0,0,0.25)",
     transition: "transform 0.2s ease, background-color 0.2s ease",
   },
+
 };
