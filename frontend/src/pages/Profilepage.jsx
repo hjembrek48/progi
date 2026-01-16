@@ -21,18 +21,16 @@ export function Profilepage() {
   const [descriptionError, setDescriptionError] = useState("");
   const [descriptionSuccess, setDescriptionSuccess] = useState("");
 
-
   useEffect(() => {
     const fetchProfile = async () => {
       try {
         const res = await apiAuth.get("profile");
         setProfile(res.data);
-        //setUsername(res.data.username || "");
         setDescription(res.data.description || "");
 
-        if(res.data.username){
-          setUsername(res.data.username)
-        } else{
+        if (res.data.username) {
+          setUsername(res.data.username);
+        } else {
           const u = await apiAuth.get("username/");
           setUsername(u.data.username || "");
         }
@@ -73,9 +71,7 @@ export function Profilepage() {
     } catch (err) {
       const data = err?.response?.data;
       const msg =
-        data?.username?.[0] ||
-        data?.detail ||
-        "Greška pri spremanju usernamea.";
+        data?.username?.[0] || data?.detail || "Greška pri spremanju usernamea.";
 
       setUsernameError(msg);
     } finally {
@@ -84,42 +80,39 @@ export function Profilepage() {
   };
 
   const saveDescription = async () => {
-  setDescriptionError("");
-  setDescriptionSuccess("");
+    setDescriptionError("");
+    setDescriptionSuccess("");
 
-  const trimmed = description.trim();
+    const trimmed = description.trim();
 
-  // nema promjene → ne šalji
-  if (trimmed === (profile?.description || "")) {
-    setDescriptionSuccess("Nema promjena.");
-    return;
-  }
+    // nema promjene → ne šalji
+    if (trimmed === (profile?.description || "")) {
+      setDescriptionSuccess("Nema promjena.");
+      return;
+    }
 
-  try {
-    setIsSavingDescription(true);
+    try {
+      setIsSavingDescription(true);
 
-    const res = await apiAuth.patch("profile/", {
-      description: trimmed,
-    });
+      const res = await apiAuth.patch("profile/", {
+        description: trimmed,
+      });
 
-    const newDescription = res.data.description || "";
+      const newDescription = res.data.description || "";
 
-    setDescription(newDescription);
-    setProfile((p) => ({ ...p, description: newDescription }));
-    setDescriptionSuccess("Opis spremljen!");
-  } catch (err) {
-    const data = err?.response?.data;
-    const msg =
-      data?.description?.[0] ||
-      data?.detail ||
-      "Greška pri spremanju opisa.";
+      setDescription(newDescription);
+      setProfile((p) => ({ ...p, description: newDescription }));
+      setDescriptionSuccess("Opis spremljen!");
+    } catch (err) {
+      const data = err?.response?.data;
+      const msg =
+        data?.description?.[0] || data?.detail || "Greška pri spremanju opisa.";
 
-    setDescriptionError(msg);
-  } finally {
-    setIsSavingDescription(false);
-  }
-};
-
+      setDescriptionError(msg);
+    } finally {
+      setIsSavingDescription(false);
+    }
+  };
 
   if (!profile) {
     return <div style={{ color: "white" }}>Učitavanje...</div>;
@@ -215,11 +208,43 @@ export function Profilepage() {
               setDescriptionError("");
               setDescriptionSuccess("");
             }}
-            onBlur={saveDescription}
             placeholder="Dodaj Opis..."
             style={styles.opis_input}
           />
 
+          <div
+            style={{
+              display: "flex",
+              gap: 10,
+              marginTop: 10,
+              alignItems: "center",
+              flexWrap: "wrap",
+            }}
+          >
+            <button
+              onClick={saveDescription}
+              disabled={isSavingDescription}
+              style={{
+                ...styles.saveButton,
+                opacity: isSavingDescription ? 0.7 : 1,
+                cursor: isSavingDescription ? "not-allowed" : "pointer",
+              }}
+            >
+              {isSavingDescription ? "Spremam..." : "Spremi opis"}
+            </button>
+
+            {descriptionError ? (
+              <span style={{ color: "#ffb4b4", fontWeight: 600 }}>
+                {descriptionError}
+              </span>
+            ) : null}
+
+            {descriptionSuccess ? (
+              <span style={{ color: "#b7ffcc", fontWeight: 600 }}>
+                {descriptionSuccess}
+              </span>
+            ) : null}
+          </div>
         </div>
 
         <div style={styles.profileButtons}>
@@ -413,5 +438,4 @@ const styles = {
     boxShadow: "0 4px 12px rgba(0,0,0,0.25)",
     transition: "transform 0.2s ease, background-color 0.2s ease",
   },
-
 };
