@@ -837,3 +837,6 @@ class UsernameUpdateView(APIView):
         request.user.save(update_fields=["username"])
 
         return Response({"username": request.user.username}, status=status.HTTP_200_OK)
+
+    def get(self, request):
+        return Response({"username": request.user.username}, status=200)

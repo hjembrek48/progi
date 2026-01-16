@@ -21,6 +21,15 @@
     border: #CAD2C5 solid 3px !important;
     transition: all 0.2s ease !important;
 }
+.home_button.active{
+    border-radius: 8px !important;
+    border: #CAD2C5 solid 3px !important;
+    background-color: #C1121F !important;
+}
+.home_button.active:hover{
+    background-color: #A00A1A !important;
+    transform: scale(1.05) !important;
+}
 #nav_button{
     display: flex;
     flex: 1;
