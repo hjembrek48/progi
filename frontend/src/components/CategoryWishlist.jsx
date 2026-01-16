@@ -1,181 +1,320 @@
 import { useEffect, useState } from "react";
 import apiAuth from "../services/apiAuth";
+import axios from "axios";
+import { getAccessToken, setAccessToken } from "../services/auth.js";
 
 export function CategoryWishlist() {
   const [genres, setGenres] = useState([]);
   const [selectedGenres, setSelectedGenres] = useState([]);
-  const MAX_GENRES = 6;
+
+  const ensureAccessToken = async () => {
+    const token = getAccessToken();
+    if (token) return token;
+
+    const res = await axios.post(
+      `${process.env.REACT_APP_API_URL}/api/token/refresh-cookie/`,
+      {},
+      { withCredentials: true }
+    );
+
+    setAccessToken(res.data.access);
+    return res.data.access;
+  };
 
   useEffect(() => {
-    const fetchGenres = async () => {
+    const fetchGenresAndProfile = async () => {
       try {
-        const res = await apiAuth.get("genres/");
-        setGenres(res.data);
+        await ensureAccessToken();
+
+        const [genresRes, profileRes] = await Promise.all([
+          apiAuth.get("genres/"),
+          apiAuth.get("profile/"),
+        ]);
+
+        setGenres(genresRes.data);
+
+        const raw = profileRes.data?.interests || [];
+        setSelectedGenres(raw.map((g) => g.id));
       } catch (err) {
-        console.error("Greška kod dohvaćanja žanrova", err);
+        console.error(
+          "Greška kod dohvaćanja žanrova/profila",
+          err?.response?.status,
+          err?.response?.data || err
+        );
       }
     };
 
-    fetchGenres();
+    fetchGenresAndProfile();
   }, []);
 
   const toggleGenre = (genreId) => {
-    setSelectedGenres((prev) => {
-      if (prev.includes(genreId)) {
-        return prev.filter((id) => id !== genreId);
-      }
-
-      if (prev.length >= MAX_GENRES) {
-        return prev;
-      }
-
-      return [...prev, genreId];
-    });
+    setSelectedGenres((prev) =>
+      prev.includes(genreId)
+        ? prev.filter((id) => id !== genreId)
+        : [...prev, genreId]
+    );
   };
 
   const saveWishlist = async () => {
     try {
-      await apiAuth.put("profile/genre-wishlist/", {
-        genres: selectedGenres,
+      await ensureAccessToken();
+
+      await apiAuth.patch("profile/", {
+        interest_ids: selectedGenres,
       });
-      alert("Spremljeno!");
+
+      const profileRes = await apiAuth.get("profile/");
+      setSelectedGenres(
+        (profileRes.data?.interests || []).map((g) => g.id)
+      );
+
     } catch (err) {
-      console.error("Greška kod spremanja", err);
+      console.error(
+        "Greška kod spremanja",
+        err?.response?.status,
+        err?.response?.data || err
+      );
     }
   };
 
-  return (
-    <div style={styles.page}>
-      <h2 style={styles.title}>
-        Odaberi omiljene žanrove{" "}
-        <span style={styles.subtitle}>
-          ({selectedGenres.length}/{MAX_GENRES})
-        </span>
-      </h2>
-
-      <div style={styles.gridWrapper}>
-        <div style={styles.grid}>
-          {genres.map((genre) => {
-            const isChecked = selectedGenres.includes(genre.id);
-            const isDisabled =
-              !isChecked && selectedGenres.length >= MAX_GENRES;
-
-            return (
-              <label
-                key={genre.id}
-                style={{
-                  ...styles.genreItem,
-                  ...(isDisabled ? styles.genreItemDisabled : {}),
-                }}
-              >
-                <input
-                  type="checkbox"
-                  checked={isChecked}
-                  disabled={isDisabled}
-                  onChange={() => toggleGenre(genre.id)}
-                  style={styles.checkbox}
-                />
-                <span style={styles.genreText}>{genre.name}</span>
-              </label>
-            );
-          })}
+return (
+  <div style={styles.page}>
+    <div style={styles.shell}>
+      <div style={styles.header}>
+        <div>
+          <h2 style={styles.title}>Odaberi omiljene žanrove</h2>
+          <p style={styles.caption}>
+            Klikni na kartice. Odabrano:{" "}
+            <span style={styles.countPill}>{selectedGenres.length}</span>
+          </p>
         </div>
+
+        <button style={styles.saveButton} onClick={saveWishlist}>
+          Spremi ({selectedGenres.length})
+        </button>
       </div>
 
-      <button
-        style={{
-          ...styles.saveButton,
-          ...(selectedGenres.length === 0 ? styles.saveButtonDisabled : {}),
-        }}
-        onClick={saveWishlist}
-        disabled={selectedGenres.length === 0}
-      >
-        Spremi
-      </button>
+      <div style={styles.grid}>
+        {genres.map((genre) => {
+          const isChecked = selectedGenres.includes(genre.id);
+
+          return (
+            <label
+              key={genre.id}
+              style={{
+                ...styles.genreCard,
+                ...(isChecked ? styles.genreCardActive : {}),
+              }}
+            >
+              <input
+                type="checkbox"
+                checked={isChecked}
+                onChange={() => toggleGenre(genre.id)}
+                style={styles.checkboxHidden}
+              />
+
+              <div style={styles.cardInner}>
+                <span style={styles.genreName}>{genre.name}</span>
+
+                <span
+                  style={{
+                    ...styles.badge,
+                    ...(isChecked ? styles.badgeOn : styles.badgeOff),
+                  }}
+                >
+                  {isChecked ? "Odabrano" : "Dodaj"}
+                </span>
+              </div>
+
+              <div
+                style={{
+                  ...styles.glow,
+                  opacity: isChecked ? 1 : 0,
+                }}
+              />
+            </label>
+          );
+        })}
+      </div>
     </div>
-  );
+  </div>
+);
+
 }
+
 
 const styles = {
   page: {
-    padding: "40px",
+    minHeight: "100vh",
+    padding: "48px 18px",
     color: "white",
+    background:
+      "radial-gradient(1000px 600px at 15% 10%, rgba(140,255,213,0.12), transparent 60%), radial-gradient(900px 600px at 80% 20%, rgba(140,190,255,0.12), transparent 55%), linear-gradient(180deg, #0b1416 0%, #0e1b1d 55%, #0b1416 100%)",
+    display: "flex",
+    justifyContent: "center",
+  },
+
+  shell: {
+    width: "100%",
+    maxWidth: "980px",
+    borderRadius: "26px",
+    padding: "22px",
+    background:
+      "linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04))",
+    border: "1px solid rgba(255,255,255,0.10)",
+    boxShadow: "0 30px 90px rgba(0,0,0,0.55)",
+    backdropFilter: "blur(10px)",
+  },
+
+  header: {
+    display: "flex",
+    alignItems: "flex-end",
+    justifyContent: "space-between",
+    gap: "18px",
+    padding: "10px 10px 16px 10px",
+    borderBottom: "1px solid rgba(255,255,255,0.10)",
+    marginBottom: "18px",
   },
 
   title: {
-    fontSize: "22px",
-    fontWeight: 700,
-    letterSpacing: "0.6px",
-    marginBottom: "12px",
+    margin: 0,
+    fontSize: "28px",
+    fontWeight: 800,
+    letterSpacing: "0.2px",
+    lineHeight: 1.1,
+    background:
+      "linear-gradient(90deg, rgba(220,255,245,1) 0%, rgba(190,230,255,1) 40%, rgba(255,220,245,1) 100%)",
+    WebkitBackgroundClip: "text",
+    WebkitTextFillColor: "transparent",
   },
 
-  subtitle: {
+  caption: {
+    margin: "10px 0 0 0",
     fontSize: "14px",
-    fontWeight: 500,
-    opacity: 0.75,
+    opacity: 0.85,
+    color: "rgba(245,255,255,0.9)",
   },
 
-  gridWrapper: {
-    display: "flex",
+  countPill: {
+    display: "inline-flex",
+    alignItems: "center",
     justifyContent: "center",
+    minWidth: "28px",
+    height: "22px",
+    padding: "0 10px",
+    borderRadius: "999px",
+    marginLeft: "6px",
+    fontWeight: 800,
+    fontSize: "12px",
+    color: "#071213",
+    background:
+      "linear-gradient(90deg, rgba(140,255,213,1), rgba(140,190,255,1))",
+    boxShadow: "0 10px 24px rgba(0,0,0,0.35)",
   },
 
   grid: {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-    gap: "16px",
-    marginTop: "24px",
-    maxWidth: "900px",
+    gap: "14px",
+    marginTop: "10px",
     width: "100%",
   },
 
-  genreItem: {
+  genreCard: {
+    position: "relative",
+    borderRadius: "18px",
+    padding: "16px 16px",
+    cursor: "pointer",
+    userSelect: "none",
+    overflow: "hidden",
+    background:
+      "linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.03))",
+    border: "1px solid rgba(255,255,255,0.12)",
+    boxShadow: "0 18px 55px rgba(0,0,0,0.45)",
+    transform: "translateY(0px) scale(1)",
+    transition:
+      "transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease, background 180ms ease",
+  },
+
+  genreCardActive: {
+    border: "1px solid rgba(140,255,213,0.55)",
+    boxShadow:
+      "0 22px 70px rgba(0,0,0,0.55), 0 0 0 1px rgba(140,255,213,0.25) inset",
+    background:
+      "linear-gradient(180deg, rgba(140,255,213,0.18), rgba(255,255,255,0.04))",
+    transform: "translateY(-2px) scale(1.01)",
+  },
+
+  cardInner: {
+    position: "relative",
+    zIndex: 2,
     display: "flex",
     alignItems: "center",
-    gap: "12px",
-    padding: "14px 16px",
-    borderRadius: "16px",
-    background: "linear-gradient(145deg, #3f5f5a, #2b4446)",
-    cursor: "pointer",
-    transition: "transform 0.2s ease, box-shadow 0.2s ease",
-    boxShadow: "0 6px 14px rgba(0, 0, 0, 0.35)",
+    justifyContent: "space-between",
+    gap: "14px",
   },
 
-
-  genreItemDisabled: {
-    opacity: 0.5,
-    cursor: "not-allowed",
-  },
-
-  genreText: {
+  genreName: {
     fontSize: "15px",
-    fontWeight: 600,
+    fontWeight: 800,
     letterSpacing: "0.4px",
+    color: "rgba(245,255,255,0.95)",
     textTransform: "capitalize",
-    color: "#f1faee",
   },
 
-  checkbox: {
-    transform: "scale(1.2)",
-    accentColor: "#cad2c5",
+  badge: {
+    fontSize: "12px",
+    fontWeight: 800,
+    padding: "8px 10px",
+    borderRadius: "999px",
+    border: "1px solid rgba(255,255,255,0.14)",
+    transition: "transform 180ms ease, opacity 180ms ease",
+    transform: "translateY(0px)",
+    whiteSpace: "nowrap",
+  },
+
+  badgeOn: {
+    color: "#061212",
+    background:
+      "linear-gradient(90deg, rgba(140,255,213,1), rgba(140,190,255,1))",
+    boxShadow: "0 12px 26px rgba(0,0,0,0.35)",
+  },
+
+  badgeOff: {
+    color: "rgba(255,255,255,0.88)",
+    background: "rgba(255,255,255,0.06)",
+  },
+
+  glow: {
+    position: "absolute",
+    inset: "-40px -40px auto -40px",
+    height: "160px",
+    background:
+      "radial-gradient(closest-side, rgba(140,255,213,0.38), transparent 70%)",
+    filter: "blur(8px)",
+    transition: "opacity 180ms ease",
+    zIndex: 1,
+    pointerEvents: "none",
+  },
+
+  checkboxHidden: {
+    position: "absolute",
+    opacity: 0,
+    pointerEvents: "none",
   },
 
   saveButton: {
-    marginTop: "36px",
-    padding: "14px 28px",
     border: "none",
-    borderRadius: "18px",
-    background: "linear-gradient(145deg, #2c3f44, #1f2d33)",
-    color: "white",
-    fontWeight: 700,
-    letterSpacing: "0.6px",
+    borderRadius: "16px",
+    padding: "12px 16px",
+    fontWeight: 900,
+    letterSpacing: "0.4px",
+    color: "#061212",
     cursor: "pointer",
-    boxShadow: "0 8px 20px rgba(0,0,0,0.35)",
-    transition: "transform 0.15s ease",
-  },
-
-  saveButtonDisabled: {
-    opacity: 0.5,
-    cursor: "not-allowed",
+    background:
+      "linear-gradient(90deg, rgba(140,255,213,1), rgba(140,190,255,1), rgba(255,220,245,1))",
+    boxShadow: "0 18px 40px rgba(0,0,0,0.45)",
+    transform: "translateY(0px)",
+    transition: "transform 140ms ease, box-shadow 140ms ease, filter 140ms ease",
   },
 };
