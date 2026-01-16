@@ -179,11 +179,15 @@
     justify-content: space-between !important;
     margin-top: auto;
     padding: 0.75rem !important;
+    height: 120px !important;
 }
 .card_title {
     font-size: larger !important;
     margin-bottom: 0.5em !important;
     text-align: center !important;
+    height: 2.4em !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
 }
 .button_type1 {
     font-size: 1rem !important;
@@ -259,6 +263,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    margin-top: 2rem;
 }
 .welcome_container {
     color: white;
@@ -332,9 +337,35 @@
     padding-left: 0% !important;
     padding-right: 0% !important;
     padding-bottom: 2% !important;
-    padding-top: 2% !important; 
+    padding-top: 2% !important;
+    background-color: #2B547E !important;
+    font-weight: bold !important;
+    text-align: center;
+    font-size: small;
+    color: white !important;
 }
-
+.inner_badge_container {
+    padding-left: 0% !important;
+    padding-right: 0% !important;
+    padding-bottom: 2% !important;
+    padding-top: 2% !important;
+    font-weight: bold !important;
+    font-size: x-small;
+}
+.basic_container {
+    background: white;
+    border-radius: 10px;
+    padding: 2rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    margin-top: 2rem;
+}
+.container-header {
+    background: linear-gradient(135deg, #2e913f, #aed2b0);
+    padding: 1.2rem 1.5rem;
+    border-radius: 12px;
+    color: white;
+    margin-bottom: 1.5rem;
+}
 
 
 @media (max-width: 1200px) {

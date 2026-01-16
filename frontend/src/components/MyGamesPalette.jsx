@@ -2,8 +2,6 @@ import { useEffect, useState } from "react";
 import { Button, Container } from "react-bootstrap";
 import { GameCard } from "./GameCard";
 import { GameCardBigger } from "./GameCardBigger";
-import { FaArrowAltCircleDown } from "react-icons/fa";
-import { FaArrowAltCircleUp } from "react-icons/fa";
 import apiAuth from "../services/apiAuth";
 import { Link, Element } from "react-scroll";
 import './../styles/homepage.css';
