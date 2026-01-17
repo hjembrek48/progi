@@ -9,7 +9,6 @@ import './styles/App.css'
 import { ProtectedRoute } from './components/ProtectedRoute.jsx';
 import { AuthProvider } from './components/AuthProvider.jsx';
 import { RestrictedRoute } from './components/RestrictedRoute.jsx';
-import { Marketplace } from './pages/Marketplace.jsx';
 import { GameExchange } from './pages/GameExchange.jsx';
 import { EditOffer } from './pages/EditOffer.jsx';
 import { OffersList } from './pages/OffersList.jsx';
@@ -19,6 +18,7 @@ import { MyTrades } from './pages/MyTrades.jsx';
 import { CategoryWishlist } from './components/CategoryWishlist.jsx';
 import { Wishlist } from './pages/Wishlist.jsx';
 import ListingPage from './pages/ListingPage.jsx';
+import { NoRoute } from './pages/NoRoute.jsx';
 
 function App() {
   return (
@@ -26,7 +26,10 @@ function App() {
       <BrowserRouter>
         <Routes>
             <Route path='/' element={<Homepage />} />
-            <Route path='/login' element={<Loginpage />} />
+            <Route path='/login' element={
+              <RestrictedRoute maxStep={2}>
+                <Loginpage />
+              </RestrictedRoute>} />
             <Route path="/my-games" element={<MyGames/>}/>
             <Route path="/category-wishlist" element={<CategoryWishlist />}></Route>
             <Route path='/login/add_location' element={
@@ -42,10 +45,6 @@ function App() {
             <Route path='/my_games' element={
               <ProtectedRoute minStep={3}>
                 <MyGames />
-              </ProtectedRoute>} />
-            <Route path='/marketplace' element={
-              <ProtectedRoute minStep={3}>
-                <Marketplace />
               </ProtectedRoute>} />
             <Route path='/gameexchange' element={
               <ProtectedRoute minStep={3} >
@@ -79,6 +78,9 @@ function App() {
               <ProtectedRoute minStep={3}>
                 <Wishlist/>
               </ProtectedRoute>}/>
+            <Route path='*' element={
+              <NoRoute />
+            } />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

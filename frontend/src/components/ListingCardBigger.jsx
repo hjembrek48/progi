@@ -1,15 +1,21 @@
-import { Button, Modal, Container } from "react-bootstrap";
+import { Button, Modal, Container, ButtonGroup } from "react-bootstrap";
 import ReactStars from "react-rating-stars-component";
+import { Link } from "react-router";
+import { ReportButton } from "./ReportButton";
 import { FaStar } from "react-icons/fa";
 import { VscPerson } from "react-icons/vsc";
 import './../styles/homepage.css';
 import { useState } from "react";
 import { useEffect } from "react";
+import { useAuth } from "./AuthProvider";
 import apiAuth from "../services/apiAuth";
 
 export function ListingCardBigger({ listing, onClose }) {
     const [genres, setGenres] = useState([]);
     const [currentListing, setCurrentListing] = useState(listing);
+    const {registrationStep} = useAuth();
+
+    const username = (listing.profile && listing.profile.username) ? listing.profile.username : listing.profile?.email.split("@")[0] || "—";
 
     useEffect(() => {
         setCurrentListing(listing);
@@ -78,8 +84,15 @@ export function ListingCardBigger({ listing, onClose }) {
                     </Container>
                 </>
             </Modal.Body>
-            <Modal.Footer>
-                <p>Owned by: {listing.profile.email}</p>
+            <Modal.Footer className="modal_footer_de">
+                <span>Owned by: {username}</span>
+                {(registrationStep > 2) &&
+                (<ButtonGroup className="d-flex flex-wrap gap-2">
+                    <ReportButton className="button_type1" listingId={listing.id} />
+                    <Link to={`/gameexchange?listingId=${listing.id}`}>
+                        <Button className="button_type3">Request trade</Button>
+                    </Link>
+                </ButtonGroup>)}
             </Modal.Footer>
         </Modal>
     );

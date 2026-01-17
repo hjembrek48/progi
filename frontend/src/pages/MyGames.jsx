@@ -68,18 +68,23 @@ export function MyGames() {
                 </div>
                 {loading && <Loading size="lg" fullPage={false} className="py-5" />}
                 {!loading && (myGames.length > 0) && (
-                    <MyGamesPalette 
-                        my_games={myGames} 
-                        onGamesChange={async () => {
-                            setLoading(true);
-                            try {
-                                await Promise.all([fetchMyGames(), fetchMyListings()]);
-                            } finally {
-                                setLoading(false);
-                            }
-                        }}
-                        myListings={myListings}
-                    />
+                    <Container>
+                        <div className="container-header">
+                                <h1>My Games:</h1>
+                        </div>
+                        <MyGamesPalette 
+                            my_games={myGames} 
+                            onGamesChange={async () => {
+                                setLoading(true);
+                                try {
+                                    await Promise.all([fetchMyGames(), fetchMyListings()]);
+                                } finally {
+                                    setLoading(false);
+                                }
+                            }}
+                            myListings={myListings}
+                        />
+                    </Container>
                 )}
                 {!loading && (myGames.length === 0) && <NoMyGamesPalette />}
 

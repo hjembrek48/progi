@@ -53,7 +53,7 @@ export function Logged_homepage_header() {
         {location.pathname.match("/search/{0,1}") ? (
           <div></div>
         ) : (
-          <form className="d-flex gap-2" onSubmit={onSearchSubmit}>
+          <form className="d-flex gap-2 search_box" onSubmit={onSearchSubmit}>
             <FormControl
               placeholder="Search games"
               type="text"
@@ -66,10 +66,7 @@ export function Logged_homepage_header() {
         )}
       </div>
       {registrationStep > 2 ? (
-        <div
-          className="d-flex gap-3 justify-content-end align-items-center"
-          style={{ minWidth: "300px" }}
-        >
+        <div>
           <NotificationBell />
           <Button
             className="home_button d-flex flex-column align-items-center"

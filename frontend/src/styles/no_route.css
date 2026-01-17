@@ -1,0 +1,19 @@
+.no_route_container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    min-height: 80vh;
+    background-color: #52796f;
+    border: 30px solid #cad2c5;
+    border-radius: 10px;
+}
+.no_route_container h1 {
+    font-size: 6rem;
+    font-weight: bold;
+    color: #C1121F; 
+}
+.no_route_container h2 {
+    
+}
