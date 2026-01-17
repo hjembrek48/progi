@@ -15,6 +15,7 @@ export function EditOffer() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(function() {
     async function fetchData() {
@@ -25,25 +26,62 @@ export function EditOffer() {
         const offerData = offerRes.data;
         setOffer(offerRes.data);
 
+        const profileRes = await apiAuth.get('profile/');
+        const me = profileRes.data;
+        setCurrentUser(me);
+
         const myGamesRes = await apiAuth.get('games/');
-        //setMyGames(myGamesRes.data.filter(g => g.active));
-        setMyGames(myGamesRes.data);
+        const myGamesFromApi = myGamesRes.data;
         
-        const targetId = offerData.target.id;
+        const isCurrentUserProposer = me?.id === offerData?.proposer?.id;
+        const counterpartId = isCurrentUserProposer ? offerData.target.id : offerData.proposer.id;
+
+        const myGamesInOffer = isCurrentUserProposer 
+          ? (offerData.offered_games || [])
+          : (offerData.requested_games || []);
+        
+        const myGamesMap = new Map();
+        myGamesFromApi.forEach(game => myGamesMap.set(game.id, game));
+        myGamesInOffer.forEach(game => {
+          if (!myGamesMap.has(game.id)) {
+            myGamesMap.set(game.id, game);
+          }
+        });
+        
+        const allMyGames = Array.from(myGamesMap.values());
+        setMyGames(allMyGames);
+
         const listingsRes = await apiAuth.get('listings/');
+        const counterpartGamesFromListings = listingsRes.data
+          .filter((listing) => (listing.profile?.id) === counterpartId)
+          .map((listing) => listing.game);
 
-        const targetGamesFromListings = listingsRes.data
-        .filter(listing => (listing.profile?.id) === targetId)
-        .map(listing => listing.game);
-        // mozda filter po active?
-
-        setTargetGames(targetGamesFromListings);
+        const gamesInOffer = isCurrentUserProposer 
+          ? (offerData.requested_games || [])
+          : (offerData.offered_games || []);
+        
+        const counterpartGamesMap = new Map();
+        counterpartGamesFromListings.forEach(game => counterpartGamesMap.set(game.id, game));
+        gamesInOffer.forEach(game => {
+          if (!counterpartGamesMap.has(game.id)) {
+            counterpartGamesMap.set(game.id, game);
+          }
+        });
+        
+        const allCounterpartGames = Array.from(counterpartGamesMap.values());
+        setTargetGames(allCounterpartGames);
 
         const offeredIds = (offerData.offered_games || []).map(g => g.id);
         const requestedIds = (offerData.requested_games || []).map(g => g.id);
 
-        setSelectedOfferedGames(offeredIds);
-        setSelectedRequestedGames(requestedIds);
+        if (isCurrentUserProposer) {
+          setSelectedOfferedGames(offeredIds);
+          setSelectedRequestedGames(requestedIds);
+        } else {
+          // ako current user nije proposer, obrni preselectane igre
+          setSelectedOfferedGames(requestedIds);
+          setSelectedRequestedGames(offeredIds);
+        }
         
         setError(null);
       } catch (err) {
@@ -87,10 +125,21 @@ export function EditOffer() {
 
     try {
       setSubmitting(true);
-      await apiAuth.patch('swaps/' + id + '/', {
-        offered_game_ids: selectedOfferedGames,
-        requested_game_ids: selectedRequestedGames
-      });
+      
+      const isCurrentUserProposer = currentUser && offer?.proposer && currentUser.id === offer.proposer.id;
+      const payload = isCurrentUserProposer
+        ? {
+            offered_game_ids: selectedOfferedGames,
+            requested_game_ids: selectedRequestedGames
+          }
+        : {
+            proposer_id: offer.target.id,
+            target_id: offer.proposer.id,
+            offered_game_ids: selectedOfferedGames,
+            requested_game_ids: selectedRequestedGames
+          };
+      
+      await apiAuth.patch('swaps/' + id + '/', payload);
       navigate('/offers/' + id);
     } catch (err) {
       console.error("Update failed", err);
@@ -161,7 +210,10 @@ export function EditOffer() {
     return null;
   }
 
-  const targetName = offer.target && offer.target.email ? offer.target.email : "—";
+  const isCurrentUserProposer = currentUser && offer?.proposer && currentUser.id === offer.proposer.id;
+  const counterpartName = isCurrentUserProposer
+    ? (offer.target && offer.target.username ? offer.target.username : offer.target?.email.split("@")[0] || "—")
+    : (offer.proposer && offer.proposer.username ? offer.proposer.username : offer.proposer?.email.split("@")[0] || "—");
 
   return (
     <Container className="py-5">
@@ -169,7 +221,7 @@ export function EditOffer() {
         
         {/* Header */}
         <div className="mb-4">
-          <h2 className="fw-bold mb-1">Edit Offer for {targetName}</h2>
+          <h2 className="fw-bold mb-1">Edit Offer with {counterpartName}</h2>
           <p className="text-muted">Modify the games you want to swap. You must select at least one game from each side.</p>
         </div>
 
@@ -193,7 +245,7 @@ export function EditOffer() {
               targetGames, 
               selectedRequestedGames, 
               handleWantedGameToggle, 
-              `Games you want from ${targetName}`
+              `Games you want from ${counterpartName}`
             )}
           </Col>
         </Row>

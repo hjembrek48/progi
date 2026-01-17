@@ -11,6 +11,7 @@ export function OffersList() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
   const navigate = useNavigate();
 
   useEffect(function() {
@@ -37,6 +38,22 @@ export function OffersList() {
     fetchOffers();
   }, []);
 
+  async function handleDelete(offerId) {
+    if (!window.confirm("Are you sure you want to delete this offer? This action cannot be undone.")) return;
+    try {
+      setDeletingId(offerId);
+      await apiAuth.delete('swaps/' + offerId + '/');
+      setOffers(function(prev) {
+        return prev.filter(function(o) { return o.id !== offerId; });
+      });
+    } catch (err) {
+      console.error("Failed to delete trade offer:", err);
+      setError("Failed to delete trade offer.");
+    } finally {
+      setDeletingId(null);
+    }
+  }
+
   if (loading) return <Loading size="lg" fullPage />;
 
   if (error) {
@@ -59,8 +76,8 @@ export function OffersList() {
       ) : (
         <ul className="list-group">
           {offers.map(function(offer) {
-            const proposer = (offer.proposer && offer.proposer.email) ? offer.proposer.email : "—";
-            const target = (offer.target && offer.target.email) ? offer.target.email : "—";
+            const proposer = (offer.proposer && offer.proposer.username) ? offer.proposer.username : offer.proposer?.email.split("@")[0] || "—";
+            const target = (offer.target && offer.target.username) ? offer.target.username : offer.target?.email.split("@")[0] || "—";
             
             const isCurrentUserProposer = currentUser && offer.proposer && currentUser.id === offer.proposer.id;
 
@@ -90,8 +107,18 @@ export function OffersList() {
 
                 <div className="text-end">
                   <span className="badge bg-warning text-dark shadow-sm">PENDING</span>
-                  <div className="mt-3">
+                  <div className="mt-3 d-flex gap-2 justify-content-end">
                     <Link className="btn btn-sm btn-outline-primary px-3" to={'/offers/' + offer.id}>Details</Link>
+                    {isCurrentUserProposer && (
+                      <Button 
+                        variant="outline-danger" 
+                        size="sm"
+                        disabled={deletingId === offer.id}
+                        onClick={() => handleDelete(offer.id)}
+                      >
+                        {deletingId === offer.id ? "Deleting..." : "Delete"}
+                      </Button>
+                    )}
                   </div>
                 </div>
               </li>

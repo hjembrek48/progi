@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import apiAuth from '../services/apiAuth.js';
 import { GameCardBigger } from '../components/GameCardBigger';
 import { Container, Spinner } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 
 export function GameExchange() {
   const [searchParams] = useSearchParams();
@@ -154,7 +155,10 @@ export function GameExchange() {
 
   return (
     <div className="container py-5">
-      <h2 className="text-center mb-4">New trade offer</h2>
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h2 className="fw-bold text-dark mb-0">New trade offer</h2>
+        <Button className="home_button" onClick={() => {navigate(-1)}}>← Back</Button>
+      </div>
       <div className="row">
         
         {/* LIJEVO: Tuđe igre */}
