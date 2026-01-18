@@ -68,7 +68,7 @@ export function CategoryWishlist() {
         (profileRes.data?.interests || []).map((g) => g.id)
       );
 
-      alert("Spremljeno!");
+      alert("Saved!");
     } catch (err) {
       console.error(
         "Greška kod spremanja",
@@ -83,9 +83,9 @@ export function CategoryWishlist() {
       <div style={styles.shell}>
         <div style={styles.header}>
           <div>
-            <h2 style={styles.title}>Odaberi omiljene žanrove</h2>
+            <h2 style={styles.title}>Choose your favorite genres!</h2>
             <p style={styles.caption}>
-              Odabrano:
+              Selected:
               <span style={styles.countPill}>
                 {selectedGenres.length}
               </span>
@@ -105,7 +105,7 @@ export function CategoryWishlist() {
               (e.currentTarget.style.transform = "scale(1)")
             }
           >
-            Spremi
+            Save
           </button>
         </div>
 

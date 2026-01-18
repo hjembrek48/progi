@@ -27,7 +27,6 @@ export function Profilepage() {
       try {
         const res = await apiAuth.get("profile");
         setProfile(res.data);
-        //setUsername(res.data.username || "");
         setDescription(res.data.description || "");
 
         if(res.data.username){
@@ -51,13 +50,12 @@ export function Profilepage() {
     const trimmed = username.trim();
 
     if (trimmed.length < 3) {
-      setUsernameError("Username mora imati barem 3 znaka.");
+      setUsernameError("Put at least 3 letters or simbols.");
       return;
     }
 
-    // Ako se nije promijenio, ne šalji
     if (trimmed === (profile?.username || "")) {
-      setUsernameSuccess("Nema promjena.");
+      setUsernameSuccess("No changes.");
       return;
     }
 
@@ -69,7 +67,7 @@ export function Profilepage() {
 
       setUsername(newUsername);
       setProfile((p) => ({ ...p, username: newUsername }));
-      setUsernameSuccess("Username spremljen!");
+      setUsernameSuccess("Username saved!!");
     } catch (err) {
       const data = err?.response?.data;
       const msg =
@@ -89,9 +87,8 @@ export function Profilepage() {
 
   const trimmed = description.trim();
 
-  // nema promjene → ne šalji
   if (trimmed === (profile?.description || "")) {
-    setDescriptionSuccess("Nema promjena.");
+    setDescriptionSuccess("No changes.");
     return;
   }
 
@@ -106,7 +103,7 @@ export function Profilepage() {
 
     setDescription(newDescription);
     setProfile((p) => ({ ...p, description: newDescription }));
-    setDescriptionSuccess("Opis spremljen!");
+    setDescriptionSuccess("Description saved!");
   } catch (err) {
     const data = err?.response?.data;
     const msg =
@@ -122,7 +119,7 @@ export function Profilepage() {
 
 
   if (!profile) {
-    return <div style={{ color: "white" }}>Učitavanje...</div>;
+    return <div style={{ color: "white" }}>Loading...</div>;
   }
 
   return (
@@ -158,7 +155,7 @@ export function Profilepage() {
                     saveUsername();
                   }
                 }}
-                placeholder="Korisničko ime"
+                placeholder="Username"
                 style={styles.korisnicko_ime_input}
               />
 
@@ -180,7 +177,7 @@ export function Profilepage() {
                     cursor: isSavingUsername ? "not-allowed" : "pointer",
                   }}
                 >
-                  {isSavingUsername ? "Spremam..." : "Spremi username"}
+                  {isSavingUsername ? "Saving..." : "Save username"}
                 </button>
 
                 {usernameError ? (
@@ -200,10 +197,10 @@ export function Profilepage() {
                 <strong style={styles.label}>Email:</strong> {profile.email}
               </p>
               <p style={styles.smallInfo}>
-                <strong style={styles.label}>Lokacija:</strong> {profile.address}
+                <strong style={styles.label}>Location:</strong> {profile.address}
               </p>
               <p style={styles.smallInfo}>
-                <strong style={styles.label}>Aktivne zamjene:</strong> broj
+                <strong style={styles.label}>Active trades:</strong> broj
               </p>
             </div>
           </div>
@@ -216,7 +213,7 @@ export function Profilepage() {
               setDescriptionSuccess("");
             }}
             onBlur={saveDescription}
-            placeholder="Dodaj Opis..."
+            placeholder="Add description..."
             style={styles.opis_input}
           />
 
