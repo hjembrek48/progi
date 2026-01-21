@@ -410,6 +410,10 @@
     margin-top: 2rem;
 }
 .container-header {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     background: linear-gradient(135deg, #2e913f, #aed2b0);
     padding: 1.2rem 1.5rem;
     border-radius: 12px;
@@ -530,6 +534,34 @@
     align-items: center;
     justify-content: center;
 }
+.link_to_pref {
+    cursor: pointer;
+    text-decoration: underline;
+    color: #8d021f;
+}
+.prefer-text {
+    font-size: 2.3rem;
+    text-align: center;
+}
+.prefer-text p {
+    font-size: 4rem;
+}
+.popover-preferences {
+    max-width: 250px;
+    font-size: 0.9rem;
+}
+.info_overlay button {
+    border: none;
+    font-size: 1.2rem;
+    color: white;
+    cursor: pointer;
+    padding: 4px;
+    background-color: #354F52;
+}
+.popover-preferences .popover-header {
+    color: #5469a1;
+    font-weight: 600;
+}
 
 
 @media (max-width: 1200px) {
@@ -610,5 +642,21 @@
         padding: 5px !important;
         font-size: 0.75rem !important;
         min-width: 10em !important;
+    }
+    .homepage-accordion .accordion-header p {
+        font-size: 0.9rem;
+    }
+    .homepage-accordion .accordion-body {
+        font-size: 0.8rem;
+        line-height: 1.4;
+    }
+    .prefer-text {
+        font-size: 0.8rem;
+    }
+    .prefer-text p {
+        font-size: 2rem;
+    }
+    .link_to_pref {
+        font-size: 0.8rem;
     }
 }

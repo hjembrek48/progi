@@ -68,7 +68,7 @@ export function MyGames() {
                 </div>
                 {loading && <Loading size="lg" fullPage={false} className="py-5" />}
                 {!loading && (myGames.length > 0) && (
-                    <Container>
+                    <Container className='mt-4 p-4 bg-white rounded'>
                         <div className="container-header">
                                 <h1>My Games:</h1>
                         </div>

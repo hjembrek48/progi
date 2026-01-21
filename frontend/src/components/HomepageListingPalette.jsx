@@ -1,22 +1,30 @@
-import { useEffect, useState } from "react";
-import { Button, Container, Card } from "react-bootstrap";
+import { useEffect, useState, useRef } from "react";
+import { Button, Container, Card, Overlay, Popover } from "react-bootstrap";
 import { ListingCard } from "./ListingCard";
 import { ListingCardBigger } from "./ListingCardBigger";
-import { Link, Element } from "react-scroll";
 import apiAuth from "../services/apiAuth";
 import './../styles/homepage.css';
 import { CategoryCard } from "./CategoryCard";
+import { useNavigate } from "react-router";
+import { AiFillCaretUp } from "react-icons/ai";
+import { AiFillCaretDown } from "react-icons/ai";
+import { PiSmileySadBold } from "react-icons/pi";
 
 const max_per_page = 5;
 
-export function HomepageListingsPalette({ listings }) {
+export function HomepageListingsPalette({ listings, preferences }) {
     const [index, setIndex] = useState(0);
     const [sortedListings, setSortedListings] = useState([]);
     const [visibleListings, setVisibleListings] = useState([]);
     const [selectedListing, setSelectedListing] = useState(null);
     const [genres, setGenres] = useState([]);
+    const [preferedGenres, setPreferedGenres] = useState([]);
     const [selectedGenre, setSelectedGenre] = useState(null);
     const [allCategoriesActivated, setAllCategoriesActivated] = useState(true);
+    const [show, setShow] = useState(false);
+    const [target, setTarget] = useState(null);
+    const navigate = useNavigate();
+    const ref = useRef(null);
 
     useEffect(() => {
         const fetchGenres = async () => {
@@ -27,40 +35,47 @@ export function HomepageListingsPalette({ listings }) {
                 console.log("Failed to fetch game categories!")
             }
         };
+        
+        const fetchPreferedGenres = async () => {
+            try {
+                const res = await apiAuth.get("profile/");
+                setPreferedGenres(res.data.interests);
+            } catch (e) {
+                console.log("Failed to fetch prefered genres!");
+            }
+        }
     
             fetchGenres();
-        }, []) //odmah dohvati žanrove
-
-    /*useEffect(() => {
-        const sorted = [...listings].sort(
-            (a, b) => new Date(b.created_at) - new Date(a.created_at)
-        );
-        setSortedListings(sorted);
-        if (index >= sorted.length) {
-            setIndex(Math.max(0, sorted.length - max_per_page));
-        }
-    }, [listings]);*/
+            if(preferences) {
+                fetchPreferedGenres();
+            }
+        }, []) //odmah dohvati žanrove i preferirane žanrove (ako je prikaz za preferences)
 
     useEffect(() => {
         let updatedListings = [...listings];
 
-        if(!selectedGenre) {
-            const sorted = updatedListings.sort(
-                (a, b) => new Date(b.created_at) - new Date(a.created_at)
+        //ako koristimo prikaz kao prikaz preferiranih igri (preferences == true) izvršavamo ovaj filter:
+        if(preferences) {
+            updatedListings = updatedListings.filter(listing => preferedGenres.some(g => g.id === listing.game.genre.id)
             );
-            setSortedListings(sorted);
-            if (index >= sorted.length) {
-                setIndex(Math.max(0, sorted.length - max_per_page));
-            }
-        } else {
-            const filtered =updatedListings.filter(listing => listing.game.genre.id === selectedGenre.id
-            ).sort(
-                (a, b) => new Date(b.created_at) - new Date(a.created_at)
-            );
-            setSortedListings(filtered);
-            setIndex(0);
         }
-    }, [selectedGenre, listings])
+
+        //ako koristimo prikaz za prikaz svih igara, ali sortitrano po određenoj kategoriji izvršavamo ovaj filter:
+        if(!preferences && selectedGenre) {
+            updatedListings = updatedListings.filter(listing => listing.game.genre.id === selectedGenre.id
+            );
+        }
+        
+        //uvijek na kraju ide sort - bilo odabrano samo preferirano, samo jedna kategorija ili sve
+        updatedListings = updatedListings.sort(
+            (a, b) => new Date(b.created_at) - new Date(a.created_at)
+        );
+        setSortedListings(updatedListings);
+        //vrati na zadnju moguću stranicu
+        if (index >= updatedListings.length) {
+            setIndex(Math.max(0, updatedListings.length - max_per_page));
+        }
+    }, [selectedGenre, listings, preferences, preferedGenres])
 
     useEffect(() => {
         setVisibleListings(
@@ -84,46 +99,104 @@ export function HomepageListingsPalette({ listings }) {
         setIndex(index + max_per_page);
     };
 
+    const handleInfo = (e) => {
+        setShow(!show);
+        setTarget(e.target);
+    }
+
     return (
         <>
-        <Element name="homepage_scroll">
             <div>
                 <div className="container-header">
-                    <h1>Newest listed games:</h1>
+                    <h1>{preferences ? "Listed games you may like:" : "Newest listed games:"}</h1>
+                    {preferences &&
+                    (
+                    <>
+                        <span
+                        ref={ref}
+                        className="info_overlay"
+                        >
+                            <Button onClick={handleInfo}>
+                                Click to see info
+                                <Overlay
+                                show={show}
+                                target={target}
+                                placement="bottom"
+                                container={ref}
+                                containerPadding={20}
+                                >
+                                    <Popover className="popover-preferences">
+                                        <Popover.Header as="h3">What are preferences?</Popover.Header>
+                                        <Popover.Body>
+                                            <strong>Preferences are your favorite game genres. 
+                                                    We show you games that match your interests.
+                                                    <br/>
+                                                    <br/>
+                                                    You can update your preferences in your profile.
+                                            </strong>
+                                        </Popover.Body>
+                                    </Popover>
+                                </Overlay>
+                            </Button>
+                        </span>
+                    </>
+                    )}
                 </div>
                 <Container className="games_palette">
-                    <Link to="homepage_scroll" smooth duration={400}>
-                        <Button className="goButton" onClick={goUp} disabled={index === 0}>
-                            <span className='arrow'>&#128897;</span>
-                            <p>Go Up</p>
-                        </Button>
-                    </Link>
-                    <Element name="homepage_scroll" />
+                    <Button className="goButton"
+                    onClick={goUp} 
+                    disabled={index === 0}
+                    >
+                        <AiFillCaretUp />
+                        <p>Go Up</p>
+                    </Button>
                     <Container className="game_palette_row">
                         {(visibleListings.length > 0) ? 
                             (visibleListings.map((listing) => (
                             <ListingCard
                             key={listing.id}
                             listing={listing}
+                            preferences={preferences}
                             onClick={() => setSelectedListing(listing)}
                             />
                             ))) : (
                                 <div className="no_games_in_cat">
-                                    No listed games in that category!
+                                    {preferences ? 
+                                    (preferedGenres.length == 0 ?
+                                        <div className="prefer-text">
+                                            You didn't set your prefered categories!
+                                            You can do that{" "}
+                                            <span 
+                                            className="link_to_pref"
+                                            onClick={() => navigate("category-wishlist")}
+                                            >
+                                                <strong>here</strong>
+                                            </span>.
+                                        </div>
+                                        :
+                                        <div className="prefer-text">
+                                            Currenty, we don't have listed games to offer you!
+                                            <p><PiSmileySadBold /></p>
+                                            
+                                        </div>
+                                    )
+                                    :
+                                    <div className="prefer-text">
+                                        No listed games in that category!
+                                    </div>
+                                    }
                                 </div>
                             )
                         }
                     </Container>
-                    <Link to="homepage_scroll" smooth duration={400}>
-                        <Button
-                        className="goButton"
-                        onClick={goDown}
-                        disabled={index + max_per_page >= sortedListings.length}
-                        >
-                            <span className='arrow'>&#128899;</span>
-                            <p>Go Down</p>
-                        </Button>
-                    </Link>
+                    <Button
+                    className="goButton"
+                    onClick={goDown}
+                    disabled={index + max_per_page >= sortedListings.length}
+                    >
+                        <AiFillCaretDown />
+                        <p>Go Down</p>
+                    </Button>
                     {selectedListing && (
                         <ListingCardBigger
                         listing={selectedListing}
@@ -132,7 +205,7 @@ export function HomepageListingsPalette({ listings }) {
                     )}
                 </Container>
             </div>
-        </Element>
+        {!preferences &&
         <Container className="categories_container">
             {genres.map((genre) => (
                 <CategoryCard 
@@ -156,6 +229,7 @@ export function HomepageListingsPalette({ listings }) {
                 </Card.Body>
             </Card>
         </Container>
+        }
         </>
     );
 }

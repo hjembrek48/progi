@@ -18,7 +18,7 @@ import { FaBell } from "react-icons/fa";
 import { CgProfile } from "react-icons/cg";
 import { FaHeart } from "react-icons/fa";
 import { FaFlag } from "react-icons/fa";
-import { Link, Element } from "react-scroll";
+import { Element } from "react-scroll";
 
 export function Homepage() {
     const [listings, setListings] = useState([]);
@@ -82,10 +82,23 @@ export function Homepage() {
 
                 {!loadingListings && 
                     (<Container>
-                        <HomepageListingsPalette listings={listings} />
+                        <HomepageListingsPalette listings={listings} preferences={false} />
                     </Container>)
                 }
             </Container>
+            {(registrationStep > 2) && <Container className='basic_container'>
+                {loadingListings && (
+                <Container className="text-center mt-5">
+                    <Spinner animation="border" />
+                    <p>Loading games you may like...</p>
+                </Container>)}
+
+                {!loadingListings && 
+                    (<Container>
+                        <HomepageListingsPalette listings={listings} preferences={true} />
+                    </Container>)
+                }
+            </Container>}
             <Element name="app_usage">
                 <Container className='homepage-accordion'>
                     <Accordion defaultActiveKey={null} alwaysOpen>
