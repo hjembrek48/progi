@@ -1,3 +1,4 @@
+# api/serializers.py
 from django.contrib.auth.models import User
 from rest_framework import serializers
 from .models import (
@@ -41,6 +42,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         many=True,
         required=False,
     )
+    avatar = serializers.ImageField(required=False, allow_null=True)
     username = serializers.CharField(source="user.username", read_only=True)
     is_staff = serializers.BooleanField(source="user.is_staff", read_only=True)
 
@@ -286,6 +288,7 @@ class NotificationSerializer(serializers.ModelSerializer):
             "description",
             "read",
             "time",
+            "avatar"
             "swap_offer",
         ]
         read_only_fields = ["recieved_profile", "profile", "time", "swap_offer"]
