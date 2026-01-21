@@ -2,10 +2,12 @@ import { useEffect, useState } from "react";
 import apiAuth from "../services/apiAuth";
 import axios from "axios";
 import { getAccessToken, setAccessToken } from "../services/auth.js";
+import { useNavigate } from "react-router";
 
 export function CategoryWishlist() {
   const [genres, setGenres] = useState([]);
   const [selectedGenres, setSelectedGenres] = useState([]);
+  const navigate = useNavigate();
 
   const ensureAccessToken = async () => {
     const token = getAccessToken();
@@ -64,9 +66,7 @@ export function CategoryWishlist() {
       });
 
       const profileRes = await apiAuth.get("profile/");
-      setSelectedGenres(
-        (profileRes.data?.interests || []).map((g) => g.id)
-      );
+      setSelectedGenres((profileRes.data?.interests || []).map((g) => g.id));
 
       alert("Saved!");
     } catch (err) {
@@ -86,27 +86,43 @@ export function CategoryWishlist() {
             <h2 style={styles.title}>Choose your favorite genres!</h2>
             <p style={styles.caption}>
               Selected:
-              <span style={styles.countPill}>
-                {selectedGenres.length}
-              </span>
+              <span style={styles.countPill}>{selectedGenres.length}</span>
             </p>
           </div>
 
-          <button
-            style={styles.saveButton}
-            onClick={saveWishlist}
-            onMouseDown={(e) =>
-              (e.currentTarget.style.transform = "scale(0.97)")
-            }
-            onMouseUp={(e) =>
-              (e.currentTarget.style.transform = "scale(1)")
-            }
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.transform = "scale(1)")
-            }
-          >
-            Save
-          </button>
+          <div style={styles.headerButtons}>
+            <button
+              style={styles.backButton}
+              onClick={() => navigate("/profile")}
+              onMouseDown={(e) =>
+                (e.currentTarget.style.transform = "scale(0.97)")
+              }
+              onMouseUp={(e) =>
+                (e.currentTarget.style.transform = "scale(1)")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.transform = "scale(1)")
+              }
+            >
+              Back to Profile
+            </button>
+
+            <button
+              style={styles.saveButton}
+              onClick={saveWishlist}
+              onMouseDown={(e) =>
+                (e.currentTarget.style.transform = "scale(0.97)")
+              }
+              onMouseUp={(e) =>
+                (e.currentTarget.style.transform = "scale(1)")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.transform = "scale(1)")
+              }
+            >
+              Save
+            </button>
+          </div>
         </div>
 
         <div style={styles.grid}>
@@ -130,7 +146,6 @@ export function CategoryWishlist() {
                   (e.currentTarget.style.transform = "scale(1)")
                 }
               >
-               
                 <div style={styles.genreContent}>
                   <input
                     type="checkbox"
@@ -139,9 +154,7 @@ export function CategoryWishlist() {
                     style={styles.checkbox}
                   />
 
-                  <span style={styles.genreName}>
-                    {genre.name}
-                  </span>
+                  <span style={styles.genreName}>{genre.name}</span>
                 </div>
               </label>
             );
@@ -178,6 +191,13 @@ const styles = {
     justifyContent: "space-between",
     alignItems: "flex-end",
     marginBottom: "24px",
+    gap: "14px",
+  },
+
+  headerButtons: {
+    display: "flex",
+    gap: "12px",
+    alignItems: "center",
   },
 
   title: {
@@ -220,7 +240,6 @@ const styles = {
     background: "rgba(255,255,255,0.14)",
   },
 
-  
   genreContent: {
     display: "flex",
     flexDirection: "column",
@@ -240,6 +259,17 @@ const styles = {
     transform: "scale(1.2)",
     accentColor: "#cad2c5",
     cursor: "pointer",
+  },
+
+  backButton: {
+    padding: "12px 18px",
+    borderRadius: "14px",
+    background: "rgba(255,255,255,0.08)",
+    border: "1px solid rgba(255,255,255,0.14)",
+    color: "white",
+    fontWeight: 700,
+    cursor: "pointer",
+    transition: "transform 0.15s ease",
   },
 
   saveButton: {
