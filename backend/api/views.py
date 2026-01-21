@@ -58,6 +58,7 @@ def create_cookie_response(user: User) -> Response:
         {
             "access": str(refresh.access_token),
             "username": user.username,
+            "is_staff": user.is_staff,
         },
         status=status.HTTP_200_OK,
     )

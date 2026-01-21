@@ -23,7 +23,7 @@ import { Element } from "react-scroll";
 export function Homepage() {
     const [listings, setListings] = useState([]);
     const [loadingListings, setLoadingListings] = useState(true);
-    const {registrationStep, loading} = useAuth();
+    const {registrationStep, loading, isAdmin} = useAuth();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -70,6 +70,7 @@ export function Homepage() {
                         <Button className='home_button' id="nav_button" onClick={() => navigate('mytrades')}>My Trades</Button>
                         <Button className='home_button' id="nav_button" onClick={() => navigate('offers')}>Offers</Button>
                         <Button className='home_button' id="nav_button" onClick={() => navigate('wishlist')}>Wishlist</Button>
+                        {isAdmin && <Button className='home_button' id="nav_button" onClick={() => window.open('https://progi-backend-lpki.onrender.com/admin/', '_blank')}>Admin Panel</Button>}
                     </ButtonGroup>
                 </div>}
             <Welcome />

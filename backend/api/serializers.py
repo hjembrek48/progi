@@ -42,6 +42,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         required=False,
     )
     username = serializers.CharField(source="user.username", read_only=True)
+    is_staff = serializers.BooleanField(source="user.is_staff", read_only=True)
 
     class Meta:
         model = Profile
@@ -55,7 +56,8 @@ class ProfileSerializer(serializers.ModelSerializer):
             "updated_at",
             "interests",
             "interest_ids",
-            "email"
+            "email",
+            "is_staff"
         ]
         read_only_fields = ["updated_at"]
 
