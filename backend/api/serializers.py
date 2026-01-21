@@ -56,6 +56,7 @@ class ProfileSerializer(serializers.ModelSerializer):
             "latitude",
             "longitude",
             "updated_at",
+            "avatar",
             "interests",
             "interest_ids",
             "email",
