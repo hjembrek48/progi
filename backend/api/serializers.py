@@ -289,7 +289,7 @@ class NotificationSerializer(serializers.ModelSerializer):
             "description",
             "read",
             "time",
-            "avatar"
+            "avatar",
             "swap_offer",
         ]
         read_only_fields = ["recieved_profile", "profile", "time", "swap_offer"]
