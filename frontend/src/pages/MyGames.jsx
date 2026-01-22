@@ -63,7 +63,7 @@ export function MyGames() {
                         <Button className='home_button' id="nav_button" onClick={() => navigate('/')}>Homepage</Button>
                         <Button className='home_button' id="nav_button" onClick={() => navigate('/mytrades')}>My Trades</Button>
                         <Button className='home_button' id="nav_button" onClick={() => navigate('/offers')}>Offers</Button>
-                        <Button className='home_button' id="nav_button">Wishlist</Button>
+                        <Button className='home_button' id="nav_button" onClick={() => navigate('/wishlist')}>Wishlist</Button>
                     </ButtonGroup>
                 </div>
                 {loading && <Loading size="lg" fullPage={false} className="py-5" />}
