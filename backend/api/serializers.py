@@ -173,8 +173,25 @@ class WishlistSerializer(serializers.ModelSerializer):
         read_only_fields = ["created_at", "display_name"]
 
     def get_display_name(self, obj):
+        if isinstance(obj, dict):
+            board_game = obj.get('board_game')
+            return board_game.name if board_game else ""
+        
         return obj.board_game.name
-
+    
+    def validate_board_game_id(self, value):
+        request = self.context.get("request")
+        
+        if request and request.user.is_authenticated:
+            exists = WishlistEntry.objects.filter(
+                profile=request.user.profile, 
+                board_game=value).exists()
+            
+            if exists:
+                raise serializers.ValidationError("Ova igra je već na Vašoj listi želja.")
+                
+        return value
+    
 
 class SwapOfferSerializer(serializers.ModelSerializer):
     proposer = ProfileSerializer(read_only=True)
@@ -277,6 +294,24 @@ class ReportSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ["sender", "sender_username", "created_at"]
 
+    def validate(self, data):
+        request=self.context.get("request")
+        target_listing=data.get("target_listing")
+        user_profile=request.user.profile
+
+        if request and request.user.is_authenticated:
+            if target_listing.profile==request.user.profile:
+                raise serializers.ValidationError({
+                    "target_listing":"Ne možete prijaviti vlastiti oglas"
+                })
+            exists=Report.objects.filter(
+                sender=user_profile,
+                target_listing=target_listing
+            ).exists()
+
+            if exists:
+                raise serializers.ValidationError({"target_listing":"Već ste prijavili ovaj oglas"})
+        return data
 class NotificationSerializer(serializers.ModelSerializer):
     swap_offer = SwapOfferSerializer(read_only=True)
 

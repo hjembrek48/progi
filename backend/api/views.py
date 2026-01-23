@@ -2,7 +2,7 @@
 
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.db import transaction
+from django.db import transaction, IntegrityError
 from django.db.models import Q
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.utils.decorators import method_decorator
@@ -387,7 +387,7 @@ class ListingList(generics.ListCreateAPIView):
             ),
         ]
     )
-    def preform_create(self, serializer):
+    def perform_create(self, serializer):
         game=serializer.validate_data.get("game")
         user_profile = self.request.user.profile
 
@@ -501,8 +501,10 @@ class WishlistListCreate(generics.ListCreateAPIView):
         return WishlistEntry.objects.filter(profile=self.request.user.profile)
 
     def perform_create(self, serializer):
-        serializer.save(profile=self.request.user.profile)
-
+        try: 
+            serializer.save(profile=self.request.user.profile)
+        except IntegrityError:
+            return Response({"Detal":"Greška u unosu integritet narušen"},status=status.HTTP_400_BAD_REQUEST)
 
 class WishlistDetail(generics.DestroyAPIView):
     serializer_class = WishlistSerializer
