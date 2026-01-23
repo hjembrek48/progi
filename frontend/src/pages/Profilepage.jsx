@@ -276,9 +276,7 @@ export function Profilepage() {
               <p style={styles.smallInfo}>
                 <strong style={styles.label}>Location:</strong> {profile.address}
               </p>
-              <p style={styles.smallInfo}>
-                <strong style={styles.label}>Active trades:</strong> broj
-              </p>
+              
             </div>
           </div>
 
