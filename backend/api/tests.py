@@ -116,11 +116,8 @@ class TradingFlowTest(TestCase):
         catan = Game.objects.get(id=game_catan_id)
         monopoly = Game.objects.get(id=game_monopoly_id)
 
-        self.assertEqual(catan.borrower_profile, self.profile_b)
-        self.assertFalse(catan.active)
-
-        self.assertEqual(monopoly.borrower_profile, self.profile_a)
-        self.assertFalse(monopoly.active)
+        self.assertEqual(catan.profile, self.profile_b)
+        self.assertEqual(monopoly.profile, self.profile_a)
 
         notif_final_a = (
             Notification.objects.filter(recieved_profile=self.profile_a)

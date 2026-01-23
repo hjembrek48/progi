@@ -239,6 +239,14 @@ class Notification(models.Model):
 @receiver(post_save, sender=Notification)
 def send_notification_push(sender, instance, created, **kwargs):
     if created:
-        from .utils import send_push_notification
+        from .utils import send_push_notification, send_email_notification
 
         send_push_notification(instance.recieved_profile.user, instance.description)
+        
+        email_addr = instance.recieved_profile.email or instance.recieved_profile.user.email
+        if email_addr:
+             user = instance.recieved_profile.user
+             if instance.recieved_profile.email and instance.recieved_profile.email != user.email:
+                 user.email = instance.recieved_profile.email
+            
+             send_email_notification(user, "Nova obavijest - Play Trade", instance.description)

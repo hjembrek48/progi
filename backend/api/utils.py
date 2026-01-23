@@ -1,9 +1,28 @@
 from pywebpush import webpush, WebPushException
 from django.conf import settings
+from django.core.mail import send_mail
 import json
 import logging
 
 logger = logging.getLogger(__name__)
+
+
+def send_email_notification(user, subject, message):
+    if not user.email:
+        logger.warning(f"User {user.username} has no email address. Skipping email notification.")
+        return
+
+    try:
+        send_mail(
+            subject=subject,
+            message=message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[user.email],
+            fail_silently=False,
+        )
+        logger.info(f"Email sent to {user.email}")
+    except Exception as e:
+        logger.error(f"Failed to send email to {user.email}: {e}")
 
 
 def send_push_notification(user, message, url=None):
