@@ -14,6 +14,7 @@ from .models import (
     BoardGame,
     PushSubscription,
 )
+from .utils import send_welcome_email
 
 class GenreSerializer(serializers.ModelSerializer):
     class Meta:
@@ -74,6 +75,7 @@ class UserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         print(validated_data)
         user = User.objects.create_user(**validated_data)
+        send_welcome_email(user)
         return user
 
 

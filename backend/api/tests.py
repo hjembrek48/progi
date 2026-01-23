@@ -170,8 +170,8 @@ class ReportingListing(TestCase):
         )
     
     def test_create_report_success(self):
-        self.client.force_login(user=self.user_a) #kada se koristi force_login u setttings mora biti postavljeno 
-        self.client.force_login(user=self.user_b) #SesssionAuthentication
+        self.client.force_authenticate(user=self.user_a)  #kada se koristi force_login u setttings mora biti postavljeno login
+        self.client.force_authenticate(user=self.user_b)
         data={"target_listing":self.l_usera_catan.id,
               "description":"Ovaj oglas je prevara"}
         
@@ -184,7 +184,7 @@ class ReportingListing(TestCase):
         self.assertEqual(report.sender, self.profile_b)
 
     def test_create_report_failure1(self):
-        self.client.force_login(user=self.user_a)
+        self.client.force_authenticate(user=self.user_a)
         data={"target_listing":self.l_usera_catan.id,
               "description":"Ovaj oglas je prevara"}
         response=self.client.post("/api/reports/",
@@ -193,7 +193,7 @@ class ReportingListing(TestCase):
         self.assertEqual(Report.objects.count(), 0)
 
     def test_create_report_failure2(self):
-        self.client.force_login(user=self.user_b)
+        self.client.force_authenticate(user=self.user_b)
         self.report_usera=Report.objects.create(
             sender=self.profile_b,
             target_listing=self.l_usera_catan,
@@ -237,7 +237,7 @@ class CreateListing(TestCase):
         )
 
     def test_create_listing_success(self):
-        self.client.force_login(user=self.user_a)
+        self.client.force_authenticate(user=self.user_a)
 
         data={
             "description":"Opis",
@@ -252,7 +252,7 @@ class CreateListing(TestCase):
         self.assertEqual(listing.profile, self.profile_a)
 
     def test_create_listing_failure(self):
-        self.client.force_login(user=self.user_a)
+        self.client.force_authenticate(user=self.user_a)
         self.listing_user_a=Listing.objects.create(
             description="Opis",
             profile=self.profile_a,
@@ -286,7 +286,7 @@ class WishlistEntryNew(TestCase):
         )
 
     def test_new_wishlist_entry_success(self):
-        self.client.force_login(user=self.user_a)
+        self.client.force_authenticate(user=self.user_a)
         data={
             "board_game_id":self.bgg_catan.id
         }
@@ -295,7 +295,7 @@ class WishlistEntryNew(TestCase):
         self.assertEqual(WishlistEntry.objects.count(),1)
 
     def test_new_wishlist_entry_failure(self):
-        self.client.force_login(user=self.user_a)
+        self.client.force_authenticate(user=self.user_a)
         self.w_usera=WishlistEntry.objects.create(
             board_game_id=self.bgg_catan.id,
             profile=self.profile_a
@@ -306,3 +306,134 @@ class WishlistEntryNew(TestCase):
         response=self.client.post("/api/wishlist/", data, format="json")
         self.assertEqual(response.status_code, 400)
         self.assertEqual(WishlistEntry.objects.count(),1)
+
+class ListingAccessTest(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+
+        self.user_a = User.objects.create_user(username="usera", password="password123")
+        self.profile_a = self.user_a.profile
+
+        self.bgg_catan = BoardGame.objects.create(
+            bgg_id=13,
+            name="Catan",
+            min_players=3,
+            max_players=4,
+            playing_time=60,
+            complexity=2.3
+        )
+        self.bgg_monopoly = BoardGame.objects.create(
+            bgg_id=140,
+            name="Monopoly",
+            min_players=2,
+            max_players=8,
+            playing_time=120,
+            complexity=1.6
+        )
+        
+        self.game_catan = Game.objects.create(
+            board_game=self.bgg_catan,
+            profile=self.profile_a,
+            description="Catan",
+            active=True
+        )
+        self.game_monopoly = Game.objects.create(
+            board_game=self.bgg_monopoly,
+            profile=self.profile_a,
+            description="Monopoly",
+            active=True
+        )
+        
+        self.listing_catan = Listing.objects.create(
+            profile=self.profile_a,
+            game=self.game_catan,
+            description="Catan Listing"
+        )
+        self.listing_monopoly = Listing.objects.create(
+            profile=self.profile_a,
+            game=self.game_monopoly,
+            description="Monopoly Listing"
+        )
+
+    def test_public_listing_access(self):
+        response = self.client.get("/api/listings/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 2)
+
+    def test_listing_filtering(self):
+        response = self.client.get("/api/listings/?search=Catan")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]["game"]["board_game"]["name"], "Catan")
+
+        response = self.client.get("/api/listings/?min_complexity=2.0")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]["game"]["board_game"]["name"], "Catan")
+
+
+class ProfileUpdateTest(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+
+        self.user_a = User.objects.create_user(username="usera", password="password123")
+        self.profile_a = self.user_a.profile
+
+    def test_profile_update(self):
+        self.client.force_authenticate(user=self.user_a)
+        data = {
+            "description": "Updated",
+            "address": "Zagreb",
+            "latitude": 45.815,
+            "longitude": 15.982
+        }
+        response = self.client.patch("/api/profile/location/", data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+        self.profile_a.refresh_from_db()
+        self.assertEqual(self.profile_a.description, "Updated")
+        self.assertEqual(self.profile_a.address, "Zagreb")
+
+
+class ListingLifecycleTest(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+
+        self.user_a = User.objects.create_user(username="usera", password="password123")
+        self.user_b = User.objects.create_user(username="userb", password="password123")
+
+        self.profile_a = self.user_a.profile
+        self.profile_b = self.user_b.profile
+        
+        self.bgg_catan = BoardGame.objects.create(
+            bgg_id=13,
+            name="Catan",
+            min_players=3,
+            max_players=4,
+            playing_time=60,
+            complexity=2.3
+        )
+        self.game_a = Game.objects.create(
+            board_game=self.bgg_catan,
+            profile=self.profile_a,
+            active=True
+        )
+        self.listing_a = Listing.objects.create(
+            profile=self.profile_a,
+            game=self.game_a,
+            description="Listing A"
+        )
+
+    def test_delete_own_listing(self):
+        self.client.force_authenticate(user=self.user_a)
+        response = self.client.delete(f"/api/listings/{self.listing_a.id}/")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(Listing.objects.count(), 0)
+
+    def test_delete_other_listing_failure(self):
+        self.client.force_authenticate(user=self.user_b)
+        try:
+            self.client.delete(f"/api/listings/{self.listing_a.id}/")
+        except Exception:
+            pass
+        self.assertEqual(Listing.objects.count(), 1)

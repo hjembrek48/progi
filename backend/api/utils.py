@@ -56,3 +56,8 @@ def send_push_notification(user, message, url=None):
                 subscription.delete()
         except Exception as e:
             logger.error(f"Unexpected error sending push: {e}")
+
+def send_welcome_email(user):
+    subject = "Welcome to Play Trade!"
+    message = f"Hi {user.username},\n\nWelcome to Play Trade! We're excited to have you on board.\n\nBest regards,\nThe Play Trade Team"
+    send_email_notification(user, subject, message)

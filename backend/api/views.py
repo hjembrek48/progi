@@ -37,6 +37,7 @@ from .serializers import (
     PushSubscriptionSerializer,
     UsernameUpdateSerializer
 )
+from .utils import send_welcome_email
 from decimal import Decimal, ROUND_HALF_UP, InvalidOperation
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 
@@ -159,6 +160,7 @@ class LogInWithGoogle(APIView):
                 first_name=first_name[:150],
                 last_name=last_name[:150],
             )
+            send_welcome_email(user)
         
         from .models import Profile
         profile, _ = Profile.objects.get_or_create(user = user)
