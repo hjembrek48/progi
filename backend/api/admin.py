@@ -22,3 +22,25 @@ class HasInterestInline(admin.TabularInline):
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
     inlines = [HasInterestInline]
+    list_display = ("user", "email", "avatar_preview", "updated_at")
+    fields = (
+        "user",
+        "email",
+        "description",
+        "avatar",
+        "address",
+        "latitude",
+        "longitude",
+        "updated_at",
+    )
+
+    readonly_fields = ("updated_at",)
+
+    def avatar_preview(self, obj):
+        if obj.avatar:
+            return format_html(
+                '<img src="{}" style="width:40px; height:40px; object-fit:cover; border-radius:50%;" />',
+                obj.avatar.url
+            )
+        return "-"
+    avatar_preview.short_description = "Avatar"

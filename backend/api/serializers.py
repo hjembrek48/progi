@@ -1,3 +1,4 @@
+# api/serializers.py
 from django.contrib.auth.models import User
 from rest_framework import serializers
 from .models import (
@@ -41,19 +42,25 @@ class ProfileSerializer(serializers.ModelSerializer):
         many=True,
         required=False,
     )
+    avatar = serializers.ImageField(required=False, allow_null=True)
+    username = serializers.CharField(source="user.username", read_only=True)
+    is_staff = serializers.BooleanField(source="user.is_staff", read_only=True)
 
     class Meta:
         model = Profile
         fields = [
             "id",
+            "username",
             "description",
             "address",
             "latitude",
             "longitude",
             "updated_at",
+            "avatar",
             "interests",
             "interest_ids",
-            "email"
+            "email",
+            "is_staff"
         ]
         read_only_fields = ["updated_at"]
 
@@ -166,8 +173,25 @@ class WishlistSerializer(serializers.ModelSerializer):
         read_only_fields = ["created_at", "display_name"]
 
     def get_display_name(self, obj):
+        if isinstance(obj, dict):
+            board_game = obj.get('board_game')
+            return board_game.name if board_game else ""
+        
         return obj.board_game.name
-
+    
+    def validate_board_game_id(self, value):
+        request = self.context.get("request")
+        
+        if request and request.user.is_authenticated:
+            exists = WishlistEntry.objects.filter(
+                profile=request.user.profile, 
+                board_game=value).exists()
+            
+            if exists:
+                raise serializers.ValidationError("Ova igra je već na Vašoj listi želja.")
+                
+        return value
+    
 
 class SwapOfferSerializer(serializers.ModelSerializer):
     proposer = ProfileSerializer(read_only=True)
@@ -270,6 +294,24 @@ class ReportSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ["sender", "sender_username", "created_at"]
 
+    def validate(self, data):
+        request=self.context.get("request")
+        target_listing=data.get("target_listing")
+        user_profile=request.user.profile
+
+        if request and request.user.is_authenticated:
+            if target_listing.profile==request.user.profile:
+                raise serializers.ValidationError({
+                    "target_listing":"Ne možete prijaviti vlastiti oglas"
+                })
+            exists=Report.objects.filter(
+                sender=user_profile,
+                target_listing=target_listing
+            ).exists()
+
+            if exists:
+                raise serializers.ValidationError({"target_listing":"Već ste prijavili ovaj oglas"})
+        return data
 class NotificationSerializer(serializers.ModelSerializer):
     swap_offer = SwapOfferSerializer(read_only=True)
 
@@ -282,6 +324,7 @@ class NotificationSerializer(serializers.ModelSerializer):
             "description",
             "read",
             "time",
+            "avatar",
             "swap_offer",
         ]
         read_only_fields = ["recieved_profile", "profile", "time", "swap_offer"]

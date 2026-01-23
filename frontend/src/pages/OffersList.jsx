@@ -109,16 +109,6 @@ export function OffersList() {
                   <span className="badge bg-warning text-dark shadow-sm">PENDING</span>
                   <div className="mt-3 d-flex gap-2 justify-content-end">
                     <Link className="btn btn-sm btn-outline-primary px-3" to={'/offers/' + offer.id}>Details</Link>
-                    {isCurrentUserProposer && (
-                      <Button 
-                        variant="outline-danger" 
-                        size="sm"
-                        disabled={deletingId === offer.id}
-                        onClick={() => handleDelete(offer.id)}
-                      >
-                        {deletingId === offer.id ? "Deleting..." : "Delete"}
-                      </Button>
-                    )}
                   </div>
                 </div>
               </li>

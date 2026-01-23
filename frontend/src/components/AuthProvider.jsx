@@ -8,6 +8,7 @@ const authContext = createContext();
 export function AuthProvider({ children }) {
     const [loading, setLoading] = useState(true);
     const [registrationStep, setRegistrationStep] = useState(null);
+    const [isAdmin, setIsAdmin] = useState(false);
     // 0 -> server error
     // 1 -> neregistriran
     // 2 -> prošao samo Google OAuth
@@ -22,6 +23,7 @@ export function AuthProvider({ children }) {
                 const user = await checkUser();
                 if (user) { //ako user ima access token, onda provjeravamo lokaciju
                     const location = await apiAuth.get('/profile/location/');
+                    setIsAdmin(location.data.is_staff || false);
                     if(location.data.latitude && location.data.longitude) {
                         setRegistrationStep(3);
                     } else {
@@ -29,9 +31,11 @@ export function AuthProvider({ children }) {
                     }
                 } else {
                     setRegistrationStep(1);
+                    setIsAdmin(false);
                 }
             } catch(err) {
                 setRegistrationStep(0);
+                setIsAdmin(false);
             } finally {
                 setLoading(false);
             }
@@ -49,7 +53,7 @@ export function AuthProvider({ children }) {
 
     return(
         //Omata djecu i daje im pristup nad contextom
-        <authContext.Provider value={{registrationStep, setRegistrationStep, fetchUserStatus, loading}}>
+        <authContext.Provider value={{registrationStep, setRegistrationStep, fetchUserStatus, loading, isAdmin}}>
             { children }
         </authContext.Provider>
     );

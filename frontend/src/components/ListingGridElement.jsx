@@ -19,7 +19,7 @@ function ListingGridElement({ listing, onOpen }) {
       </div>
       <div>
         <h4 className="m-0">{listing.game.name}</h4>
-        <div>Owned by: {listing.profile.email.split("@")[0]}</div>
+        <div>Owned by: {(listing.profile && listing.profile.username) ? listing.profile.username : listing.profile?.email.split("@")[0] || "—"}</div>
       </div>
     </div>
   );

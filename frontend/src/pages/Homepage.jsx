@@ -18,12 +18,12 @@ import { FaBell } from "react-icons/fa";
 import { CgProfile } from "react-icons/cg";
 import { FaHeart } from "react-icons/fa";
 import { FaFlag } from "react-icons/fa";
-import { Link, Element } from "react-scroll";
+import { Element } from "react-scroll";
 
 export function Homepage() {
     const [listings, setListings] = useState([]);
     const [loadingListings, setLoadingListings] = useState(true);
-    const {registrationStep, loading} = useAuth();
+    const {registrationStep, loading, isAdmin} = useAuth();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -70,6 +70,7 @@ export function Homepage() {
                         <Button className='home_button' id="nav_button" onClick={() => navigate('mytrades')}>My Trades</Button>
                         <Button className='home_button' id="nav_button" onClick={() => navigate('offers')}>Offers</Button>
                         <Button className='home_button' id="nav_button" onClick={() => navigate('wishlist')}>Wishlist</Button>
+                        {isAdmin && <Button className='home_button' id="nav_button" onClick={() => window.open('https://progi-backend-lpki.onrender.com/admin/', '_blank')}>Admin Panel</Button>}
                     </ButtonGroup>
                 </div>}
             <Welcome />
@@ -82,10 +83,23 @@ export function Homepage() {
 
                 {!loadingListings && 
                     (<Container>
-                        <HomepageListingsPalette listings={listings} />
+                        <HomepageListingsPalette listings={listings} preferences={false} />
                     </Container>)
                 }
             </Container>
+            {(registrationStep > 2) && <Container className='basic_container'>
+                {loadingListings && (
+                <Container className="text-center mt-5">
+                    <Spinner animation="border" />
+                    <p>Loading games you may like...</p>
+                </Container>)}
+
+                {!loadingListings && 
+                    (<Container>
+                        <HomepageListingsPalette listings={listings} preferences={true} />
+                    </Container>)
+                }
+            </Container>}
             <Element name="app_usage">
                 <Container className='homepage-accordion'>
                     <Accordion defaultActiveKey={null} alwaysOpen>

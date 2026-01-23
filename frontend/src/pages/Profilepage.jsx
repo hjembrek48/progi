@@ -1,7 +1,7 @@
 import { ProfilePageHeader } from "../components/ProfilePageHeader";
 import { Footer } from "../components/Footer";
 import { FaPlus, FaUserCircle } from "react-icons/fa";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 
 import apiAuth from "../services/apiAuth.js";
@@ -21,6 +21,9 @@ export function Profilepage() {
   const [descriptionError, setDescriptionError] = useState("");
   const [descriptionSuccess, setDescriptionSuccess] = useState("");
 
+  const fileInputRef = useRef(null);
+  const [isSavingAvatar, setIsSavingAvatar] = useState(false);
+  const [avatarError, setAvatarError] = useState("");
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -29,9 +32,9 @@ export function Profilepage() {
         setProfile(res.data);
         setDescription(res.data.description || "");
 
-        if(res.data.username){
-          setUsername(res.data.username)
-        } else{
+        if (res.data.username) {
+          setUsername(res.data.username);
+        } else {
           const u = await apiAuth.get("username/");
           setUsername(u.data.username || "");
         }
@@ -82,41 +85,87 @@ export function Profilepage() {
   };
 
   const saveDescription = async () => {
-  setDescriptionError("");
-  setDescriptionSuccess("");
+    setDescriptionError("");
+    setDescriptionSuccess("");
 
-  const trimmed = description.trim();
+    const trimmed = description.trim();
 
-  if (trimmed === (profile?.description || "")) {
-    setDescriptionSuccess("No changes.");
-    return;
-  }
+    if (trimmed === (profile?.description || "")) {
+      setDescriptionSuccess("No changes.");
+      return;
+    }
 
-  try {
-    setIsSavingDescription(true);
+    try {
+      setIsSavingDescription(true);
 
-    const res = await apiAuth.patch("profile/", {
-      description: trimmed,
-    });
+      const res = await apiAuth.patch("profile/", {
+        description: trimmed,
+      });
 
-    const newDescription = res.data.description || "";
+      const newDescription = res.data.description || "";
 
-    setDescription(newDescription);
-    setProfile((p) => ({ ...p, description: newDescription }));
-    setDescriptionSuccess("Description saved!");
-  } catch (err) {
-    const data = err?.response?.data;
-    const msg =
-      data?.description?.[0] ||
-      data?.detail ||
-      "Greška pri spremanju opisa.";
+      setDescription(newDescription);
+      setProfile((p) => ({ ...p, description: newDescription }));
+      setDescriptionSuccess("Description saved!");
+    } catch (err) {
+      const data = err?.response?.data;
+      const msg =
+        data?.description?.[0] ||
+        data?.detail ||
+        "Greška pri spremanju opisa.";
 
-    setDescriptionError(msg);
-  } finally {
-    setIsSavingDescription(false);
-  }
-};
+      setDescriptionError(msg);
+    } finally {
+      setIsSavingDescription(false);
+    }
+  };
 
+  const openAvatarPicker = () => {
+    setAvatarError("");
+    fileInputRef.current?.click();
+  };
+
+  const handleAvatarChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setAvatarError("");
+
+    if (file.type !== "image/jpeg" && file.type !== "image/png") {
+      setAvatarError("Only .jpg, .jpeg and .png files allowed!");
+      e.target.value = null;
+      return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      setAvatarError("File too big! Allowed size is up to 2MB.");
+      e.target.value = null;
+      return;
+    }
+
+    try {
+      setIsSavingAvatar(true);
+
+      const fd = new FormData();
+      fd.append("avatar", file);
+
+      const res = await apiAuth.patch("profile/", fd, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      setProfile((p) => ({ ...p, avatar: res.data.avatar }));
+    } catch (err) {
+      const data = err?.response?.data;
+      const msg =
+        data?.avatar?.[0] ||
+        data?.detail ||
+        "Greška pri spremanju slike profila.";
+      setAvatarError(msg);
+    } finally {
+      setIsSavingAvatar(false);
+      e.target.value = null;
+    }
+  };
 
   if (!profile) {
     return <div style={{ color: "white" }}>Loading...</div>;
@@ -134,8 +183,30 @@ export function Profilepage() {
         >
           <div style={styles.cardHeader}>
             <div style={styles.imageContainer}>
-              <FaUserCircle style={styles.defaultIcon} />
-              <button style={styles.addButton}>
+              {profile.avatar ? (
+                <img src={profile.avatar} alt="profile" style={styles.slika} />
+              ) : (
+                <FaUserCircle style={styles.defaultIcon} />
+              )}
+
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleAvatarChange}
+                style={{ display: "none" }}
+              />
+
+              <button
+                style={{
+                  ...styles.addButton,
+                  opacity: isSavingAvatar ? 0.7 : 1,
+                  cursor: isSavingAvatar ? "not-allowed" : "pointer",
+                }}
+                onClick={openAvatarPicker}
+                disabled={isSavingAvatar}
+                type="button"
+              >
                 <FaPlus size={14} />
               </button>
             </div>
@@ -191,6 +262,12 @@ export function Profilepage() {
                     {usernameSuccess}
                   </span>
                 ) : null}
+
+                {avatarError ? (
+                  <span style={{ color: "#ffb4b4", fontWeight: 600 }}>
+                    {avatarError}
+                  </span>
+                ) : null}
               </div>
 
               <p style={styles.smallInfo}>
@@ -216,7 +293,6 @@ export function Profilepage() {
             placeholder="Add description..."
             style={styles.opis_input}
           />
-
         </div>
 
         <div style={styles.profileButtons}>

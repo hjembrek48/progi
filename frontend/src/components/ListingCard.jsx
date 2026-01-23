@@ -1,7 +1,7 @@
 import { Card, Container } from "react-bootstrap";
 import "./../styles/homepage.css"
 
-export function ListingCard({ listing, onClick }) {
+export function ListingCard({ listing, preferences, onClick }) {
     const username = (listing.profile && listing.profile.username) ? listing.profile.username : listing.profile?.email.split("@")[0] || "—";
 
     return(
@@ -9,6 +9,11 @@ export function ListingCard({ listing, onClick }) {
         className="game_card_unlisted"
         onClick={onClick}
         >
+            {preferences && (
+                <span className="badge bg-success position-absolute top-0 end-0 m-2">
+                    Recommended
+                </span>
+            )}
             <Container className="listing_photo_container">
                 <Card.Img
                 variant="top"

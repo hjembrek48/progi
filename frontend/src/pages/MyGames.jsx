@@ -63,12 +63,12 @@ export function MyGames() {
                         <Button className='home_button' id="nav_button" onClick={() => navigate('/')}>Homepage</Button>
                         <Button className='home_button' id="nav_button" onClick={() => navigate('/mytrades')}>My Trades</Button>
                         <Button className='home_button' id="nav_button" onClick={() => navigate('/offers')}>Offers</Button>
-                        <Button className='home_button' id="nav_button">Wishlist</Button>
+                        <Button className='home_button' id="nav_button" onClick={() => navigate('/wishlist')}>Wishlist</Button>
                     </ButtonGroup>
                 </div>
                 {loading && <Loading size="lg" fullPage={false} className="py-5" />}
                 {!loading && (myGames.length > 0) && (
-                    <Container>
+                    <Container className='mt-4 p-4 bg-white rounded'>
                         <div className="container-header">
                                 <h1>My Games:</h1>
                         </div>

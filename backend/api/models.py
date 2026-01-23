@@ -18,6 +18,7 @@ class Profile(models.Model):
     interests = models.ManyToManyField(
         "Genre", through="HasInterest", related_name="interested_profiles", blank=True
     )
+    avatar = models.ImageField(upload_to="profile_images/", blank=True, null=True)
     updated_at = models.DateTimeField(auto_now=True)
     email=models.CharField(max_length=255, blank=True, default="")
 

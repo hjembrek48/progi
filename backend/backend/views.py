@@ -10,6 +10,7 @@ from rest_framework.response import Response
 from rest_framework.authentication import SessionAuthentication
 from rest_framework import generics, status
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 import requests
 import traceback
 from django.utils.decorators import method_decorator
@@ -106,7 +107,7 @@ class LogInWithGoogle(APIView):
 class ProfileRetrieveUpdate(generics.RetrieveUpdateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = ProfileSerializer
-
+    parser_classes = (MultiPartParser, FormParser, JSONParser)
     def get_object(self):
         profile, _ = Profile.objects.get_or_create(user=self.request.user)
         return profile
