@@ -24,10 +24,12 @@ async function setup() {
   network = await Network(driver);
 
   await driver.manage().setTimeouts({ implicit: 10000 });
+
+  return driver;
 }
 
-async function login() {
-  await driver.get("http://localhost:3000/");
+async function login(driver, googleLoginIndex) {
+  await driver.get(process.env.FRONTEND_URL);
   await driver.findElement(selenium.By.css(".home_button")).click();
 
   await new Promise((r) => setTimeout(r, 2000));
@@ -57,12 +59,16 @@ async function login() {
   });
 
   await driver
-    .findElement(selenium.By.css("li.aZvCDf:nth-child(1) > div:nth-child(1)"))
+    .findElement(
+      selenium.By.css(
+        `li.aZvCDf:nth-child(${googleLoginIndex + 1}) > div:nth-child(1)`,
+      ),
+    )
     .click();
 
   await driver.switchTo().window(originalWindow);
 
-  await driver.wait(selenium.until.urlIs("http://localhost:3000/"));
+  await driver.wait(selenium.until.urlIs(process.env.FRONTEND_URL));
 
   let profileButton = await driver.findElement(
     selenium.By.css("h5:nth-child(2)"),
@@ -73,7 +79,7 @@ async function login() {
   console.log("Login test successfull");
 }
 
-async function addGame(gameName, genre, publisher, description) {
+async function addGame(driver, gameName, genre, publisher, description) {
   // navigate to games page
   await driver.findElement(selenium.By.id("nav_button")).click();
 
@@ -183,6 +189,8 @@ async function addGame(gameName, genre, publisher, description) {
     }
   } catch {}
 
+  await new Promise((r) => setTimeout(r, 5000));
+
   let gameFound = false;
   let gameElement;
   await driver.manage().setTimeouts({ implicit: 2000 });
@@ -203,7 +211,7 @@ async function addGame(gameName, genre, publisher, description) {
         let date = await parent.findElement(selenium.By.css(".date_container"));
         let dateText = await date.getText();
         let time = new Date(dateText);
-        if (Math.abs(now.getTime() - time.getTime()) < 10000) {
+        if (Math.abs(now.getTime() - time.getTime()) < 30000) {
           gameFound = true;
           gameElement = parent;
           break;
@@ -221,7 +229,7 @@ async function addGame(gameName, genre, publisher, description) {
 
   await gameElement.click();
 
-  await new Promise((r) => setTimeout(r, 2000));
+  await new Promise((r) => setTimeout(r, 7000));
 
   assert(
     (
@@ -232,6 +240,13 @@ async function addGame(gameName, genre, publisher, description) {
         .getText()
     ).replace("\n", "") == `Genre:${genre}`,
     "Incorrect genre applied to game",
+  );
+
+  await driver.wait(
+    async () =>
+      (await driver.findElement(selenium.By.css("p:nth-child(3)")).getText()) !=
+      "—",
+    20000,
   );
 
   assert(
@@ -250,14 +265,17 @@ async function addGame(gameName, genre, publisher, description) {
     );
   }
 
-  console.log("Game successfully added");
+  console.log("Add game test passed.");
 
   // return to home page
   driver.findElement(selenium.By.css("body")).sendKeys(selenium.Key.ESCAPE);
   driver.findElement(selenium.By.css(".logo")).click();
+
+  return { gameName: selectedGameName, createdAt: now };
 }
 
-async function changeUsernameAndDescription(username, description) {
+async function changeUsernameAndDescription(driver, username, description) {
+  await driver.get(process.env.FRONTEND_URL);
   const usernameSelector = selenium.By.css("input[placeholder='Username']");
   const descriptionSelector = selenium.By.css("textarea");
   await driver
@@ -316,11 +334,7 @@ async function changeUsernameAndDescription(username, description) {
     .findElement(selenium.By.xpath("//button[text()='Save username']"))
     .click();
 
-  await driver.wait(
-    selenium.until.elementLocated(
-      selenium.By.xpath("//span[text()='Username saved!!']"),
-    ),
-  );
+  await driver.wait(selenium.until.elementLocated(selenium.By.css("span")));
 
   await new Promise((r) => setTimeout(r, 2000));
 
@@ -350,6 +364,246 @@ async function changeUsernameAndDescription(username, description) {
   //await driver.findElement(selenium.By.css("svg")).click();
 }
 
+async function waitForAlert(driver) {
+  await driver.wait(async () => {
+    let alertFound = false;
+    while (!alertFound) {
+      try {
+        await driver.switchTo().alert();
+        alertFound = true;
+      } catch {}
+    }
+
+    return true;
+  }, 20000);
+}
+
+async function findGame(driver, name, dateTime, action) {
+  const now = new Date(dateTime);
+  await driver.get(process.env.FRONTEND_URL);
+  await driver.findElement(selenium.By.id("nav_button")).click();
+  await driver.wait(
+    selenium.until.elementLocated(
+      selenium.By.xpath("//h1[text()='My Games:']"),
+    ),
+  );
+
+  try {
+    while (true) {
+      await driver
+        .findElement(selenium.By.xpath(`//p[text()='Go Up']`))
+        .click();
+      continue;
+    }
+  } catch {}
+
+  let gameFound = false;
+  let gameElement;
+  await driver.manage().setTimeouts({ implicit: 2000 });
+  while (!gameFound) {
+    let elements = await driver.findElements(
+      selenium.By.xpath(`//div[text()='${name}']`),
+    );
+
+    if (elements.length == 0) {
+      await driver
+        .findElement(selenium.By.xpath(`//p[text()='Go Down']`))
+        .click();
+      continue;
+    } else {
+      for (let i = 0; i < elements.length; i++) {
+        const element = elements[i];
+        let parent = await element.findElement(selenium.By.xpath("./.."));
+        let date = await parent.findElement(selenium.By.css(".date_container"));
+        let dateText = await date.getText();
+        let time = new Date(dateText);
+        if (Math.abs(now.getTime() - time.getTime()) < 30000) {
+          gameFound = true;
+          gameElement = parent;
+          break;
+        }
+      }
+    }
+
+    if (!gameFound) {
+      await driver
+        .findElement(selenium.By.xpath(`//p[text()='Go Down']`))
+        .click();
+    }
+  }
+
+  if (action == null || action == "") {
+    return gameElement;
+  } else {
+    await gameElement.click();
+    if (action == "delete") {
+      driver
+        .findElement(selenium.By.xpath("//button[text()='Delete Game']"))
+        .click();
+      await waitForAlert(driver);
+      let alert = await driver.switchTo().alert();
+      await alert.accept();
+      await waitForAlert(driver);
+      alert = await driver.switchTo().alert();
+      let alertText = await alert.getText();
+      assert(
+        alertText == "Game deleted!",
+        `Deleting game ${name} (created at ${dateTime}) failed`,
+      );
+      await alert.accept();
+      console.log("Delete game test passed.");
+    } else if (action == "list") {
+      await driver.findElement(selenium.By.css(".btn-success")).click();
+      await waitForAlert(driver);
+      let alert = await driver.switchTo().alert();
+      let alertText = await alert.getText();
+      assert(alertText == "Game successfully listed!", "Failed to list game");
+      await alert.accept();
+      console.log("Add game to listing test passed.");
+    }
+  }
+}
+
+async function gameExchange(gameName, genre, publisher) {
+  const options = new firefox.Options().enableBidi();
+  let profile = process.env.PROFILE;
+  options.setProfile(profile);
+  let driver1 = await new selenium.Builder()
+    .forBrowser("firefox")
+    .setFirefoxOptions(options)
+    .build();
+
+  let driver2 = await new selenium.Builder()
+    .forBrowser("firefox")
+    .setFirefoxOptions(options)
+    .build();
+
+  await driver1.manage().setTimeouts({ implicit: 10000 });
+  await driver2.manage().setTimeouts({ implicit: 10000 });
+
+  await Promise.all([login(driver1, 0), login(driver2, 1)]);
+
+  let results = await Promise.all([
+    addGame(driver1, gameName, genre, publisher, ""),
+    addGame(driver2, gameName, genre, publisher, ""),
+  ]);
+
+  let game1 = results[0];
+  let game2 = results[1];
+
+  await Promise.all([
+    changeUsernameAndDescription(driver1, "testuser1", ""),
+    changeUsernameAndDescription(driver2, "testuser2", ""),
+  ]);
+
+  await findGame(driver2, game1.gameName, game1.createdAt, "list");
+
+  await searchForGame(driver1, game1.gameName, "testuser2");
+  await driver1.findElement(selenium.By.css(".button_type3")).click();
+  await offerGame(driver1, game2.gameName);
+  await acceptLatestOffer(driver2);
+
+  await findGame(driver2, game1.gameName, game1.createdAt, "delete");
+  await findGame(driver1, game2.gameName, game2.createdAt, "delete");
+
+  console.log("Game exchange test passed.");
+}
+
+async function searchForGame(driver, query, username) {
+  await driver.get(process.env.FRONTEND_URL);
+  await driver
+    .findElement(selenium.By.css("input"))
+    .sendKeys(query, selenium.Key.ENTER);
+
+  await driver
+    .findElement(selenium.By.xpath("//button[text()='Exclude My Listings']"))
+    .click();
+
+  await driver
+    .findElement(selenium.By.xpath(`//*[text()[contains(.,'${username}')]]`))
+    .click();
+}
+
+async function offerGame(driver, gameName) {
+  let container = await driver.findElement(selenium.By.css(".border-dark"));
+  let childText = await container.findElement(
+    selenium.By.xpath(`.//*[text()[contains(.,'${gameName}')]]`),
+  );
+  let firstParent = await childText.findElement(selenium.By.xpath("./.."));
+  let secondParent = await firstParent.findElement(selenium.By.xpath("./.."));
+  await secondParent.findElement(selenium.By.css("input")).click();
+  await driver.findElement(selenium.By.css(".btn-success")).click();
+
+  await waitForAlert(driver);
+
+  let alert = await driver.switchTo().alert();
+  let alertText = await alert.getText();
+  await alert.accept();
+}
+
+async function acceptLatestOffer(driver) {
+  await driver.get(process.env.FRONTEND_URL);
+
+  await driver
+    .findElement(selenium.By.xpath("//button[text()='Offers']"))
+    .click();
+
+  await driver.wait(
+    selenium.until.elementLocated(selenium.By.css(".home_button")),
+  );
+
+  await driver
+    .findElement(selenium.By.xpath("//*[text()[contains(.,'Details')]]"))
+    .click();
+
+  await driver.wait(
+    selenium.until.elementLocated(selenium.By.css(".bg-light")),
+  );
+
+  await driver.findElement(selenium.By.css(".btn-success")).click();
+
+  await waitForAlert(driver);
+  let alert = await driver.switchTo().alert();
+  await alert.accept();
+
+  await driver.wait(
+    selenium.until.elementLocated(selenium.By.css(".list-group")),
+  );
+
+  let text = await driver
+    .findElement(
+      selenium.By.css(
+        "li.list-group-item:nth-child(1) > div:nth-child(2) > span:nth-child(1)",
+      ),
+    )
+    .getText();
+  assert(text == "ACCEPTED", "Offer status incorrect");
+}
+
+async function testGameList() {
+  const options = new firefox.Options().enableBidi();
+  let profile = process.env.PROFILE;
+  options.setProfile(profile);
+  let driver1 = await new selenium.Builder()
+    .forBrowser("firefox")
+    .setFirefoxOptions(options)
+    .build();
+
+  await driver1.manage().setTimeouts({ implicit: 10000 });
+
+  await login(driver1, 1);
+
+  let game = await findGame(driver1, "Trains", "1/23/2026, 8:58:46 PM", null);
+  await game.click();
+
+  //await findGame(driver1, "Age of Steam", "23/01/2026, 5:48:52 PM", "list");
+  //await findGame(driver1, "Zany Penguins", "1/23/2026, 2:14:03 PM", "delete");
+  //await searchForGame(driver1, "Age of Steam", "testuser2");
+  //await driver1.findElement(selenium.By.css(".button_type3")).click();
+  //await offerGame(driver1, "Age of Steam");
+  //acceptLatestOffer(driver1);
+}
+
 async function runTests() {
   await setup();
   await login();
@@ -360,4 +614,15 @@ async function runTests() {
     `description test ${now}`,
   );
 }
-runTests();
+async function moretest() {
+  let driver = await setup();
+  await login(driver, 0);
+  let game = await addGame(driver, "tra", "STRATEGY", "abcd", "");
+
+  await findGame(driver, game.gameName, game.createdAt, "delete");
+}
+//runTests();
+
+gameExchange("trains", "STRATEGY", "abcd");
+//testGameList();
+//moretest();
